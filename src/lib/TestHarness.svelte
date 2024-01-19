@@ -2,10 +2,14 @@
 	import 'ress';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { stringToBool } from './helpers.ts';
+	import { stringToBool } from './helpers.js';
 
 	import GymCheckbox from './GymCheckbox.svelte';
 	import GymSlider from './GymSlider.svelte';
+
+	export let maxWidth = 500;
+	export let maxHeight = 500;
+	export let maxFontSize = 50;
 
 	let params = $page.url.searchParams;
 
@@ -52,9 +56,9 @@
 				</ul>
 
 				<br />
-				<GymSlider min={0} max={500} bind:props name="width" />
-				<GymSlider min={0} max={500} bind:props name="height" />
-				<GymSlider min={8} max={50} bind:props name="fontsize" />
+				<GymSlider min={0} max={maxWidth} bind:props name="width" />
+				<GymSlider min={0} max={maxHeight} bind:props name="height" />
+				<GymSlider min={5} max={maxFontSize} bind:props name="fontsize" />
 
 				<br />
 				<hr />
@@ -126,7 +130,6 @@
 	}
 
 	section {
-		font-family: monospace;
 		height: 100vh;
 		width: 100vw;
 	}
@@ -149,6 +152,8 @@
 		flex-direction: column;
 		background: #ccc;
 		height: 100vh;
+		font-family: monospace;
+		color: #000;
 	}
 
 	.test-controls span {
