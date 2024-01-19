@@ -16,6 +16,12 @@ Svelte Gym aims to improve developer experience on two specific challenges of co
 
 # Usage
 
+```bash
+npm install -D svelte-dev
+pnpm install -D svelte-dev
+bun install -D svelte-dev
+```
+
 Create a gym route for each component containing the following:
 
 
@@ -41,3 +47,8 @@ Create a gym route for each component containing the following:
 ```
 
 
+# Support
+
+If you like this project please consider supporting it:
+
+<a href="https://www.buymeacoffee.com/sveltegym" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>

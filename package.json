@@ -1,6 +1,6 @@
 {
 	"name": "svelte-gym",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"license": "MIT",
 	"scripts": {
 		"dev": "vite dev",
@@ -18,6 +18,10 @@
 			"types": "./dist/index.d.ts",
 			"svelte": "./dist/index.js"
 		}
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/paulsputer/svelte-gym.git"
 	},
 	"files": [
 		"dist",
