@@ -3,6 +3,8 @@
 
 A gym to fully exercise your Svelte components.
 
+![image](https://github.com/paulsputer/svelte-gym/assets/4686906/b06068e8-bdbd-4efa-9155-6ef15f5023c5)
+
 
 ## Why Svelte Gym?
 
