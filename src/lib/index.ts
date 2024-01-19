@@ -1,6 +1,6 @@
 // Reexport your entry components here
 import TestHarness from './TestHarness.svelte';
-import { stringToBool } from './helpers.ts';
+import { stringToBool } from './helpers.js';
 // Common components to interact
 import GymCheckbox from './GymCheckbox.svelte';
 import GymLog from './GymLog.svelte';

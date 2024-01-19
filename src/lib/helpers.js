@@ -1,4 +1,8 @@
-export function stringToBool(p: String | null): Boolean | null {
+/**
+ * @param {string | null} p
+ * @returns {(boolean|null)}
+ */
+export function stringToBool(p) {
     if (p == null) {
         return null;
     }
