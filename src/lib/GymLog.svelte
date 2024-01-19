@@ -1,6 +1,5 @@
 <script>
 	// @ts-nocheck
-
 	export let log;
 </script>
 
@@ -17,6 +16,7 @@
 <style>
 	.holder {
 		padding-top: 1em;
+		color: #000;
 	}
 
 	.heading {

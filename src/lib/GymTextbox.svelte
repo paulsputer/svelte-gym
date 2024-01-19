@@ -1,6 +1,5 @@
 <script>
 	// @ts-nocheck
-
 	import { page } from '$app/stores';
 	export let props;
 	export let name;
@@ -23,6 +22,10 @@
 <style>
 	.holder {
 		padding-left: 1em;
+	}
+
+	.holder label {
+		color: #000;
 	}
 
 	label div {
