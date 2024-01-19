@@ -2,6 +2,7 @@
 config-initial: ## First time configuration of system
 	brew install pnpm
 	nvm install --lts 
+	nvm use 20
 
 .PHONY: config
 config: ## Configure after package updates etc 
@@ -22,6 +23,10 @@ package: ## Create the package
 .PHONY: run
 run: ## Run the live mode
 	pnpm run dev -- --open
+
+.PHONY: publish
+publish: ## Publish package
+	pnpm publish
 
 
 

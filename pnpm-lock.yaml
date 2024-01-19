@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+dependencies:
+  ress:
+    specifier: ^5.0.2
+    version: 5.0.2
+
 devDependencies:
   '@sveltejs/adapter-auto':
     specifier: ^3.0.0
@@ -44,9 +49,6 @@ devDependencies:
   publint:
     specifier: ^0.1.9
     version: 0.1.16
-  ress:
-    specifier: ^5.0.2
-    version: 5.0.2
   svelte:
     specifier: ^4.2.7
     version: 4.2.9
@@ -1791,7 +1793,7 @@ packages:
 
   /ress@5.0.2:
     resolution: {integrity: sha512-oHBtOWo/Uc8SzQMbQNIKTcgi8wKmAs7IlNlRywmXudbOtF+c27FlOIq7tnwLDVcTywe6JXYo1pDXHO6kABwNYA==}
-    dev: true
+    dev: false
 
   /reusify@1.0.4:
     resolution: {integrity: sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==}
