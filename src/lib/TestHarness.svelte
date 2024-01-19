@@ -56,9 +56,9 @@
 				</ul>
 
 				<br />
-				<GymSlider min={0} max={maxWidth} bind:props name="width" />
-				<GymSlider min={0} max={maxHeight} bind:props name="height" />
-				<GymSlider min={5} max={maxFontSize} bind:props name="fontsize" />
+				<GymSlider units="px" min={0} max={maxWidth} bind:props name="width" />
+				<GymSlider units="px" min={0} max={maxHeight} bind:props name="height" />
+				<GymSlider units="px" min={5} max={maxFontSize} bind:props name="fontsize" />
 
 				<br />
 				<hr />

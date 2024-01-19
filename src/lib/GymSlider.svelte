@@ -5,6 +5,7 @@
 	export let name;
 	export let min;
 	export let max;
+	export let units;
 </script>
 
 <div class="holder">
@@ -14,7 +15,7 @@
 			{min}
 			{max}
 			on:input={(e) => {
-				props[name] = e.target.value + 'px';
+				props[name] = e.target.value + units;
 				$page.url.searchParams.set(name, props[name]);
 			}}
 		/>
