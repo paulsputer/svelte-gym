@@ -71,8 +71,17 @@
 </section>
 
 <style>
+	section hr {
+		border-color: #999;
+	}
 	.test-grid.grid {
 		visibility: visible;
+	}
+
+	.test-controls a,
+	.test-controls a:visited {
+		color: #000;
+		text-decoration: underline;
 	}
 
 	.test-grid {

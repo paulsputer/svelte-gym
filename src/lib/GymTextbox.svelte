@@ -21,7 +21,7 @@
 
 <style>
 	.holder {
-		padding-left: 1em;
+		padding: 0 1em;
 	}
 
 	.holder label {
