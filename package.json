@@ -1,6 +1,6 @@
 {
 	"name": "svelte-gym",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"license": "MIT",
 	"scripts": {
 		"dev": "vite dev",
@@ -29,8 +29,8 @@
 		"!dist/**/*.spec.*"
 	],
 	"peerDependencies": {
-		"@sveltejs/kit": "^2.3.3",
-		"svelte": "^4.0.0"
+		"@sveltejs/kit": ">=1.0.0",
+		"svelte": ">=3.0.0"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
@@ -57,6 +57,6 @@
 	"types": "./dist/index.d.ts",
 	"type": "module",
 	"dependencies": {
-		"ress": "^5.0.2"
+		"ress": ">=1.0.0"
 	}
 }

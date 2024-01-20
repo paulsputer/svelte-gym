@@ -6,7 +6,7 @@ settings:
 
 dependencies:
   ress:
-    specifier: ^5.0.2
+    specifier: '>=1.0.0'
     version: 5.0.2
 
 devDependencies:
