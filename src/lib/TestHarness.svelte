@@ -14,12 +14,12 @@
 	let params = $page.url.searchParams;
 
 	let props = {
-		controls: stringToBool(params.get('controls')) ?? true,
-		grid: stringToBool(params.get('grid')) ?? true,
-		highlight: stringToBool(params.get('highlight')) ?? true,
-		width: params.get('width') || 'auto',
-		height: params.get('height') || 'auto',
-		fontsize: params.get('fontsize') || '1em'
+		__controls: stringToBool(params.get('__controls')) ?? true,
+		__grid: stringToBool(params.get('__grid')) ?? true,
+		__highlight: stringToBool(params.get('__highlight')) ?? true,
+		__width: params.get('__width') || 'auto',
+		__height: params.get('__height') || 'auto',
+		__fontsize: params.get('__fontsize') || '1em'
 	};
 
 	function gotoPermalink() {
@@ -28,37 +28,44 @@
 </script>
 
 <section>
-	<div class="test-grid" class:grid={props.grid}></div>
+	<div class="test-grid" class:grid={props.__grid}></div>
 
-	<div class="test-area" class:controls={props.controls}>
+	<div class="test-area" class:controls={props.__controls}>
 		<div class="test-holder">
 			<div
 				class="test-component"
-				class:highlight={props.highlight}
+				class:highlight={props.__highlight}
 				style="
-				--w:{props.width};
-				--h:{props.height};
-				--fs:{props.fontsize}"
+				--w:{props.__width};
+				--h:{props.__height};
+				--fs:{props.__fontsize}"
 			>
 				<slot name="componentToTest" />
 			</div>
 		</div>
-		{#if props.controls}
+		{#if props.__controls}
 			<div class="test-controls">
 				<span><a href="#" on:click={gotoPermalink}>Generate Permalink</a></span>
 
 				<hr />
 				<br />
 				<ul>
-					<li><GymCheckbox bind:props name="controls" /></li>
-					<li><GymCheckbox bind:props name="grid" /></li>
-					<li><GymCheckbox bind:props name="highlight" /></li>
+					<li><GymCheckbox bind:props name="__controls" label="controls" /></li>
+					<li><GymCheckbox bind:props name="__grid" label="grid" /></li>
+					<li><GymCheckbox bind:props name="__highlight" label="highlight" /></li>
 				</ul>
 
 				<br />
-				<GymSlider units="px" min={0} max={maxWidth} bind:props name="width" />
-				<GymSlider units="px" min={0} max={maxHeight} bind:props name="height" />
-				<GymSlider units="px" min={5} max={maxFontSize} bind:props name="fontsize" />
+				<GymSlider units="px" min={0} max={maxWidth} bind:props name="__width" label="width" />
+				<GymSlider units="px" min={0} max={maxHeight} bind:props name="__height" label="height" />
+				<GymSlider
+					units="px"
+					min={5}
+					max={maxFontSize}
+					bind:props
+					name="__fontsize"
+					label="fontsize"
+				/>
 
 				<br />
 				<hr />

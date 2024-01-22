@@ -6,6 +6,7 @@
 	export let min;
 	export let max;
 	export let units;
+	export let label = name;
 </script>
 
 <div class="holder">
@@ -19,7 +20,7 @@
 				$page.url.searchParams.set(name, props[name]);
 			}}
 		/>
-		<span>{name}</span>
+		<span>{label ?? name}</span>
 	</label>
 </div>
 

@@ -3,11 +3,12 @@
 	import { page } from '$app/stores';
 	export let props;
 	export let name;
+	export let label = name;
 </script>
 
 <div class="holder">
 	<label>
-		<div>{name}</div>
+		<div>{label ?? name}</div>
 		<input
 			type="text"
 			value={props[name]}

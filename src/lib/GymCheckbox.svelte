@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	export let props;
 	export let name;
+	export let label = name;
 </script>
 
 <div class="holder">
@@ -15,7 +16,7 @@
 				$page.url.searchParams.set(name, props[name]);
 			}}
 		/>
-		<span>{name}</span>
+		<span>{label ?? name}</span>
 	</label>
 </div>
 
