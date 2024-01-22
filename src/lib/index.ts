@@ -6,6 +6,7 @@ import GymCheckbox from './GymCheckbox.svelte';
 import GymLog from './GymLog.svelte';
 import GymSlider from './GymSlider.svelte';
 import GymTextbox from './GymTextbox.svelte';
+import GymDropdown from './GymDropdown.svelte';
 
 
 
@@ -17,6 +18,7 @@ export {
     GymCheckbox,
     GymLog,
     GymSlider,
-    GymTextbox
+    GymTextbox,
+    GymDropdown
 
 }
