@@ -151,6 +151,7 @@
 	}
 
 	.test-component {
+		position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: center;

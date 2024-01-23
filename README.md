@@ -8,10 +8,27 @@ A gym to fully exercise your Svelte components.
 
 ## Why Svelte Gym?
 
-Svelte Gym aims to improve developer experience on two specific challenges of component development and maintenance:
+Developing and testing components should be easy!
 
-1. Testing the responsiveness of a component with respect to it's parent element
-2. Sharing specific scenarios that may be problematic or that need to be tested
+### Development
+
+Svelte Gym provides a sandbox environment to exercise your components and ensure they are responding correctly.
+
++ How does the component respond when the parent element gets larger/smaller both vertically / horizontally?
++ Is font size on the parent element respected?
++ Does text overflow in the expected way?
+
+### Testing
+
+Svelte Gym makes it easy to replicate component state by creating permalinks for a component's state.
+
+For example:
+
++ http://localhost:5174/?__width=262px&__height=221px&spinner=false&label=Test+Text#
++ http://localhost:5174/?__width=262px&__height=221px&spinner=true&label=Test+Text#
+
+This not only makes sharing problematic scenarios with your team straight forward but it also unlocks the possibility for 
+visual regression testing using a tool such as [BackstopJS](https://github.com/garris/BackstopJS)
 
 
 # Usage
