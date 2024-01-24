@@ -1,11 +1,13 @@
-<script lang="ts">
+<script>
 	import 'ress';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { stringToBool } from './helpers.js';
+	import { onMount } from 'svelte';
 
 	import GymCheckbox from './GymCheckbox.svelte';
 	import GymSlider from './GymSlider.svelte';
+	import GymButton from './GymButton.svelte';
 
 	export let maxWidth = 500;
 	export let maxHeight = 500;
@@ -19,8 +21,23 @@
 		__highlight: stringToBool(params.get('__highlight')) ?? true,
 		__width: params.get('__width') || 'auto',
 		__height: params.get('__height') || 'auto',
-		__fontsize: params.get('__fontsize') || '1em'
+		__fontsize: params.get('__fontsize') || '1em',
+		__resetAnimations: () => {}
 	};
+
+	onMount(() => {
+		let hasAnimations = document.getAnimations().length > 0;
+		// @ts-ignore
+		props.__resetAnimations = hasAnimations ? resetAnimations : undefined;
+	});
+
+	function resetAnimations() {
+		console.info('Svelte-Gym: Animations Reset');
+		document.getAnimations().forEach((a) => {
+			a.cancel();
+			a.play();
+		});
+	}
 
 	function gotoPermalink() {
 		goto($page.url.toString());
@@ -54,6 +71,7 @@
 					<li><GymCheckbox bind:props name="__grid" label="grid" /></li>
 					<li><GymCheckbox bind:props name="__highlight" label="highlight" /></li>
 				</ul>
+				<GymButton bind:props name="__resetAnimations" label="Reset Animations" />
 
 				<br />
 				<GymSlider units="px" min={0} max={maxWidth} bind:props name="__width" label="width" />

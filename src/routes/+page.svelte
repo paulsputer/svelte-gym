@@ -10,7 +10,6 @@
 		active: stringToBool(params.get('active')) ?? true,
 		spinner: stringToBool(params.get('spinner')) ?? false,
 		onclick: () => {
-			console.log('>>');
 			const entry = `click event @ ${new Date().toUTCString()}`;
 			log = [entry, ...log];
 		}
