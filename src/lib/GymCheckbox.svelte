@@ -21,11 +21,13 @@
 </div>
 
 <style>
-	.holder label {
-		color: #000;
+	.holder {
+		margin: 0 0.5em 0 0;
+		user-select: none;
+		cursor: pointer;
 	}
 
-	label span {
-		text-transform: capitalize;
+	.holder label {
+		color: #000;
 	}
 </style>

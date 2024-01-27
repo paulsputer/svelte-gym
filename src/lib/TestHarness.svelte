@@ -74,9 +74,26 @@
 				<GymButton bind:props name="__resetAnimations" label="Reset Animations" />
 
 				<br />
-				<GymSlider units="px" min={0} max={maxWidth} bind:props name="__width" label="width" />
-				<GymSlider units="px" min={0} max={maxHeight} bind:props name="__height" label="height" />
 				<GymSlider
+					hideExtra={true}
+					units="px"
+					min={0}
+					max={maxWidth}
+					bind:props
+					name="__width"
+					label="width"
+				/>
+				<GymSlider
+					hideExtra={true}
+					units="px"
+					min={0}
+					max={maxHeight}
+					bind:props
+					name="__height"
+					label="height"
+				/>
+				<GymSlider
+					hideExtra={true}
 					units="px"
 					min={5}
 					max={maxFontSize}

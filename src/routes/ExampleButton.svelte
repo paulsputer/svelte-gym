@@ -16,7 +16,7 @@
 			<slot name="icon" />
 		{/if}
 		<div class="label-holder">
-			{label}
+			{label ?? '~'}
 		</div>
 	</div>
 </div>
