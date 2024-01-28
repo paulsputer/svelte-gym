@@ -1,22 +1,18 @@
 
 # svelte-gym
 
-A gym to fully exercise your Svelte components.
+Rapidly create and exercise your Svelte components.
 
 ![image](https://github.com/paulsputer/svelte-gym/assets/4686906/b06068e8-bdbd-4efa-9155-6ef15f5023c5)
 
 
 ## Why Svelte Gym?
 
-Developing and testing components should be easy!
-
-### Development
-
-Svelte Gym provides a sandbox environment to exercise your components and ensure they are responding correctly.
-
+Developing and testing components should be easy!  Svelte Gym provides a playground environment to exercise your components and ensure they are responding correctly.
 + How does the component respond when the parent element gets larger/smaller both vertically / horizontally?
 + Is font size on the parent element respected?
 + Does text overflow in the expected way?
++ Is bad data handled gracefully or leak to the UI i.e null, NaN, Inf, undefined
 
 ### Testing
 
@@ -62,6 +58,10 @@ Create a gym route for each component containing the following:
 	</svelte:fragment>
 </TestHarness>
 ```
+
+## JSON Path Support
+
+To allow testing of components with more complex structures a basic form of JSON Path is supported.  i.e. `root.subA.subB`, this also works with arrays `root.myArray.0`
 
 
 # Support

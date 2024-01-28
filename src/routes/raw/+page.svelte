@@ -2,6 +2,7 @@
 	import { TestHarness, stringToBool, GymSlider, GymLog, GymTextbox } from '../../lib';
 	import { page } from '$app/stores';
 	import { restoreProps } from '../../lib/helpers.js';
+	import GymCheckbox from '$lib/GymCheckbox.svelte';
 
 	let params = $page.url.searchParams;
 
@@ -15,10 +16,21 @@
 			}
 		},
 		num: '',
+		numArray: [32, 64, 128],
 		num_nest: {
+			numArray: [32, 64, 128],
 			num: '',
 			nest: {
 				num: ''
+			}
+		},
+		flag: true,
+		flagArray: [false, false, false],
+		flag_nest: {
+			flag: false,
+			flagArray: [false, false, false],
+			nest: {
+				flag: false
 			}
 		}
 	};
@@ -46,6 +58,28 @@
 					<li>num nested twice: {props.num_nest.nest.num}</li>
 				</ul>
 			</div>
+			<div>
+				<h1>Num Array</h1>
+				<ul>
+					<li>num arary: {props.numArray}</li>
+					<li>num nested once array: {props.num_nest.numArray}</li>
+				</ul>
+			</div>
+			<div>
+				<h1>Flags</h1>
+				<ul>
+					<li>flag: {props.flag}</li>
+					<li>flag nested once: {props.flag_nest.flag}</li>
+					<li>flag nested twice: {props.flag_nest.nest.flag}</li>
+				</ul>
+			</div>
+			<div>
+				<h1>Flag Array</h1>
+				<ul>
+					<li>flag: {props.flagArray}</li>
+					<li>flag nested once: {props.flag_nest.flagArray}</li>
+				</ul>
+			</div>
 		</section>
 	</svelte:fragment>
 
@@ -59,6 +93,19 @@
 			<GymSlider bind:props name="num" label="L0 num" />
 			<GymSlider bind:props name="num_nest.num" label="L1 num" />
 			<GymSlider bind:props name="num_nest.nest.num" label="L2 num" />
+			<GymSlider bind:props name="numArray.0" label="Array 0" />
+			<GymSlider bind:props name="numArray.1" label="Array 1" />
+			<GymSlider bind:props name="num_nest.numArray.0" label="Nested Array 0" />
+			<GymSlider bind:props name="num_nest.numArray.1" label="Nested Array 1" />
+		</div>
+		<div>
+			<GymCheckbox bind:props name="flag" label="L0 Flag" />
+			<GymCheckbox bind:props name="flag_nest.flag" label="L1 Flag" />
+			<GymCheckbox bind:props name="flag_nest.nest.flag" label="L2 Flag" />
+			<GymCheckbox bind:props name="flagArray.0" label="Array 0" />
+			<GymCheckbox bind:props name="flagArray.1" label="Array 1" />
+			<GymCheckbox bind:props name="flag_nest.flagArray.0" label="Nested Array 0" />
+			<GymCheckbox bind:props name="flag_nest.flagArray.1" label="Nested Array 1" />
 		</div>
 		<GymLog {log} />
 	</svelte:fragment>

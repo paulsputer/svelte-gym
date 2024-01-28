@@ -67,9 +67,9 @@
 				<hr />
 				<br />
 				<ul>
-					<li><GymCheckbox bind:props name="__controls" label="controls" /></li>
-					<li><GymCheckbox bind:props name="__grid" label="grid" /></li>
-					<li><GymCheckbox bind:props name="__highlight" label="highlight" /></li>
+					<li><GymCheckbox hideExtra={true} bind:props name="__controls" label="controls" /></li>
+					<li><GymCheckbox hideExtra={true} bind:props name="__grid" label="grid" /></li>
+					<li><GymCheckbox hideExtra={true} bind:props name="__highlight" label="highlight" /></li>
 				</ul>
 				<GymButton bind:props name="__resetAnimations" label="Reset Animations" />
 
