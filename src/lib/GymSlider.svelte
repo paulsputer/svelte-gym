@@ -41,7 +41,43 @@
 		{ label: 'undefined', value: undefined }
 	];
 
+	const unitOpts = [
+		'px',
+		'em',
+		'rem',
+		'%',
+		'ch',
+		'vw',
+		'vh',
+		'svh',
+		'lvh',
+		'dvh',
+		'svw',
+		'lvw',
+		'dvw'
+	];
+
 	let _initialVal = getProp(name, props);
+
+	if (Number.isNaN(+_initialVal)) {
+		// Could be due to units
+		const possibleUnits = unitOpts.filter((e) => {
+			return _initialVal.indexOf(e) > 0;
+		});
+
+		// Take the largest if multiple
+		const u = possibleUnits.reduce((a, e) => {
+			e.length > (a ?? '').length;
+			return e;
+		}, null);
+
+		if (u) {
+			// Override the units so the control makes sense
+			units = u;
+			_initialVal = _initialVal.slice(0, -u.length);
+		}
+	}
+
 	let res = extraOpts.filter((e) => {
 		if (e.value === _initialVal || '' + e.value === _initialVal) {
 			return true;
