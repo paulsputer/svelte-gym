@@ -32,6 +32,16 @@
 	];
 
 	let _initialVal = getProp(name, props);
+
+	// Coerce to bool
+	if (_initialVal === 'true' || _initialVal === 1) {
+		_initialVal = true;
+		setProp(true, name, props);
+	} else if (_initialVal === 'false' || _initialVal === 0) {
+		_initialVal = false;
+		setProp(false, name, props);
+	}
+
 	let res = extraOpts.filter((e) => {
 		if (e.value === _initialVal || '' + e.value === _initialVal) {
 			return true;

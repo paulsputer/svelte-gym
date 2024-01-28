@@ -34,6 +34,9 @@ export function setProp(v, name, props, postfix, excludePermaLink) {
 
     if (parts.length > 1) {
         base = parts.slice(0, -1).reduce((a, e) => {
+            if (!a) {
+                return null;
+            }
             return a[e];
         }, base);
     }
@@ -45,7 +48,9 @@ export function setProp(v, name, props, postfix, excludePermaLink) {
     }
 
     // @ts-ignore
-    base[parts.slice(-1)] = finalVal
+    if (base) {
+        base[parts.slice(-1)] = finalVal
+    }
 
     if (!excludePermaLink ?? false) {
         get(page).url.searchParams.set(name, '' + finalVal);
