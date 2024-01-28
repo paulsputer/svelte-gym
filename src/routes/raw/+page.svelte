@@ -1,10 +1,8 @@
 <script lang="ts">
-	import { TestHarness, stringToBool, GymSlider, GymLog, GymTextbox } from '../../lib';
+	import { TestHarness, GymSlider, GymLog, GymTextbox } from '../../lib';
 	import { page } from '$app/stores';
 	import { restoreProps } from '../../lib/helpers.js';
 	import GymCheckbox from '$lib/GymCheckbox.svelte';
-
-	let params = $page.url.searchParams;
 
 	let log: string[] = [];
 	let props = {

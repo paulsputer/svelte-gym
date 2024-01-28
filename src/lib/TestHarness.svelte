@@ -2,7 +2,7 @@
 	import 'ress';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { stringToBool } from './helpers.js';
+	import { restoreProps } from './helpers.js';
 	import { onMount } from 'svelte';
 
 	import GymCheckbox from './GymCheckbox.svelte';
@@ -16,12 +16,12 @@
 	let params = $page.url.searchParams;
 
 	let props = {
-		__controls: stringToBool(params.get('__controls')) ?? true,
-		__grid: stringToBool(params.get('__grid')) ?? true,
-		__highlight: stringToBool(params.get('__highlight')) ?? true,
-		__width: params.get('__width') || 'auto',
-		__height: params.get('__height') || 'auto',
-		__fontsize: params.get('__fontsize') || '1em',
+		__controls: true,
+		__grid: true,
+		__highlight: true,
+		__width: 'auto',
+		__height: 'auto',
+		__fontsize: '1em',
 		__resetAnimations: () => {}
 	};
 
@@ -42,6 +42,8 @@
 	function gotoPermalink() {
 		goto($page.url.toString());
 	}
+
+	restoreProps(props);
 </script>
 
 <section>

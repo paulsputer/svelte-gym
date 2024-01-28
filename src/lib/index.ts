@@ -14,7 +14,13 @@ import GymRadioGroup from './GymRadioGroup.svelte';
 
 export {
     TestHarness,
+
+    /**
+     * @deprecated use restoreProps instead as a simpler alternative
+     * There's no need to manually parse URL parameters
+     */
     stringToBool,
+
     restoreProps,
 
     GymCheckbox,
