@@ -23,9 +23,11 @@ For example:
 + http://localhost:5174/?__width=262px&__height=221px&spinner=false&label=Test+Text#
 + http://localhost:5174/?__width=262px&__height=221px&spinner=true&label=Test+Text#
 
-This not only makes sharing problematic scenarios with your team straight forward but it also unlocks the possibility for 
-visual regression testing using a tool such as [BackstopJS](https://github.com/garris/BackstopJS)
+Problematic scenarios can now be easily replicated and shared with team members.  It also makes visual regression testing using a tool such as [BackstopJS](https://github.com/garris/BackstopJS) a breeze.
 
+#### URL Param and Props Structure
+
+For more complex components it may be necessary to create generators, rather than control the specific content you most likely want to control the number of elements.  In those cases best prefix properties with a single underscore to help make intentions clear.  Be aware that Svelte-Gym reserves a double underscore prefix.
 
 # Usage
 
@@ -40,11 +42,14 @@ Create a gym route for each component containing the following:
 
 ```svelte
 <script>
-    import { TestHarness, stringToBool, GymCheckbox, GymLog, GymTextbox } from "svelte-gym";
+    import { TestHarness, restoreProps, GymCheckbox, GymLog, GymTextbox } from "svelte-gym";
 
     let props = {
         //Define your component properties and callbacks
     }
+
+	// properties are automatically restored from the URL Params
+	restoreProps(props);
 
 </script>
 
@@ -55,6 +60,7 @@ Create a gym route for each component containing the following:
 
 	<svelte:fragment slot="controls">
 		<!-- Add GymControls to exercise custom properties of your component -->
+		<!-- Use the hideExtra param to hide options such as null, undefined etc. -->
 	</svelte:fragment>
 </TestHarness>
 ```
@@ -64,8 +70,22 @@ Create a gym route for each component containing the following:
 To allow testing of components with more complex structures a basic form of JSON Path is supported.  i.e. `root.subA.subB`, this also works with arrays `root.myArray.0`
 
 
-# Support
+# Support The Project!
 
-If you like this project please consider supporting it:
+If Svelte-Gym saves you time please consider supporting it:
 
 <a href="https://www.buymeacoffee.com/sveltegym" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
+# Enterprise Support
+
+We offer support to startups and enterprise, [subscribe here](https://www.buymeacoffee.com/sveltegym/membership)
+
+
+# Training / Workshops
+
+[Tap Here](https://www.buymeacoffee.com/sveltegym/commissions) to book training for your team either online or in-person.
+
+
+## License
+
+[MIT](https://github.com/sveltejs/kit/blob/main/LICENSE)
