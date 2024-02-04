@@ -59,7 +59,7 @@
 			<div>
 				<h1>Num Array</h1>
 				<ul>
-					<li>num arary: {props.numArray}</li>
+					<li>num array: {props.numArray}</li>
 					<li>num nested once array: {props.num_nest.numArray}</li>
 				</ul>
 			</div>

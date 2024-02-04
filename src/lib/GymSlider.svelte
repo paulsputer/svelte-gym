@@ -38,7 +38,7 @@
 		{ label: 'NaN', value: 'NaN' },
 		{ label: 'Inf', value: Infinity },
 		{ label: 'null', value: null },
-		{ label: 'undefined', value: undefined }
+		{ label: 'undefined', value: 'undefined' }
 	];
 
 	const unitOpts = [

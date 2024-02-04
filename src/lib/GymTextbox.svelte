@@ -26,10 +26,8 @@
 	}
 
 	const extraOpts = [
-		// NOTE: Important to define NaN as a string else comparison won't work
-		// and radio buttons will not activate accordingly
 		{ label: 'null', value: null },
-		{ label: 'undefined', value: undefined }
+		{ label: 'undefined', value: 'undefined' }
 	];
 
 	let _initialVal = getProp(name, props);
