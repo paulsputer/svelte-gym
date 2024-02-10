@@ -5,9 +5,10 @@
 	import { setProp, getProp } from './helpers.js';
 	export let props;
 	export let name;
-	export let min;
-	export let max;
-	export let units;
+	export let min = 0;
+	export let max = 100;
+	export let units = null;
+	export let fn = (v) => v;
 	export let label = name;
 
 	export let hideExtra = false;
@@ -57,7 +58,15 @@
 		'dvw'
 	];
 
-	let _initialVal = getProp(name, props);
+	function applyFunctor(v) {
+		if (typeof v === 'number') {
+			return fn(v);
+		}
+
+		return v;
+	}
+
+	let _initialVal = applyFunctor(getProp(name, props));
 
 	if (Number.isNaN(+_initialVal)) {
 		// Could be due to units
@@ -99,7 +108,7 @@
 			{max}
 			on:input={(e) => {
 				_props._override = optDefault;
-				setProp(+e.target.value, name, props, units);
+				setProp(applyFunctor(+e.target.value), name, props, units);
 			}}
 			bind:value={_initialVal}
 		/>
