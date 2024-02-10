@@ -137,8 +137,4 @@
 	label span {
 		text-transform: capitalize;
 	}
-
-	.ninu {
-		display: flex;
-	}
 </style>
