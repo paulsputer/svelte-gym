@@ -1,6 +1,4 @@
 <script lang="ts">
-	import Page from '../routes/+page.svelte';
-
 	// @ts-nocheck
 
 	import GymRadioGroup from './GymRadioGroup.svelte';
