@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import Page from '../routes/+page.svelte';
 
 	// @ts-nocheck
@@ -7,8 +7,8 @@
 	import { setProp, getProp } from './helpers.js';
 	export let props;
 	export let name;
-	export let min = null;
-	export let max = null;
+	export let min: number | null = null;
+	export let max: number | null = null;
 	export let units = null;
 	export let fn = null;
 	export let label = name;
