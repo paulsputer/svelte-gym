@@ -208,6 +208,7 @@
 		height: 100vh;
 		font-family: monospace;
 		color: #000;
+		overflow: scroll;
 	}
 
 	.test-controls span {
