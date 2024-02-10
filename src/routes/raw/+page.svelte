@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import { restoreProps } from '../../lib/helpers.js';
 	import GymCheckbox from '$lib/GymCheckbox.svelte';
+	import GymDropdown from '$lib/GymDropdown.svelte';
 
 	let log: string[] = [];
 	let props = {
@@ -30,6 +31,13 @@
 			nest: {
 				flag: false
 			}
+		},
+		dropdown: '',
+		dropdown_nest: {
+			dropdown: '',
+			nest: {
+				dropdown: ''
+			}
 		}
 	};
 
@@ -54,6 +62,14 @@
 					<li>num: {props.num}</li>
 					<li>num nested once: {props.num_nest.num}</li>
 					<li>num nested twice: {props.num_nest.nest.num}</li>
+				</ul>
+			</div>
+			<div>
+				<h1>Dropdown</h1>
+				<ul>
+					<li>options as string array: {props.dropdown.stringArray}</li>
+					<li>options as object: {props.dropdown.object}</li>
+					<li>objects as object array: {props.dropdown.objectArray}</li>
 				</ul>
 			</div>
 			<div>
@@ -86,6 +102,11 @@
 			<GymTextbox bind:props name="label" label="L0 label" />
 			<GymTextbox bind:props name="label_nest.label" label="L1 label" />
 			<GymTextbox bind:props name="label_nest.nest.label" label="L2 label" />
+		</div>
+		<div>
+			<GymDropdown bind:props name="dropdown.stringarray" label="L0 label" />
+			<GymDropdown bind:props name="dropdown.object" label="L1 label" />
+			<GymDropdown bind:props name="dropdown.objectarray" label="L2 label" />
 		</div>
 		<div>
 			<GymSlider bind:props name="num" label="L0 num" />
