@@ -1,13 +1,16 @@
 <script>
+	import Page from '../routes/+page.svelte';
+
 	// @ts-nocheck
 
 	import GymRadioGroup from './GymRadioGroup.svelte';
 	import { setProp, getProp } from './helpers.js';
 	export let props;
 	export let name;
-	export let min;
-	export let max;
-	export let units;
+	export let min = null;
+	export let max = null;
+	export let units = null;
+	export let fn = null;
 	export let label = name;
 
 	export let hideExtra = false;
@@ -30,6 +33,36 @@
 		}
 
 		props = props;
+	}
+
+	$: {
+		if (min === null && max === null) {
+			switch (units) {
+				case 'px':
+					{
+						min = 0;
+						max = window.innerWidth;
+					}
+					break;
+			}
+		}
+
+		// override functor based on units
+		// but only if no functor defined
+		if (fn === null) {
+			switch (units) {
+				case 'em':
+					{
+						fn = (v) => v / 10;
+					}
+					break;
+				case 'rem':
+					{
+						fn = (v) => v / 10;
+					}
+					break;
+			}
+		}
 	}
 
 	const extraOpts = [
@@ -57,7 +90,15 @@
 		'dvw'
 	];
 
-	let _initialVal = getProp(name, props);
+	function applyFunctor(v) {
+		if (typeof v === 'number' && fn) {
+			return fn(v);
+		}
+
+		return v;
+	}
+
+	let _initialVal = applyFunctor(getProp(name, props));
 
 	if (Number.isNaN(+_initialVal)) {
 		// Could be due to units
@@ -95,11 +136,11 @@
 	<label>
 		<input
 			type="range"
-			{min}
-			{max}
+			min={min ?? 0}
+			max={max ?? 100}
 			on:input={(e) => {
 				_props._override = optDefault;
-				setProp(+e.target.value, name, props, units);
+				setProp(applyFunctor(+e.target.value), name, props, units);
 			}}
 			bind:value={_initialVal}
 		/>
@@ -127,9 +168,5 @@
 
 	label span {
 		text-transform: capitalize;
-	}
-
-	.ninu {
-		display: flex;
 	}
 </style>
