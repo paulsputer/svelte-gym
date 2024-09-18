@@ -1,6 +1,6 @@
 {
 	"name": "svelte-gym",
-	"version": "0.2.1",
+	"version": "0.3.0",
 	"license": "MIT",
 	"description": "Rapidly create and exercise your Svelte components.",
 	"scripts": {
@@ -20,6 +20,9 @@
 			"svelte": "./dist/index.js"
 		}
 	},
+	"sideEffects": [
+		"**/*.css"
+	],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/paulsputer/svelte-gym.git"

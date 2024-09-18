@@ -1,3 +1,27 @@
+# Release v0.3.0
+
+This version deprecates all previous grid settings in favour of a more structured naming convention.  
+Previous names will continue to work but emit a console warning about the deprecated name usage.
+
+ + 0-grid-light-mode
+ + 10-grid-light-mode
+ + 20-grid-light-mode
+ + 50-grid-light-mode
+ + 100-grid-light-mode
+ + 0-grid-dark-mode
+ + 10-grid-dark-mode
+ + 20-grid-dark-mode
+ + 50-grid-dark-mode
+ + 100-grid-dark-mode
+ + 10-text-light-mode
+ + 20-text-light-mode
+ + 50-text-light-mode
+ + 100-text-light-mode
+ + 10-text-dark-mode
+ + 20-text-dark-mode
+ + 50-text-dark-mode
+ + 100-text-dark-mode
+
 # Release v0.2.1
 
 HOTFIX: remove stay import breaking build once imported
@@ -10,13 +34,13 @@ HOTFIX: remove stay import breaking build once imported
 
 Now supports the following different grid backgrounds:
 
-    + none
-    + light
-    + dark
-    + black
-    + white
-    + textBlack
-    + textWhite
++ none
++ light
++ dark
++ black
++ white
++ textBlack
++ textWhite
 
 These help test various scenarios especially when testing opacity and blurs on components.
 
