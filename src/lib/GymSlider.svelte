@@ -3,23 +3,25 @@
 
 	import GymRadioGroup from './GymRadioGroup.svelte';
 	import { setProp, getProp } from './helpers.js';
-	export let props;
-	export let name;
-	export let min: number | null = null;
-	export let max: number | null = null;
-	export let units: string | null = null;
-	export let fn: ((v: number) => number) | null = null;
-	export let label = name;
 
-	export let hideExtra = false;
+	let {
+		props = $bindable(),
+		name,
+		min = null,
+		max = null,
+		units = null,
+		fn = null,
+		label = name,
+		hideExtra = false
+	} = $props();
 
 	const optDefault = 'NONE';
 
-	let _props = {
+	let _props = $state({
 		_override: optDefault
-	};
+	});
 
-	$: {
+	$effect(() => {
 		let v = _props._override;
 
 		if (v !== optDefault) {
@@ -29,11 +31,9 @@
 			}
 			setProp(v, name, props, units);
 		}
+	});
 
-		props = props;
-	}
-
-	$: {
+	$effect(() => {
 		if (min === null && max === null) {
 			switch (units) {
 				case 'px':
@@ -61,7 +61,7 @@
 					break;
 			}
 		}
-	}
+	});
 
 	const extraOpts = [
 		// NOTE: Important to define NaN as a string else comparison won't work
@@ -96,7 +96,7 @@
 		return v;
 	}
 
-	let _initialVal = applyFunctor(getProp(name, props));
+	let _initialVal = $state(applyFunctor(getProp(name, props)));
 
 	if (Number.isNaN(+_initialVal)) {
 		// Could be due to units

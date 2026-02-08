@@ -5,7 +5,7 @@
 	let params = $page.url.searchParams;
 
 	let log: string[] = [];
-	let props = {
+	let props = $state({
 		label: 'default text',
 		active: true,
 		spinner: false,
@@ -13,17 +13,17 @@
 			const entry = `click event @ ${new Date().toUTCString()}`;
 			log = [entry, ...log];
 		}
-	};
+	});
 
 	restoreProps(props);
 </script>
 
 <TestHarness>
-	<svelte:fragment slot="componentToTest">
+	{#snippet componentToTest()}
 		<ExampleButton {...props}></ExampleButton>
-	</svelte:fragment>
+	{/snippet}
 
-	<svelte:fragment slot="controls">
+	{#snippet controls()}
 		<ul>
 			<li><GymCheckbox bind:props name="active" /></li>
 			<li><GymCheckbox bind:props name="spinner" /></li>
@@ -32,7 +32,7 @@
 			<GymTextbox bind:props name="label" />
 		</div>
 		<GymLog {log} />
-	</svelte:fragment>
+	{/snippet}
 </TestHarness>
 
 <style>

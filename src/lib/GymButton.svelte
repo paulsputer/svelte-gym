@@ -1,11 +1,9 @@
 <script>
 	// @ts-nocheck
 	import { page } from '$app/stores';
-	export let props;
-	export let name;
-	export let label = name;
+	let { props, name, label = name } = $props();
 
-	$: disabled = typeof props[name] === 'undefined';
+	let disabled = $derived(typeof props[name] === 'undefined');
 
 	function trigger(e) {
 		switch (typeof props[name]) {

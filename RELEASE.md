@@ -1,4 +1,136 @@
-# Release v1.0.0
+# Release Notes
+
+## v1.0.1 - Svelte 5 Runes Migration (2026-02-08)
+
+### Major Refactor: Svelte 5 Runes
+
+This release migrates all `svelte-gym` components to use Svelte 5 Runes syntax, providing better reactivity, type safety, and compatibility with modern Svelte applications.
+
+### Bug Fixes
+
+- **Fixed infinite reactivity loop** that caused "Maximum update depth exceeded" errors in `TestHarness` and control components
+- **Eliminated deprecation warning** for grid option (changed default from `true` to `'20-grid-light-mode'`)
+- **Fixed reactivity issues** where control changes weren't propagating to components under test
+
+### Breaking Changes
+
+#### Component API Changes
+
+All components now use Svelte 5 Runes syntax:
+
+**Before (Svelte 4):**
+```svelte
+<script>
+  export let props;
+  export let name;
+  export let label = name;
+</script>
+```
+
+**After (Svelte 5 Runes):**
+```svelte
+<script>
+  let {
+    props = $bindable(),
+    name,
+    label = name
+  } = $props();
+</script>
+```
+
+#### TestHarness Slot Changes
+
+`TestHarness` now uses **snippets** instead of named slots:
+
+**Before:**
+```svelte
+<TestHarness>
+  <svelte:fragment slot="componentToTest">
+    <MyComponent {...props} />
+  </svelte:fragment>
+  
+  <svelte:fragment slot="controls">
+    <GymCheckbox bind:props name="active" />
+  </svelte:fragment>
+</TestHarness>
+```
+
+**After:**
+```svelte
+<TestHarness>
+  {#snippet componentToTest()}
+    <MyComponent {...props} />
+  {/snippet}
+  
+  {#snippet controls()}
+    <GymCheckbox bind:props name="active" />
+  {/snippet}
+</TestHarness>
+```
+
+#### Consumer Code Changes
+
+Props objects in consumer pages must use `$state()`:
+
+**Before:**
+```svelte
+<script>
+  let props = {
+    label: 'default text',
+    active: true
+  };
+</script>
+```
+
+**After:**
+```svelte
+<script>
+  let props = $state({
+    label: 'default text',
+    active: true
+  });
+</script>
+```
+
+### Components Refactored
+
+All components have been updated to Svelte 5 Runes:
+
+- `TestHarness` - Now uses snippets and `$state`
+- `GymCheckbox` - Uses `$props()`, `$bindable()`, `$state()`, `$effect()`
+- `GymDropdown` - Uses `$props()`, `$bindable()`, `$state()`, `$effect()`, `$derived()`
+- `GymSlider` - Uses `$props()`, `$bindable()`, `$state()`, `$effect()`
+- `GymTextbox` - Uses `$props()`, `$bindable()`, `$state()`, `$effect()`
+- `GymRadioGroup` - Uses `$props()`, `$bindable()`
+- `GymButton` - Uses `$props()`, `$derived()`
+- `GymLog` - Uses `$props()`
+
+### Migration Guide
+
+To upgrade your existing code:
+
+1. **Update your props objects** to use `$state()`:
+   ```svelte
+   let props = $state({ /* your props */ });
+   ```
+
+2. **Replace slot syntax** with snippets in `TestHarness`:
+   ```svelte
+   {#snippet componentToTest()}
+     <!-- your component -->
+   {/snippet}
+   ```
+
+3. **Ensure Svelte 5** is installed:
+   ```bash
+   npm install svelte@^5.0.0
+   ```
+
+## v1.0.0 - Initial Release
+
+Initial release of svelte-gym with Svelte 4 support.
+
+---
 
 ## Svelte 5 & SvelteKit 2 Upgrade
 

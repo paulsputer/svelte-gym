@@ -3,36 +3,29 @@
 	import { setProp, getProp } from './helpers.js';
 	import GymRadioGroup from './GymRadioGroup.svelte';
 
-	export let props;
-	export let name;
-	export let label = name;
-	export let hideExtra = false;
-
-	export let multiline = false;
+	let { props = $bindable(), name, label = name, hideExtra = false, multiline = false } = $props();
 
 	const optDefault = 'NONE';
 
-	let _props = {
+	let _props = $state({
 		_override: optDefault
-	};
+	});
 
-	$: {
+	$effect(() => {
 		let v = _props._override;
 
 		if (v !== optDefault) {
 			_initialVal = '';
 			setProp(v, name, props);
 		}
-
-		props = props;
-	}
+	});
 
 	const extraOpts = [
 		{ label: 'null', value: null },
 		{ label: 'undefined', value: 'undefined' }
 	];
 
-	let _initialVal = getProp(name, props);
+	let _initialVal = $state(getProp(name, props));
 	let res = extraOpts.filter((e) => {
 		if (e.value === _initialVal || '' + e.value === _initialVal) {
 			return true;

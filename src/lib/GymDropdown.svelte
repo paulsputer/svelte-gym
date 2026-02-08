@@ -1,57 +1,56 @@
 <script lang="ts">
 	import { setProp, getProp } from './helpers.js';
 	import GymRadioGroup from './GymRadioGroup.svelte';
-	export let props: object;
-	export let name: string;
-	export let options: object[] | string[] | object;
-	export let label: string = name;
-	export let hideExtra = false;
 
-	export let optLabel = 'label';
-	export let optValue = 'value';
+	let {
+		props = $bindable(),
+		name,
+		options,
+		label = name,
+		hideExtra = false,
+		optLabel = 'label',
+		optValue = 'value'
+	} = $props();
 
-	$: {
+	let _options = $derived.by(() => {
 		if (Array.isArray(options) && options.length > 0) {
 			if (typeof options[0] === 'string') {
-				_options = options.map((e) => {
+				return options.map((e) => {
 					return { label: e, value: e };
 				});
 			} else {
-				_options = options.map((e) => {
+				return options.map((e) => {
 					return { label: e[optLabel], value: e[optValue] };
 				});
 			}
 		} else if (typeof options === 'object') {
-			_options = Object.values(options).map((e) => {
+			return Object.values(options).map((e) => {
 				return { label: e, value: e };
 			});
 		}
-	}
+		return [];
+	});
 
 	const optDefault = 'NONE';
-	let _props: { _override: string | null } = {
+	let _props = $state({
 		_override: optDefault
-	};
+	});
 
-	$: {
+	$effect(() => {
 		let v = _props._override;
 
 		if (v !== optDefault) {
 			_initialVal = false;
 			setProp(v, name, props, undefined, undefined);
 		}
-
-		props = props;
-	}
+	});
 
 	const extraOpts = [
 		{ label: 'null', value: null },
 		{ label: 'undefined', value: 'undefined' }
 	];
 
-	let _options: { label: string; value: string }[] = [];
-
-	let _initialVal = getProp(name, props);
+	let _initialVal = $state(getProp(name, props));
 
 	let res = extraOpts.filter((e) => {
 		if (e.value === _initialVal || '' + e.value === _initialVal) {

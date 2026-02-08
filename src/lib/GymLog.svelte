@@ -1,6 +1,6 @@
 <script>
 	// @ts-nocheck
-	export let log;
+	let { log } = $props();
 </script>
 
 <div class="holder">

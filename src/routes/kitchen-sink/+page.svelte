@@ -13,7 +13,7 @@
 	/** @type {string[]} */
 	let log = [];
 
-	let props = {
+	let props = $state({
 		label: 'Kitchen Sink',
 		description: 'A long description\nthat spans multiple lines.',
 		isActive: true,
@@ -30,13 +30,13 @@
 		clickMe: () => {
 			log = [`Clicked at ${new Date().toLocaleTimeString()}`, ...log];
 		}
-	};
+	});
 
 	restoreProps(props);
 </script>
 
 <TestHarness>
-	<svelte:fragment slot="componentToTest">
+	{#snippet componentToTest()}
 		<div class="demo-component" class:dark={props.settings.theme === 'dark'}>
 			<h1>{props.label}</h1>
 			<p style="white-space: pre-wrap;">{props.description}</p>
@@ -51,9 +51,9 @@
 			<p>Radio: {props.radioSelection}</p>
 			<button on:click={props.clickMe}>Log Interaction</button>
 		</div>
-	</svelte:fragment>
+	{/snippet}
 
-	<svelte:fragment slot="controls">
+	{#snippet controls()}
 		<h3>Basic Types</h3>
 		<ul>
 			<li><GymTextbox bind:props name="label" label="Label Text" /></li>
@@ -98,7 +98,7 @@
 
 		<h3>Logs</h3>
 		<GymLog {log} />
-	</svelte:fragment>
+	{/snippet}
 </TestHarness>
 
 <style>

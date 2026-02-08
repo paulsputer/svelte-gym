@@ -4,7 +4,7 @@
 	import GymSlider from '$lib/GymSlider.svelte';
 
 	let log: string[] = [];
-	let props = {
+	let props = $state({
 		basic: 0,
 		minMaxOverride: 0,
 		withFn: 0,
@@ -12,7 +12,7 @@
 		em: 0,
 		rem: 0,
 		pc: 0
-	};
+	});
 
 	const functor = (v: number) => v / 100;
 
@@ -20,7 +20,7 @@
 </script>
 
 <TestHarness>
-	<svelte:fragment slot="componentToTest">
+	{#snippet componentToTest()}
 		<section>
 			<div>
 				<h1>slider</h1>
@@ -38,9 +38,9 @@
 				</ul>
 			</div>
 		</section>
-	</svelte:fragment>
+	{/snippet}
 
-	<svelte:fragment slot="controls">
+	{#snippet controls()}
 		<div>
 			<GymSlider bind:props name="basic" label="basic slider" />
 			<GymSlider bind:props name="minMaxOverride" label="min max override" min={-100} max={100} />
@@ -51,7 +51,7 @@
 			<GymSlider bind:props units="%" name="pc" label="auto scale pc" />
 		</div>
 		<GymLog {log} />
-	</svelte:fragment>
+	{/snippet}
 </TestHarness>
 
 <style>

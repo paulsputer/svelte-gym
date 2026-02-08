@@ -1,13 +1,13 @@
 <script>
 	// @ts-nocheck
 	import { page } from '$app/stores';
-	export let props;
-	export let name;
-	export let label = name;
-	export let excludeFromPermalink = false;
-
-	// Collection of options containing `label` and `value`
-	export let options = [];
+	let {
+		props = $bindable(),
+		name,
+		label = name,
+		excludeFromPermalink = false,
+		options = []
+	} = $props();
 
 	const groupUuid = self.crypto.randomUUID();
 </script>

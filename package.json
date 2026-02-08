@@ -1,6 +1,6 @@
 {
 	"name": "svelte-gym",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"license": "MIT",
 	"description": "Rapidly create and exercise your Svelte components.",
 	"scripts": {

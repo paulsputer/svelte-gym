@@ -3,12 +3,12 @@
 	import { restoreProps } from '../../lib/helpers.js';
 
 	let log: string[] = [];
-	let props = {
+	let props = $state({
 		stringArray: null,
 		object: null,
 		objectArray: null,
 		objectArray2: null
-	};
+	});
 
 	const optStringArray = ['OPT A', 'OPT B', 'OPT C', 'OPT D'];
 	const optObject = { optA: 'OPT A', optB: 'OPT B', optC: 'OPT C', optD: 'OPT D' };
@@ -23,7 +23,7 @@
 </script>
 
 <TestHarness>
-	<svelte:fragment slot="componentToTest">
+	{#snippet componentToTest()}
 		<section>
 			<div>
 				<h1>Dropdown</h1>
@@ -35,9 +35,9 @@
 				</ul>
 			</div>
 		</section>
-	</svelte:fragment>
+	{/snippet}
 
-	<svelte:fragment slot="controls">
+	{#snippet controls()}
 		<div>
 			<GymDropdown bind:props name="stringArray" label="string array" options={optStringArray} />
 			<GymDropdown bind:props name="object" label="object" options={optObject} />
@@ -57,7 +57,7 @@
 			/>
 		</div>
 		<GymLog {log} />
-	</svelte:fragment>
+	{/snippet}
 </TestHarness>
 
 <style>

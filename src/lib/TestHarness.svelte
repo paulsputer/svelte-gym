@@ -10,19 +10,31 @@
 	import GymButton from './GymButton.svelte';
 	import GymDropdown from './GymDropdown.svelte';
 
-	export let maxWidth: number | null = null;
-	export let maxHeight: number | null = null;
-	export let maxFontSize: number | null = null;
+	let {
+		maxWidth = null,
+		maxHeight = null,
+		maxFontSize = null,
+		componentToTest,
+		controls,
+		children
+	}: {
+		maxWidth?: number | null;
+		maxHeight?: number | null;
+		maxFontSize?: number | null;
+		componentToTest?: any;
+		controls?: any;
+		children?: any;
+	} = $props();
 
-	let props = {
+	let props = $state({
 		__controls: true,
-		__grid: true,
+		__grid: '20-grid-light-mode',
 		__highlight: true,
 		__width: 'auto',
 		__height: 'auto',
 		__fontsize: '1em',
 		__resetAnimations: () => {}
-	};
+	});
 
 	const gridOptions = [
 		{ value: '0-grid-light-mode', class: 'grid bg-0 light-mode' },
@@ -131,7 +143,11 @@
 				--h:{props.__height};
 				--fs:{props.__fontsize}"
 			>
-				<slot name="componentToTest" />
+				{#if componentToTest}
+					{@render componentToTest()}
+				{:else if children}
+					{@render children()}
+				{/if}
 			</div>
 		</div>
 		<div class="test-controls">
@@ -183,7 +199,9 @@
 			<br />
 			<hr />
 			<span>
-				<slot name="controls" />
+				{#if controls}
+					{@render controls()}
+				{/if}
 			</span>
 		</div>
 	</div>
