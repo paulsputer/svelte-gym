@@ -57,7 +57,7 @@
 					_props._override = optDefault;
 					setProp(e.target.value, name, props);
 				}}
-			/>
+			></textarea>
 		{:else}
 			<input
 				type="text"

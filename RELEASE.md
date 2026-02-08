@@ -1,3 +1,12 @@
+# Release v1.0.0
+
+## Svelte 5 & SvelteKit 2 Upgrade
+
+**Major Upgrade**:
+- Upgraded to Svelte 5 and SvelteKit 2.
+- Updated `vite-plugin-svelte` to v4 (compatible with Svelte 5 / Vite 5).
+- Resolved migration issues (e.g., self-closing tags).
+
 # Release v0.4.0
 Improvements to documentation, along with a kitchen sink example page.
 
