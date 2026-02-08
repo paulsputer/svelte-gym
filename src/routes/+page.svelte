@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { TestHarness, restoreProps, GymCheckbox, GymLog, GymTextbox } from '../lib';
+	import { TestHarness, restoreProps, GymCheckbox, GymLog, GymTextbox } from '../lib/index.js';
 	import ExampleButton from './ExampleButton.svelte';
 	import { page } from '$app/stores';
 	let params = $page.url.searchParams;

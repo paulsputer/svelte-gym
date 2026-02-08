@@ -8,6 +8,8 @@
 	export let label = name;
 	export let hideExtra = false;
 
+	export let multiline = false;
+
 	const optDefault = 'NONE';
 
 	let _props = {
@@ -48,14 +50,24 @@
 <div class="holder">
 	<label>
 		<div>{label ?? name}</div>
-		<input
-			type="text"
-			bind:value={_initialVal}
-			on:input={(e) => {
-				_props._override = optDefault;
-				setProp(e.target.value, name, props);
-			}}
-		/>
+		{#if multiline}
+			<textarea
+				bind:value={_initialVal}
+				on:input={(e) => {
+					_props._override = optDefault;
+					setProp(e.target.value, name, props);
+				}}
+			/>
+		{:else}
+			<input
+				type="text"
+				bind:value={_initialVal}
+				on:input={(e) => {
+					_props._override = optDefault;
+					setProp(e.target.value, name, props);
+				}}
+			/>
+		{/if}
 	</label>
 	{#if !hideExtra}
 		<GymRadioGroup
@@ -83,7 +95,15 @@
 		padding-top: 0.5em;
 	}
 
-	input {
+	input,
+	textarea {
 		background-color: #fff;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	textarea {
+		min-height: 100px;
+		resize: vertical;
 	}
 </style>

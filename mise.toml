@@ -1,0 +1,14 @@
+[tools]
+node = "24.9.0"
+pnpm = "10.22.0"
+
+[tasks]
+# Development
+dev = { run = "pnpm run dev", description = "Start development server" }
+
+# Production Preview
+preview = { run = "pnpm run preview", description = "View the production build locally" }
+view = { run = "pnpm run preview", description = "Alias for preview" }
+
+# Build
+build = { run = "pnpm run build", description = "Build the project for production" }

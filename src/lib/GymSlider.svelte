@@ -7,8 +7,8 @@
 	export let name;
 	export let min: number | null = null;
 	export let max: number | null = null;
-	export let units = null;
-	export let fn = null;
+	export let units: string | null = null;
+	export let fn: ((v: number) => number) | null = null;
 	export let label = name;
 
 	export let hideExtra = false;

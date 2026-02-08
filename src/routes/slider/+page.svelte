@@ -14,7 +14,7 @@
 		pc: 0
 	};
 
-	const functor = (v) => v / 100;
+	const functor = (v: number) => v / 100;
 
 	restoreProps(props);
 </script>

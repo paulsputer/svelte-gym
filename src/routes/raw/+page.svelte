@@ -1,9 +1,14 @@
 <script lang="ts">
-	import { TestHarness, GymSlider, GymLog, GymTextbox } from '../../lib';
+	import {
+		TestHarness,
+		GymSlider,
+		GymLog,
+		GymTextbox,
+		GymDropdown,
+		GymCheckbox
+	} from '../../lib/index.js';
 	import { page } from '$app/stores';
 	import { restoreProps } from '../../lib/helpers.js';
-	import GymCheckbox from '$lib/GymCheckbox.svelte';
-	import GymDropdown from '$lib/GymDropdown.svelte';
 
 	let log: string[] = [];
 	let props = {
@@ -32,7 +37,11 @@
 				flag: false
 			}
 		},
-		dropdown: '',
+		dropdown: {
+			stringArray: 'a',
+			object: 'a',
+			objectArray: 'a'
+		},
 		dropdown_nest: {
 			dropdown: '',
 			nest: {
@@ -104,9 +113,27 @@
 			<GymTextbox bind:props name="label_nest.nest.label" label="L2 label" />
 		</div>
 		<div>
-			<GymDropdown bind:props name="dropdown.stringarray" label="L0 label" />
-			<GymDropdown bind:props name="dropdown.object" label="L1 label" />
-			<GymDropdown bind:props name="dropdown.objectarray" label="L2 label" />
+			<GymDropdown
+				bind:props
+				name="dropdown.stringArray"
+				label="L0 label"
+				options={['a', 'b', 'c']}
+			/>
+			<GymDropdown
+				bind:props
+				name="dropdown.object"
+				label="L1 label"
+				options={{ a: 'A', b: 'B' }}
+			/>
+			<GymDropdown
+				bind:props
+				name="dropdown.objectArray"
+				label="L2 label"
+				options={[
+					{ label: 'A', value: 'a' },
+					{ label: 'B', value: 'b' }
+				]}
+			/>
 		</div>
 		<div>
 			<GymSlider bind:props name="num" label="L0 num" />

@@ -4,7 +4,7 @@
 	export let props;
 	export let name;
 	export let label = name;
-	export let excludeFromPermalink;
+	export let excludeFromPermalink = false;
 
 	// Collection of options containing `label` and `value`
 	export let options = [];

@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { TestHarness, GymLog } from '../../lib';
+	import { TestHarness, GymLog, GymDropdown } from '../../lib/index.js';
 	import { restoreProps } from '../../lib/helpers.js';
-	import GymDropdown from '$lib/GymDropdown.svelte';
 
 	let log: string[] = [];
 	let props = {

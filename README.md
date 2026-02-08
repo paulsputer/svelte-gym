@@ -1,91 +1,142 @@
+<p align="center">
+ <img width="200" src="./static/svelte-gym.png" />
+</p>
 
-# svelte-gym
+# Svelte Gym
 
-Rapidly create and exercise your Svelte components.
+<a href="https://www.buymeacoffee.com/sveltegym" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
-![image](https://github.com/paulsputer/svelte-gym/assets/4686906/b06068e8-bdbd-4efa-9155-6ef15f5023c5)
+
+**Rapidly create, exercise, and share Svelte component states via URL-encoded permalinks.**
 
 
 ## Why Svelte Gym?
 
-Developing and testing components should be easy!  Svelte Gym provides a playground environment to exercise your components and ensure they are responding correctly.
-+ How does the component respond when the parent element gets larger/smaller both vertically / horizontally?
-+ Is font size on the parent element respected?
-+ Does text overflow in the expected way?
-+ Is bad data handled gracefully or leak to the UI i.e null, NaN, Inf, undefined
+Developing and testing components should be seamless. Svelte Gym provides a playground environment to exercise your components and ensure they respond correctly to various inputs and constraints.
 
-### Testing
+**Key Features:**
 
-Svelte Gym makes it easy to replicate component state by creating permalinks for a component's state.
+*   **URL-Driven State:** Every control and property is reflected in the URL. Share a link, share a state.
+*   **Visual Regression Ready:** Deterministic URLs make it easy to use tools like [BackstopJS](https://github.com/garris/BackstopJS) to detect visual regressions.
+*   **LLM Friendly:** The URL structure provides a context-rich, text-based representation of your component's state, making it ideal for AI-assisted development and debugging.
 
-For example:
+### Use Cases
 
-+ http://localhost:5174/?__width=262px&__height=221px&spinner=false&label=Test+Text#
-+ http://localhost:5174/?__width=262px&__height=221px&spinner=true&label=Test+Text#
+*   **Responsive Testing:** How does the component respond when the parent element resizes?
+*   **Style Verification:** Is the font size on the parent element respected?
+*   **Edge Cases:** Does text overflow expectedly? Is bad data (null, NaN, undefined) handled gracefully?
+*   **Collaboration:** Share a specific component state with a colleague or an LLM to reproduce a bug.
 
-Problematic scenarios can now be easily replicated and shared with team members.  It also makes visual regression testing using a tool such as [BackstopJS](https://github.com/garris/BackstopJS) a breeze.
+## Getting Started
 
-#### URL Param and Props Structure
-
-For more complex components it may be necessary to create generators, rather than control the specific content you most likely want to control the number of elements.  In those cases best prefix properties with a single underscore to help make intentions clear.  Be aware that Svelte-Gym reserves a double underscore prefix.
-
-# Usage
+### Installation
 
 ```bash
-npm install -D svelte-dev
-pnpm install -D svelte-dev
-bun install -D svelte-dev
+npm install -D svelte-gym
+# or
+pnpm install -D svelte-gym
+# or
+bun install -D svelte-gym
 ```
 
-Create a gym route for each component containing the following:
+### Basic Usage
 
+Create a `+page.svelte` route for your component (e.g., `src/routes/gym/my-component/+page.svelte`):
 
 ```svelte
 <script>
-    import { TestHarness, restoreProps, GymCheckbox, GymLog, GymTextbox } from "svelte-gym";
+    import { TestHarness, restoreProps, GymCheckbox, GymTextbox } from "svelte-gym";
+    import MyComponent from '$lib/MyComponent.svelte';
 
+    // 1. Define your component properties
     let props = {
-        //Define your component properties and callbacks
-    }
+        label: "Hello World",
+        isActive: true,
+        count: 0
+    };
 
-	// properties are automatically restored from the URL Params
-	restoreProps(props);
-
+    // 2. Restore properties from URL parameters automatically
+    // This allows the URL to drive the component state
+    restoreProps(props);
 </script>
 
+<!-- 3. Wrap your component in the TestHarness -->
 <TestHarness>
-	<svelte:fragment slot="componentToTest">
-		<YourComponent {...props} />
-	</svelte:fragment>
+    <svelte:fragment slot="componentToTest">
+        <MyComponent {...props} />
+    </svelte:fragment>
 
-	<svelte:fragment slot="controls">
-		<!-- Add GymControls to exercise custom properties of your component -->
-		<!-- Use the hideExtra param to hide options such as null, undefined etc. -->
-	</svelte:fragment>
+    <!-- 4. Add controls to manipulate props -->
+    <svelte:fragment slot="controls">
+        <ul>
+             <li><GymCheckbox bind:props name="isActive" /></li>
+             <li><GymTextbox bind:props name="label" /></li>
+        </ul>
+    </svelte:fragment>
 </TestHarness>
 ```
 
-## JSON Path Support
+## API Reference
 
-To allow testing of components with more complex structures a basic form of JSON Path is supported.  i.e. `root.subA.subB`, this also works with arrays `root.myArray.0`
+### `TestHarness`
 
+The main wrapper for your component playground.
 
-# Support The Project!
+**Props:**
 
-If Svelte-Gym saves you time please consider supporting it:
+*   `maxWidth` (number, optional): Maximum width constraint for the test area.
+*   `maxHeight` (number, optional): Maximum height constraint for the test area.
+*   `maxFontSize` (number, optional): Maximum font size for the test area.
 
-<a href="https://www.buymeacoffee.com/sveltegym" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+**Slots:**
 
-# Enterprise Support
+*   `componentToTest`: Place the component you want to test here.
+*   `controls`: Place `Gym*` controls here to modify `props`.
 
-We offer support to startups and enterprise, [subscribe here](https://www.buymeacoffee.com/sveltegym/membership)
+### `restoreProps(props)`
 
+Synchronizes the URL search parameters with your local `props` object. This must be called in your component's `<script>` section.
 
-# Training / Workshops
+### Controls (`Gym*` Components)
 
-[Tap Here](https://www.buymeacoffee.com/sveltegym/commissions) to book training for your team either online or in-person.
+All controls support `bind:props` and a `name` attribute corresponding to the property key in `props`.
 
+*   `GymCheckbox`: Boolean toggle.
+*   `GymTextbox`: String input.
+*   `GymSlider`: Numeric slider (requires `min`, `max`).
+*   `GymDropdown`: Select from a list of options.
+*   `GymRadioGroup`: Radio button group.
+*   `GymLog`: Displays a log of events (passed as an array of strings).
+
+### JSON Path Support
+
+Svelte Gym supports nested properties using dot notation. This is useful for complex state objects.
+
+```javascript
+let props = {
+    config: {
+        theme: {
+            mode: 'dark'
+        }
+    }
+};
+```
+
+In your controls:
+
+```svelte
+<GymDropdown bind:props name="config.theme.mode" options={['light', 'dark']} />
+```
+
+## AI / LLM Workflow
+
+Svelte Gym is designed to be "interpreter-friendly." When working with an LLM:
+
+1.  **Describe the Issue:** "My component breaks when the label is too long."
+2.  **Generate a Reproduction:** The LLM can generate a Svelte Gym URL with a long label string encoded in the parameters.
+    *   *Example:* `http://localhost:5173/gym/button?label=Super+Long+Label+That+Breaks+Layout`
+3.  **Fix and Verify:** You can verify the fix visually, and the URL serves as a regression test case.
 
 ## License
 
-[MIT](https://github.com/sveltejs/kit/blob/main/LICENSE)
+MIT

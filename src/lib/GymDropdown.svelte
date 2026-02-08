@@ -29,8 +29,7 @@
 	}
 
 	const optDefault = 'NONE';
-
-	let _props = {
+	let _props: { _override: string | null } = {
 		_override: optDefault
 	};
 
@@ -39,7 +38,7 @@
 
 		if (v !== optDefault) {
 			_initialVal = false;
-			setProp(v, name, props);
+			setProp(v, name, props, undefined, undefined);
 		}
 
 		props = props;
@@ -75,7 +74,8 @@
 			bind:value={_initialVal}
 			on:input={(e) => {
 				_props._override = optDefault;
-				setProp(e.target.value, name, props);
+				// @ts-ignore
+				setProp(e.target.value, name, props, undefined, undefined);
 			}}
 		>
 			{#each _options as opt}

@@ -23,17 +23,18 @@ export function stringToBool(p) {
 
 // NOTE: Callers must set props outside to force reactivity
 /**
- * @param {string | number} v
+ * @param {string | number | boolean | null} v
  * @param {string} name
- * @param {object} props
- * @param {string | undefined} postfix
+ * @param {any} props
+ * @param {string | undefined} [postfix]
+ * @param {boolean} [excludePermaLink]
  */
 export function setProp(v, name, props, postfix, excludePermaLink) {
     const parts = name.split('.');
     let base = props;
 
     if (parts.length > 1) {
-        base = parts.slice(0, -1).reduce((a, e) => {
+        base = parts.slice(0, -1).reduce((/** @type {any} */ a, /** @type {string | number} */ e) => {
             if (!a) {
                 return null;
             }
@@ -49,18 +50,22 @@ export function setProp(v, name, props, postfix, excludePermaLink) {
 
     // @ts-ignore
     if (base) {
-        base[parts.slice(-1)] = finalVal
+        /** @type {any} */ (base)[parts.slice(-1)[0]] = finalVal
     }
 
-    if (!excludePermaLink ?? false) {
+    if (!(excludePermaLink ?? false)) {
         get(page).url.searchParams.set(name, '' + finalVal);
     }
 }
 
+/**
+ * @param {string} name
+ * @param {any} props
+ */
 export function getProp(name, props) {
     const parts = name.split('.');
     let base = props;
-    return parts.reduce((a, e) => {
+    return parts.reduce((/** @type {any} */ a, /** @type {string | number} */ e) => {
         if (!a) {
             return null;
         }
@@ -69,6 +74,9 @@ export function getProp(name, props) {
 }
 
 
+/**
+ * @param {any} props
+ */
 export function restoreProps(props) {
 
     if (!props) {

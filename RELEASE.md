@@ -1,3 +1,8 @@
+# Release v0.4.0
+Improvements to documentation, along with a kitchen sink example page.
+
++ `GymTextbox` learnt `multiline` - this allows testing components that expect textarea input
+
 # Release v0.3.0
 
 This version deprecates all previous grid settings in favour of a more structured naming convention.  

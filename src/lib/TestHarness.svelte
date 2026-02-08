@@ -48,7 +48,7 @@
 		{ value: '100-text-dark-mode', class: 'text bg-100 dark-mode' }
 	];
 
-	function getGridClassFromValue(v) {
+	function getGridClassFromValue(v: string | boolean) {
 		// support legacy mode was boolean
 		const ov = v;
 
