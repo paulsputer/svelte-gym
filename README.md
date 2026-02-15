@@ -44,16 +44,16 @@ bun install -D svelte-gym
 Create a `+page.svelte` route for your component (e.g., `src/routes/gym/my-component/+page.svelte`):
 
 ```svelte
-<script>
+<script lang="ts">
     import { TestHarness, restoreProps, GymCheckbox, GymTextbox } from "svelte-gym";
     import MyComponent from '$lib/MyComponent.svelte';
 
     // 1. Define your component properties
-    let props = {
+    let props = $state({
         label: "Hello World",
         isActive: true,
         count: 0
-    };
+    });
 
     // 2. Restore properties from URL parameters automatically
     // This allows the URL to drive the component state
@@ -62,19 +62,54 @@ Create a `+page.svelte` route for your component (e.g., `src/routes/gym/my-compo
 
 <!-- 3. Wrap your component in the TestHarness -->
 <TestHarness>
-    <svelte:fragment slot="componentToTest">
+    {#snippet componentToTest()}
         <MyComponent {...props} />
-    </svelte:fragment>
+    {/snippet}
 
     <!-- 4. Add controls to manipulate props -->
-    <svelte:fragment slot="controls">
+    {#snippet controls()}
         <ul>
              <li><GymCheckbox bind:props name="isActive" /></li>
              <li><GymTextbox bind:props name="label" /></li>
         </ul>
-    </svelte:fragment>
+    {/snippet}
 </TestHarness>
 ```
+
+## AI / LLM Workflow & Best Practices
+
+Svelte Gym is designed to be "interpreter-friendly." To ensure the best results and visual parity when using LLMs for component development:
+
+### 1. Minimal `componentToTest` Snippet
+The `componentToTest` snippet should **only** contain the component being tested. 
+> [!IMPORTANT]
+> **Avoid wrapping the component in extra `div` or `section` tags.** This ensures that the component's layout and styles are tested in isolation, matching how it will appear when deployed.
+
+**Correct:**
+```svelte
+{#snippet componentToTest()}
+    <MyComponent {...props} />
+{/snippet}
+```
+
+**Incorrect:**
+```svelte
+{#snippet componentToTest()}
+    <div class="wrapper"> <!-- ❌ DON'T DO THIS -->
+        <MyComponent {...props} />
+    </div>
+```
+
+### 2. Use `Gym*` Input Components
+Always use the built-in `Gym` prefixed input components (e.g., `GymSlider`, `GymTextbox`, `GymCheckbox`) in the `controls` snippet.
+> [!IMPORTANT]
+> **Do not use standard HTML inputs or other custom components.** `Gym*` inputs are specifically designed to handle and test edge cases like `null`, `undefined`, `NaN`, and `Infinity`, which are critical for robust component testing and are not supported by standard inputs.
+
+### 3. URL-Driven State & Reproductions
+1.  **Describe the Issue:** "My component breaks when the label is too long."
+2.  **Generate a Reproduction:** The LLM can generate a Svelte Gym URL with a long label string encoded in the parameters.
+    *   *Example:* `http://localhost:5173/gym/button?label=Super+Long+Label+That+Breaks+Layout`
+3.  **Fix and Verify:** You can verify the fix visually, and the URL serves as a regression test case.
 
 ## API Reference
 
@@ -88,7 +123,7 @@ The main wrapper for your component playground.
 *   `maxHeight` (number, optional): Maximum height constraint for the test area.
 *   `maxFontSize` (number, optional): Maximum font size for the test area.
 
-**Slots:**
+**Snippets:**
 
 *   `componentToTest`: Place the component you want to test here.
 *   `controls`: Place `Gym*` controls here to modify `props`.
@@ -112,14 +147,16 @@ All controls support `bind:props` and a `name` attribute corresponding to the pr
 
 Svelte Gym supports nested properties using dot notation. This is useful for complex state objects.
 
-```javascript
-let props = {
+```svelte
+<script lang="ts">
+let props = $state({
     config: {
         theme: {
             mode: 'dark'
         }
     }
-};
+});
+</script>
 ```
 
 In your controls:
@@ -127,15 +164,6 @@ In your controls:
 ```svelte
 <GymDropdown bind:props name="config.theme.mode" options={['light', 'dark']} />
 ```
-
-## AI / LLM Workflow
-
-Svelte Gym is designed to be "interpreter-friendly." When working with an LLM:
-
-1.  **Describe the Issue:** "My component breaks when the label is too long."
-2.  **Generate a Reproduction:** The LLM can generate a Svelte Gym URL with a long label string encoded in the parameters.
-    *   *Example:* `http://localhost:5173/gym/button?label=Super+Long+Label+That+Breaks+Layout`
-3.  **Fix and Verify:** You can verify the fix visually, and the URL serves as a regression test case.
 
 ## License
 

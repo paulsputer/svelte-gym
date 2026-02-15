@@ -39,6 +39,10 @@ If you are adding a new type of control (e.g., `GymColorPicker`), please follow 
 3.  **Handle URL Sync**: Ensure that changes to the value update the `props` object, which `restoreProps` (in the parent) will then reflect in the URL (if wired up correctly, usually handled by reactivity in the user's page, but the control itself should primarily mutate `props`).
 4.  **UI Consistency**: Reuse existing styles or CSS variables where possible to maintain the "gym" aesthetic.
 
+## AI Assistance
+
+If you are using an AI assistant (like Cursor, GitHub Copilot, or Claude) to help with development, please refer to the [.cursorrules](file:///.cursorrules) file in the root of the repository. This file contains specific instructions to ensure the AI follows our coding standards, especially regarding the `TestHarness` and `Gym*` components.
+
 ## License
 
 By contributing, you agree that your contributions will be licensed under the MIT License.

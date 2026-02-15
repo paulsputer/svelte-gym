@@ -1,0 +1,58 @@
+# Svelte Gym Coding Standards for AI Assistants
+
+To ensure visual parity, robust testing, and consistent behavior within Svelte Gym test harnesses, follow these rules strictly:
+
+## 1. Test Harness Snippets
+
+### `componentToTest` Snippet
+- **Rule:** This snippet MUST only contain the single component being tested.
+- **Forbidden:** Do NOT wrap the component in any extra `div`, `section`, `span`, or other HTML elements.
+- **Reasoning:** Extra wrappers can introduce unintentional layout changes (flex, padding, margin) that disappear in the real app, leading to confusing visual bugs.
+
+**Do:**
+```svelte
+{#snippet componentToTest()}
+    <MyComponent {...props} />
+{/snippet}
+```
+
+**Don't:**
+```svelte
+{#snippet componentToTest()}
+    <div> <!-- ❌ Extra wrapper -->
+        <MyComponent {...props} />
+    </div>
+```
+
+### `controls` Snippet
+- **Rule:** Always use the built-in `Gym` prefixed input components (e.g., `GymSlider`, `GymTextbox`, `GymCheckbox`, `GymDropdown`).
+- **Forbidden:** Do NOT use standard HTML `<input>`, `<select>`, or custom non-Gym components for controlling properties.
+- **Reasoning:** `Gym*` components are specifically designed to handle and test edge cases like `null`, `undefined`, and `NaN`. They also automatically integrate with the `props` object and URL synchronization.
+
+**Do:**
+```svelte
+{#snippet controls()}
+    <GymTextbox bind:props name="username" label="Username" />
+    <GymSlider bind:props name="volume" min={0} max={100} />
+{/snippet}
+```
+
+**Don't:**
+```svelte
+{#snippet controls()}
+    <input type="text" bind:value={props.username} /> <!-- ❌ Use GymTextbox instead -->
+```
+
+## 2. Svelte 5 (Runes) Usage
+- This codebase uses Svelte 5. Always use Runes (`$state`, `$derived`, `$props`, `$bindable`) and Snippets (`{#snippet ...}`).
+- Always define `props` using `$state`:
+```typescript
+let props = $state({
+    count: 0,
+    label: "default"
+});
+```
+
+## 3. URL Synchronization
+- Always call `restoreProps(props)` in the `<script>` section after defining your `$state` props.
+- This ensures the URL drives the component state, making it shareable and testable.
