@@ -9,6 +9,7 @@
 		name,
 		min = null,
 		max = null,
+		step = null,
 		units = null,
 		fn = null,
 		label = name,
@@ -20,6 +21,8 @@
 	let _props = $state({
 		_override: optDefault
 	});
+
+	let _step = $state(step ?? 1);
 
 	$effect(() => {
 		let v = _props._override;
@@ -34,13 +37,63 @@
 	});
 
 	$effect(() => {
-		if (min === null && max === null) {
+		// Set defaults if null, based on units
+		if (min === null) {
+			switch (units) {
+				case 'em':
+				case 'rem':
+					min = 0.1;
+					break;
+				default:
+					min = 0;
+					break;
+			}
+		}
+
+		if (max === null) {
 			switch (units) {
 				case 'px':
-					{
-						min = 0;
+					// Default to a reasonable screen width if px, but for fonts 100 is better.
+					// However, GymSlider is generic.
+					// If name implies font (hacky but useful?) No, let's stick to safe defaults.
+					if (name.includes('font')) {
+						max = 100;
+					} else {
 						max = window.innerWidth;
 					}
+					break;
+				case 'em':
+				case 'rem':
+					max = 10;
+					break;
+				case 'vw':
+				case 'vh':
+				case 'svh':
+				case 'dvh':
+				case 'lvh':
+				case '%':
+					max = 100;
+					break;
+				default:
+					max = 100;
+					break;
+			}
+		}
+
+		// Set step based on units
+		if (step === null) {
+			switch (units) {
+				case 'em':
+				case 'rem':
+				case 'vw':
+				case 'vh':
+				case 'svh':
+				case 'dvh':
+				case 'lvh':
+					_step = 0.1;
+					break;
+				default:
+					_step = 1;
 					break;
 			}
 		}
@@ -48,18 +101,31 @@
 		// override functor based on units
 		// but only if no functor defined
 		if (fn === null) {
-			switch (units) {
-				case 'em':
-					{
-						fn = (v) => v / 10;
-					}
-					break;
-				case 'rem':
-					{
-						fn = (v) => v / 10;
-					}
-					break;
+			switch (
+				units
+				// No default functors needed anymore as we use step for precision
+			) {
 			}
+		}
+
+		// React to external prop changes (e.g. via bind:scrollTop)
+		let rawVal = getProp(name, props);
+
+		// Strip units if it matches our current units or generally parse it
+		if (typeof rawVal === 'string') {
+			const num = parseFloat(rawVal);
+			if (!isNaN(num)) {
+				// Round to nearest step to avoid floating point precision issues
+				// e.g. 1.5 -> 1.5, but 1.49999 -> 1.5
+				const prec = _step < 1 ? 10 : 1;
+				rawVal = Math.round(num * prec) / prec;
+			}
+		}
+
+		const currentVal = rawVal;
+		// Use loose equality or check for significant difference to avoid loop artifacts
+		if (currentVal != _initialVal) {
+			_initialVal = currentVal;
 		}
 	});
 
@@ -98,33 +164,38 @@
 
 	let _initialVal = $state(applyFunctor(getProp(name, props)));
 
-	if (Number.isNaN(+_initialVal)) {
-		// Could be due to units
+	// Detect units from initial value if not provided
+	if (units === null && typeof _initialVal === 'string') {
 		const possibleUnits = unitOpts.filter((e) => {
-			return _initialVal.indexOf(e) > 0;
+			return _initialVal.endsWith(e);
 		});
 
-		// Take the largest if multiple
+		// Take the longest match
 		const u = possibleUnits.reduce((a, e) => {
-			e.length > (a ?? '').length;
-			return e;
+			return e.length > (a ?? '').length ? e : a;
 		}, null);
 
 		if (u) {
-			// Override the units so the control makes sense
 			units = u;
 			_initialVal = _initialVal.slice(0, -u.length);
+		} else if (!isNaN(parseFloat(_initialVal))) {
+			// If it's a number but string, assume px if checking for font size?
+			// Or just default to px generally?
+			units = 'px';
+		}
+	} else if (units) {
+		// If units provided, strip them from initial value
+		if (typeof _initialVal === 'string' && _initialVal.endsWith(units)) {
+			_initialVal = _initialVal.slice(0, -units.length);
 		}
 	}
 
-	let res = extraOpts.filter((e) => {
-		if (e.value === _initialVal || '' + e.value === _initialVal) {
-			return true;
-		}
+	let res = extraOpts.find((e) => {
+		return e.value === _initialVal || '' + e.value === _initialVal;
 	});
 
-	if (res.length > 0) {
-		_props._override = res[0].value;
+	if (res) {
+		_props._override = res.value;
 	} else {
 		_props._override = optDefault;
 	}
@@ -136,6 +207,7 @@
 			type="range"
 			min={min ?? 0}
 			max={max ?? 100}
+			step={_step}
 			on:input={(e) => {
 				_props._override = optDefault;
 				setProp(applyFunctor(+e.target.value), name, props, units);

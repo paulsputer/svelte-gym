@@ -19,7 +19,9 @@
 		{ label: 'opt-d', value: 'OPT D', name: 'test-d', val2: 'OPT D2' }
 	];
 
-	restoreProps(props);
+	$effect.pre(() => {
+		restoreProps(props);
+	});
 </script>
 
 <TestHarness>

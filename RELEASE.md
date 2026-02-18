@@ -1,5 +1,29 @@
 # Release Notes
 
+## v1.0.2 - Scroll Hijacking & Page Centering (2026-02-17)
+
+### New Features
+
+- **Scroll Hijacking Support**: Programmatic scroll control via `__scrollY` state. The page now restores its scroll position correctly from URL parameters on load.
+- **True Page Centering**: Redesigned layout to ensure components are perfectly centered within the full viewport. The controls sidebar is now a fixed overlay, preventing it from splitting the screen.
+- **Dynamic Scroll Range**: The `scrollY` control now automatically calculates its maximum range based on the actual height of the test content.
+- **Unit Support in Permalinks**: Properties like `__scrollY` now include units (e.g., `px`) in the URL for better consistency and human readability.
+
+### Improvements & Refinement
+
+- **GymSlider Smart Defaults**: Sliders now detect units and apply sensible `min`, `max`, and `step` defaults (e.g., 0.1 step for `em`/`rem` units).
+- **Enhanced Reactivity**: Fixed issues where `GymSlider` would fall out of sync with external state changes (like window scrolling or manual URL updates).
+- **Naming Conflict Resolved**: Renamed internal state structures to avoid collisions with the `$props()` rune, ensuring clean compilation.
+
+### Bug Fixes
+
+- **Fixed "Scroll Hijacking" regression**: Resolved a bug where sliders were disconnected from their state after layout changes.
+- **Fixed Layout Clipping**: Updated CSS to allow full window scrolling when Scroll Mode is active.
+- **A11y Fixes**: Removed invalid `#` hrefs in the sidebar.
+- **Centering Overflow**: Implemented `margin: auto` for large components to ensure they remain centered even when overflowing the viewport.
+
+---
+
 ## v1.0.1 - Svelte 5 Runes Migration (2026-02-08)
 
 ### Major Refactor: Svelte 5 Runes

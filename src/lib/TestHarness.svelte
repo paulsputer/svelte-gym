@@ -4,12 +4,14 @@
 	import { goto } from '$app/navigation';
 	import { restoreProps } from './helpers.js';
 	import { onMount } from 'svelte';
+	import { get } from 'svelte/store';
 
 	import GymCheckbox from './GymCheckbox.svelte';
 	import GymSlider from './GymSlider.svelte';
 	import GymButton from './GymButton.svelte';
 	import GymDropdown from './GymDropdown.svelte';
 
+	let harnessProps = $props();
 	let {
 		maxWidth = null,
 		maxHeight = null,
@@ -17,14 +19,7 @@
 		componentToTest,
 		controls,
 		children
-	}: {
-		maxWidth?: number | null;
-		maxHeight?: number | null;
-		maxFontSize?: number | null;
-		componentToTest?: any;
-		controls?: any;
-		children?: any;
-	} = $props();
+	} = harnessProps;
 
 	let props = $state({
 		__controls: true,
@@ -33,8 +28,11 @@
 		__width: 'auto',
 		__height: 'auto',
 		__fontsize: '1em',
-		__resetAnimations: () => {}
+		__resetAnimations: () => {},
+		__scrollY: undefined as string | undefined
 	});
+
+	let scrollMode = $derived(props.__scrollY != null);
 
 	const gridOptions = [
 		{ value: '0-grid-light-mode', class: 'grid bg-0 light-mode' },
@@ -109,10 +107,47 @@
 		return '';
 	}
 
+	let maxScroll = $state(0);
+
+	function updateMaxScroll() {
+		maxScroll = Math.max(0, document.body.scrollHeight - window.innerHeight);
+	}
+
+	let initialRestoration = true;
+
 	onMount(() => {
+		if ('scrollRestoration' in history) {
+			history.scrollRestoration = 'manual';
+		}
+
 		let hasAnimations = document.getAnimations().length > 0;
 		// @ts-ignore
 		props.__resetAnimations = hasAnimations ? resetAnimations : undefined;
+
+		// Track scroll height changes
+		updateMaxScroll();
+
+		// Initial scroll restoration
+		if (props.__scrollY !== undefined) {
+			setTimeout(() => {
+				window.scrollTo(0, parseFloat(props.__scrollY as string));
+				initialRestoration = false;
+			}, 100);
+		} else {
+			initialRestoration = false;
+		}
+
+		const resizeObserver = new ResizeObserver(() => {
+			updateMaxScroll();
+		});
+		resizeObserver.observe(document.body);
+
+		window.addEventListener('resize', updateMaxScroll);
+
+		return () => {
+			resizeObserver.disconnect();
+			window.removeEventListener('resize', updateMaxScroll);
+		};
 	});
 
 	function resetAnimations() {
@@ -123,18 +158,56 @@
 		});
 	}
 
-	function gotoPermalink() {
-		goto($page.url.toString());
+	function gotoPermalink(e: Event) {
+		e.preventDefault();
+		const url = new URL(get(page).url);
+		if (props.__scrollY != null) {
+			url.searchParams.set('__scrollY', '' + props.__scrollY);
+		} else {
+			url.searchParams.delete('__scrollY');
+		}
+		goto(url.toString());
 	}
 
-	restoreProps(props);
+	$effect.pre(() => {
+		restoreProps(props);
+	});
+
+	function toggleScrollMode(e: Event & { currentTarget: EventTarget & HTMLInputElement }) {
+		if ((e.currentTarget as HTMLInputElement).checked) {
+			props.__scrollY = window.scrollY + 'px';
+		} else {
+			props.__scrollY = undefined;
+		}
+	}
+
+	function updateScroll() {
+		// Prevent initial 0 from overwriting restored value
+		if (initialRestoration && props.__scrollY !== undefined) return;
+
+		const y = window.scrollY;
+		if (props.__scrollY !== undefined || y > 0) {
+			props.__scrollY = y + 'px';
+		}
+	}
+
+	$effect(() => {
+		if (
+			props.__scrollY !== undefined &&
+			Math.abs(window.scrollY - parseFloat(props.__scrollY)) > 5
+		) {
+			window.scrollTo(0, parseFloat(props.__scrollY));
+		}
+	});
 </script>
+
+<svelte:window onscroll={updateScroll} />
 
 <section class={props.__controls ? '' : 'hide-controls'}>
 	<div class="test-grid {getGridClassFromValue(props.__grid)}"></div>
 
 	<div class="test-area" class:controls={props.__controls}>
-		<div class="test-holder">
+		<div class="test-holder" class:scroll-mode={scrollMode}>
 			<div
 				class="test-component"
 				class:highlight={props.__highlight}
@@ -151,12 +224,24 @@
 			</div>
 		</div>
 		<div class="test-controls">
-			<span><a href="#" on:click={gotoPermalink}>Generate Permalink</a></span>
+			<span
+				><button type="button" class="link-button" onclick={gotoPermalink}
+					>Generate Permalink</button
+				></span
+			>
 
 			<hr />
 			<br />
 			<ul>
-				<li><GymCheckbox hideExtra={true} bind:props name="__controls" label="controls" /></li>
+				<li>
+					<GymCheckbox hideExtra={true} bind:props name="__controls" label="controls" />
+				</li>
+				<li>
+					<label>
+						<input type="checkbox" checked={scrollMode} onchange={toggleScrollMode} />
+						<span>scroll mode</span>
+					</label>
+				</li>
 				<GymDropdown
 					hideExtra={true}
 					bind:props
@@ -166,7 +251,9 @@
 					optLabel="value"
 					optValue="value"
 				/>
-				<li><GymCheckbox hideExtra={true} bind:props name="__highlight" label="highlight" /></li>
+				<li>
+					<GymCheckbox hideExtra={true} bind:props name="__highlight" label="highlight" />
+				</li>
 			</ul>
 			<GymButton bind:props name="__resetAnimations" label="Reset Animations" />
 
@@ -187,13 +274,14 @@
 				name="__height"
 				label="height"
 			/>
+			<GymSlider hideExtra={true} max={maxFontSize} bind:props name="__fontsize" label="fontsize" />
 			<GymSlider
 				hideExtra={true}
 				units="px"
-				max={maxFontSize}
+				max={maxScroll}
 				bind:props
-				name="__fontsize"
-				label="fontsize"
+				name="__scrollY"
+				label="scrollY"
 			/>
 
 			<br />
@@ -216,43 +304,49 @@
 	section hr {
 		border-color: #999;
 	}
-	.test-controls a,
-	.test-controls a:visited {
+	.test-controls .link-button {
+		background: none;
+		border: none;
+		padding: 0;
 		color: #000;
 		text-decoration: underline;
+		cursor: pointer;
+		font: inherit;
+	}
+
+	.test-controls .link-button:hover {
+		text-decoration: none;
 	}
 
 	.test-grid {
 		width: 100%;
 		height: 100%;
-		position: absolute;
+		position: fixed;
 		top: 0;
 		left: 0;
 		z-index: -900;
 	}
 
 	.test-area {
-		grid-template-columns: 1fr;
 	}
 
 	.test-area.controls {
-		display: grid;
-		grid-template-columns: 1fr 25em;
-		align-items: center;
-		justify-content: center;
+		display: block;
 		height: 100%;
 		width: 100%;
 	}
 
 	.test-holder {
-		position: absolute;
-		top: 0;
-		left: calc(var(--control-area-width) * -0.5);
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		height: 100vh;
+		min-height: 100vh;
 		width: 100%;
+	}
+
+	.test-holder.scroll-mode {
+		align-items: flex-start;
+		padding-bottom: 50vh; /* Allow scrolling past simple content */
 	}
 
 	.hide-controls .test-holder {
@@ -261,7 +355,7 @@
 	}
 
 	section {
-		height: 100vh;
+		min-height: 100vh;
 		width: 100vw;
 	}
 
@@ -273,6 +367,7 @@
 		height: var(--h);
 		width: var(--w);
 		font-size: var(--fs);
+		margin: auto;
 	}
 
 	.highlight {
@@ -282,6 +377,7 @@
 	.test-controls {
 		position: fixed;
 		right: 0;
+		top: 0;
 		width: var(--control-area-width);
 		display: flex;
 		flex-direction: column;
@@ -290,6 +386,8 @@
 		font-family: monospace;
 		color: #000;
 		overflow: scroll;
+		border-left: 1px solid #999;
+		z-index: 1001;
 	}
 
 	.hide-controls .test-controls {

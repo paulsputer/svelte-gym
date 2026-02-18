@@ -16,7 +16,9 @@
 
 	const functor = (v: number) => v / 100;
 
-	restoreProps(props);
+	$effect.pre(() => {
+		restoreProps(props);
+	});
 </script>
 
 <TestHarness>

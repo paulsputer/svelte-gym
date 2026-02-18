@@ -15,7 +15,9 @@
 		}
 	});
 
-	restoreProps(props);
+	$effect.pre(() => {
+		restoreProps(props);
+	});
 </script>
 
 <TestHarness>
