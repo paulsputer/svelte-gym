@@ -1,11 +1,8 @@
 <p align="center">
- <img width="200" src="./static/svelte-gym.png" />
+ <img width="400" src="https://github.com/paulsputer/svelte-gym/assets/4686906/b06068e8-bdbd-4efa-9155-6ef15f5023c5" />
 </p>
 
 # Svelte Gym
-
-<a href="https://www.buymeacoffee.com/sveltegym" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
-
 
 **Rapidly create, exercise, and share Svelte component states via URL-encoded permalinks.**
 
@@ -164,6 +161,9 @@ In your controls:
 ```svelte
 <GymDropdown bind:props name="config.theme.mode" options={['light', 'dark']} />
 ```
+## Support
+
+<a href="https://www.buymeacoffee.com/sveltegym" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
 ## License
 
