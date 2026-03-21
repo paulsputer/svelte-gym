@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { restoreProps } from './helpers.js';
-	import { onMount } from 'svelte';
+	import { onMount, type Snippet } from 'svelte';
 	import { get } from 'svelte/store';
 
 	import GymCheckbox from './GymCheckbox.svelte';
@@ -11,7 +11,15 @@
 	import GymButton from './GymButton.svelte';
 	import GymDropdown from './GymDropdown.svelte';
 
-	let harnessProps = $props();
+	interface TestHarnessProps {
+		maxWidth?: number | null;
+		maxHeight?: number | null;
+		maxFontSize?: number | null;
+		componentToTest?: Snippet;
+		controls?: Snippet;
+		children?: Snippet;
+	}
+
 	let {
 		maxWidth = null,
 		maxHeight = null,
@@ -19,7 +27,7 @@
 		componentToTest,
 		controls,
 		children
-	} = harnessProps;
+	}: TestHarnessProps = $props();
 
 	let props = $state({
 		__controls: true,

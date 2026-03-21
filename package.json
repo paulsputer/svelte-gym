@@ -34,7 +34,7 @@
 	],
 	"peerDependencies": {
 		"@sveltejs/kit": ">=1.0.0",
-		"svelte": ">=3.0.0"
+		"svelte": "^5.0.0"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",

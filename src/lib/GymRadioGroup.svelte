@@ -1,13 +1,21 @@
-<script>
-	// @ts-nocheck
+<script lang="ts">
 	import { page } from '$app/stores';
+
+	interface GymRadioGroupProps {
+		props: Record<string, any>;
+		name: string;
+		label?: string;
+		excludeFromPermalink?: boolean;
+		options?: Array<{ label: string; value: any }>;
+	}
+
 	let {
 		props = $bindable(),
 		name,
 		label = name,
 		excludeFromPermalink = false,
 		options = []
-	} = $props();
+	}: GymRadioGroupProps = $props();
 
 	const groupUuid = self.crypto.randomUUID();
 </script>

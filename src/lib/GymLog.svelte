@@ -1,6 +1,9 @@
-<script>
-	// @ts-nocheck
-	let { log } = $props();
+<script lang="ts">
+	interface GymLogProps {
+		log: any[];
+	}
+
+	let { log }: GymLogProps = $props();
 </script>
 
 <div class="holder">

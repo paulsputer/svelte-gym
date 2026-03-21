@@ -2,6 +2,16 @@
 	import { setProp, getProp } from './helpers.js';
 	import GymRadioGroup from './GymRadioGroup.svelte';
 
+	interface GymDropdownProps {
+		props: Record<string, any>;
+		name: string;
+		options: any[] | Record<string, any>;
+		label?: string;
+		hideExtra?: boolean;
+		optLabel?: string;
+		optValue?: string;
+	}
+
 	let {
 		props = $bindable(),
 		name,
@@ -10,7 +20,7 @@
 		hideExtra = false,
 		optLabel = 'label',
 		optValue = 'value'
-	} = $props();
+	}: GymDropdownProps = $props();
 
 	let _options = $derived.by(() => {
 		if (Array.isArray(options) && options.length > 0) {

@@ -1,8 +1,18 @@
 <script lang="ts">
-	// @ts-nocheck
-
 	import GymRadioGroup from './GymRadioGroup.svelte';
 	import { setProp, getProp } from './helpers.js';
+
+	interface GymSliderProps {
+		props: Record<string, any>;
+		name: string;
+		min?: number | null;
+		max?: number | null;
+		step?: number | null;
+		units?: string | null;
+		fn?: ((v: number) => number) | null;
+		label?: string;
+		hideExtra?: boolean;
+	}
 
 	let {
 		props = $bindable(),
@@ -14,7 +24,7 @@
 		fn = null,
 		label = name,
 		hideExtra = false
-	} = $props();
+	}: GymSliderProps = $props();
 
 	const optDefault = 'NONE';
 

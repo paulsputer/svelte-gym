@@ -1,9 +1,15 @@
-<script>
-	// @ts-nocheck
+<script lang="ts">
 	import { setProp, getProp } from './helpers.js';
 	import GymRadioGroup from './GymRadioGroup.svelte';
 
-	let { props = $bindable(), name, label = name, hideExtra = false } = $props();
+	interface GymCheckboxProps {
+		props: Record<string, any>;
+		name: string;
+		label?: string;
+		hideExtra?: boolean;
+	}
+
+	let { props = $bindable(), name, label = name, hideExtra = false }: GymCheckboxProps = $props();
 
 	const optDefault = 'NONE';
 

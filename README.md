@@ -165,6 +165,10 @@ In your controls:
 
 <a href="https://www.buymeacoffee.com/sveltegym" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
+## Known Issues
+
+- **Type definitions generated as `Record<string, never>`:** If your published package emits broken `.d.ts` files where all component props are typed as `Record<string, never>`, ensure your `peerDependencies.svelte` is set to `"^5.0.0"` (not `">=3.0.0"`). The `@sveltejs/package` type generator uses this field to select the correct type shims — a range that intersects with Svelte 3 causes it to use legacy shims that don't understand `$props()`. See [sveltejs/kit#12972](https://github.com/sveltejs/kit/issues/12972) for details.
+
 ## License
 
 MIT

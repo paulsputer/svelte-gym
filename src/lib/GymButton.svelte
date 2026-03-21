@@ -1,7 +1,13 @@
-<script>
-	// @ts-nocheck
+<script lang="ts">
 	import { page } from '$app/stores';
-	let { props, name, label = name } = $props();
+
+	interface GymButtonProps {
+		props: Record<string, any>;
+		name: string;
+		label?: string;
+	}
+
+	let { props, name, label = name }: GymButtonProps = $props();
 
 	let disabled = $derived(typeof props[name] === 'undefined');
 

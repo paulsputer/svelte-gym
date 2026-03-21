@@ -1,9 +1,16 @@
-<script>
-	// @ts-nocheck
+<script lang="ts">
 	import { setProp, getProp } from './helpers.js';
 	import GymRadioGroup from './GymRadioGroup.svelte';
 
-	let { props = $bindable(), name, label = name, hideExtra = false, multiline = false } = $props();
+	interface GymTextboxProps {
+		props: Record<string, any>;
+		name: string;
+		label?: string;
+		hideExtra?: boolean;
+		multiline?: boolean;
+	}
+
+	let { props = $bindable(), name, label = name, hideExtra = false, multiline = false }: GymTextboxProps = $props();
 
 	const optDefault = 'NONE';
 
