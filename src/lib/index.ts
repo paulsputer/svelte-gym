@@ -8,6 +8,7 @@ import GymSlider from './GymSlider.svelte';
 import GymTextbox from './GymTextbox.svelte';
 import GymDropdown from './GymDropdown.svelte';
 import GymRadioGroup from './GymRadioGroup.svelte';
+import GymColorPicker from './GymColorPicker.svelte';
 
 
 
@@ -27,7 +28,8 @@ export {
     GymLog,
     GymSlider,
     GymTextbox,
-    GymDropdown,
-    GymRadioGroup
+    	GymDropdown,
+	GymRadioGroup,
+	GymColorPicker
 
 }

@@ -7,6 +7,7 @@
 		GymSlider,
 		GymDropdown,
 		GymRadioGroup,
+		GymColorPicker,
 		GymLog
 	} from '$lib';
 
@@ -27,6 +28,7 @@
 		},
 		selection: 'Option A',
 		radioSelection: 'radio1',
+		accentColor: '#3b82f6',
 		clickMe: () => {
 			log = [`Clicked at ${new Date().toLocaleTimeString()}`, ...log];
 		}
@@ -51,6 +53,7 @@
 			</p>
 			<p>Selection: {props.selection}</p>
 			<p>Radio: {props.radioSelection}</p>
+			<p>Accent: <span style="color: {props.accentColor}">{props.accentColor}</span></p>
 			<button on:click={props.clickMe}>Log Interaction</button>
 		</div>
 	{/snippet}
@@ -95,6 +98,9 @@
 					options={['radio1', 'radio2', 'radio3']}
 					label="Radio Group"
 				/>
+			</li>
+			<li>
+				<GymColorPicker bind:props name="accentColor" label="Accent Color" />
 			</li>
 		</ul>
 
