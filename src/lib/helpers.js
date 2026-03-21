@@ -1,5 +1,3 @@
-import { page } from '$app/stores';
-import { get } from 'svelte/store';
 /**
  * @param {string | null} p
  * @returns {(boolean|null)}
@@ -53,8 +51,10 @@ export function setProp(v, name, props, postfix, excludePermaLink) {
         /** @type {any} */ (base)[parts.slice(-1)[0]] = finalVal
     }
 
-    if (!(excludePermaLink ?? false)) {
-        get(page).url.searchParams.set(name, '' + finalVal);
+    if (!(excludePermaLink ?? false) && typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        url.searchParams.set(name, '' + finalVal);
+        history.replaceState(null, '', url);
     }
 }
 
@@ -84,8 +84,9 @@ export function restoreProps(props) {
         return;
     };
 
-    const params = get(page).url.searchParams;
+    if (typeof window === 'undefined') return;
 
+    const params = new URL(window.location.href).searchParams;
 
     params.forEach((v, k) => {
         setProp(v, k, props, undefined, true);

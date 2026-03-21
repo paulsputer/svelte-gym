@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 
 	interface GymRadioGroupProps {
 		props: Record<string, any>;
@@ -17,7 +16,8 @@
 		options = []
 	}: GymRadioGroupProps = $props();
 
-	const groupUuid = self.crypto.randomUUID();
+	let _counter = 0;
+	const groupId = `gym-radio-${_counter++}-${Date.now()}`;
 </script>
 
 <div class="holder">
@@ -25,12 +25,14 @@
 		<label>
 			<input
 				type="radio"
-				name={groupUuid}
+				name={groupId}
 				on:change={(e) => {
 					props[name] = e.target.value;
 
-					if (!(excludeFromPermalink ?? false)) {
-						$page.url.searchParams.set(name, props[name]);
+					if (!(excludeFromPermalink ?? false) && typeof window !== 'undefined') {
+						const url = new URL(window.location.href);
+						url.searchParams.set(name, props[name]);
+						history.replaceState(null, '', url);
 					}
 				}}
 				bind:group={props[name]}

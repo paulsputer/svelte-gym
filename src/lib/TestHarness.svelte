@@ -1,10 +1,6 @@
 <script lang="ts">
-	import 'ress';
-	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
 	import { restoreProps } from './helpers.js';
 	import { onMount, type Snippet } from 'svelte';
-	import { get } from 'svelte/store';
 
 	import GymCheckbox from './GymCheckbox.svelte';
 	import GymSlider from './GymSlider.svelte';
@@ -168,17 +164,19 @@
 
 	function gotoPermalink(e: Event) {
 		e.preventDefault();
-		const url = new URL(get(page).url);
+		const url = new URL(window.location.href);
 		if (props.__scrollY != null) {
 			url.searchParams.set('__scrollY', '' + props.__scrollY);
 		} else {
 			url.searchParams.delete('__scrollY');
 		}
-		goto(url.toString());
+		history.pushState(null, '', url);
 	}
 
 	$effect.pre(() => {
-		restoreProps(props);
+		if (typeof window !== 'undefined') {
+			restoreProps(props);
+		}
 	});
 
 	function toggleScrollMode(e: Event & { currentTarget: EventTarget & HTMLInputElement }) {
@@ -484,5 +482,256 @@
 		background-repeat: repeat;
 		background-size: 140px 30px;
 		background-color: var(--bg-color);
+	}
+
+	/* ================================================================
+	   Inlined CSS Reset (ress v5.0.2)
+	   Applied globally when TestHarness is rendered
+	   ================================================================ */
+
+	:global(html) {
+		box-sizing: border-box;
+		-webkit-text-size-adjust: 100%;
+		word-break: normal;
+		-moz-tab-size: 4;
+		tab-size: 4;
+	}
+
+	:global(*),
+	:global(::before),
+	:global(::after) {
+		background-repeat: no-repeat;
+		box-sizing: inherit;
+	}
+
+	:global(::before),
+	:global(::after) {
+		text-decoration: inherit;
+		vertical-align: inherit;
+	}
+
+	:global(*) {
+		padding: 0;
+		margin: 0;
+	}
+
+	:global(hr) {
+		overflow: visible;
+		height: 0;
+		color: inherit;
+	}
+
+	:global(details),
+	:global(main) {
+		display: block;
+	}
+
+	:global(summary) {
+		display: list-item;
+	}
+
+	:global(small) {
+		font-size: 80%;
+	}
+
+	:global([hidden]) {
+		display: none;
+	}
+
+	:global(abbr[title]) {
+		border-bottom: none;
+		text-decoration: underline;
+		text-decoration: underline dotted;
+	}
+
+	:global(a) {
+		background-color: transparent;
+	}
+
+	:global(a:active),
+	:global(a:hover) {
+		outline-width: 0;
+	}
+
+	:global(code),
+	:global(kbd),
+	:global(pre),
+	:global(samp) {
+		font-family: monospace, monospace;
+	}
+
+	:global(pre) {
+		font-size: 1em;
+	}
+
+	:global(b),
+	:global(strong) {
+		font-weight: bolder;
+	}
+
+	:global(sub),
+	:global(sup) {
+		font-size: 75%;
+		line-height: 0;
+		position: relative;
+		vertical-align: baseline;
+	}
+
+	:global(sub) {
+		bottom: -0.25em;
+	}
+
+	:global(sup) {
+		top: -0.5em;
+	}
+
+	:global(table) {
+		border-color: inherit;
+		text-indent: 0;
+	}
+
+	:global(iframe) {
+		border-style: none;
+	}
+
+	:global(input) {
+		border-radius: 0;
+	}
+
+	:global([type='number']::-webkit-inner-spin-button),
+	:global([type='number']::-webkit-outer-spin-button) {
+		height: auto;
+	}
+
+	:global([type='search']) {
+		-webkit-appearance: textfield;
+		outline-offset: -2px;
+	}
+
+	:global([type='search']::-webkit-search-decoration) {
+		-webkit-appearance: none;
+	}
+
+	:global(textarea) {
+		overflow: auto;
+		resize: vertical;
+	}
+
+	:global(button),
+	:global(input),
+	:global(optgroup),
+	:global(select),
+	:global(textarea) {
+		font: inherit;
+	}
+
+	:global(optgroup) {
+		font-weight: bold;
+	}
+
+	:global(button) {
+		overflow: visible;
+	}
+
+	:global(button),
+	:global(select) {
+		text-transform: none;
+	}
+
+	:global(button),
+	:global([type='button']),
+	:global([type='reset']),
+	:global([type='submit']),
+	:global([role='button']) {
+		cursor: pointer;
+	}
+
+	:global(button::-moz-focus-inner),
+	:global([type='button']::-moz-focus-inner),
+	:global([type='reset']::-moz-focus-inner),
+	:global([type='submit']::-moz-focus-inner) {
+		border-style: none;
+		padding: 0;
+	}
+
+	:global(button:-moz-focusring),
+	:global([type='button']::-moz-focus-inner),
+	:global([type='reset']::-moz-focus-inner),
+	:global([type='submit']::-moz-focus-inner) {
+		outline: 1px dotted ButtonText;
+	}
+
+	:global(button),
+	:global(html [type='button']),
+	:global([type='reset']),
+	:global([type='submit']) {
+		-webkit-appearance: button;
+	}
+
+	:global(button),
+	:global(input),
+	:global(select),
+	:global(textarea) {
+		background-color: transparent;
+		border-style: none;
+	}
+
+	:global(a:focus),
+	:global(button:focus),
+	:global(input:focus),
+	:global(select:focus),
+	:global(textarea:focus) {
+		outline-width: 0;
+	}
+
+	:global(select) {
+		-moz-appearance: none;
+		-webkit-appearance: none;
+	}
+
+	:global(select::-ms-expand) {
+		display: none;
+	}
+
+	:global(select::-ms-value) {
+		color: currentColor;
+	}
+
+	:global(legend) {
+		border: 0;
+		color: inherit;
+		display: table;
+		max-width: 100%;
+		white-space: normal;
+	}
+
+	:global(::-webkit-file-upload-button) {
+		-webkit-appearance: button;
+		color: inherit;
+		font: inherit;
+	}
+
+	:global([disabled]) {
+		cursor: default;
+	}
+
+	:global(img) {
+		border-style: none;
+	}
+
+	:global(progress) {
+		vertical-align: baseline;
+	}
+
+	:global([aria-busy='true']) {
+		cursor: progress;
+	}
+
+	:global([aria-controls]) {
+		cursor: pointer;
+	}
+
+	:global([aria-disabled='true']) {
+		cursor: default;
 	}
 </style>

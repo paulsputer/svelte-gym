@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-
 	interface GymButtonProps {
 		props: Record<string, any>;
 		name: string;

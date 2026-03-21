@@ -69,7 +69,7 @@
 					if (name.includes('font')) {
 						max = 100;
 					} else {
-						max = window.innerWidth;
+						max = typeof window !== 'undefined' ? window.innerWidth : 1920;
 					}
 					break;
 				case 'em':
