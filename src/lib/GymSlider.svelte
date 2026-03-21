@@ -174,6 +174,19 @@
 
 	let _initialVal = $state(applyFunctor(getProp(name, props)));
 
+	let _decimals = $derived((() => {
+		const s = String(_step);
+		const dot = s.indexOf('.');
+		return dot === -1 ? 0 : s.length - dot - 1;
+	})());
+
+	function formatVal(v: any): string {
+		if (typeof v === 'number' && _decimals > 0) {
+			return v.toFixed(_decimals);
+		}
+		return String(v ?? '');
+	}
+
 	// Detect units from initial value if not provided
 	if (units === null && typeof _initialVal === 'string') {
 		const possibleUnits = unitOpts.filter((e) => {
@@ -213,6 +226,7 @@
 
 <div class="holder">
 	<label>
+		<span class="value-indicator">{formatVal(_initialVal)}{units ?? ''}</span>
 		<input
 			type="range"
 			min={min ?? 0}
@@ -248,5 +262,16 @@
 
 	label span {
 		text-transform: capitalize;
+	}
+
+	.value-indicator {
+		display: block;
+		text-align: center;
+		font-variant-numeric: tabular-nums;
+		font-family: monospace;
+		font-size: 0.75em;
+		line-height: 1;
+		margin: 0;
+		padding: 0;
 	}
 </style>
