@@ -1,0 +1,27 @@
+{
+	"name": "eslint-plugin-svelte-gym",
+	"version": "1.0.0",
+	"description": "ESLint rules for validating svelte-gym test harness pages",
+	"main": "index.cjs",
+	"license": "MIT",
+	"keywords": [
+		"eslint",
+		"eslintplugin",
+		"eslint-plugin",
+		"svelte",
+		"svelte-gym",
+		"testing"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/paulsputer/svelte-gym",
+		"directory": "eslint-plugin"
+	},
+	"files": [
+		"index.cjs",
+		"rules/"
+	],
+	"peerDependencies": {
+		"eslint": ">=8.0.0"
+	}
+}

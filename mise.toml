@@ -12,3 +12,11 @@ view = { run = "pnpm run preview", description = "Alias for preview" }
 
 # Build
 build = { run = "pnpm run build", description = "Build the project for production" }
+
+# Test
+test = { run = "pnpm run test:unit && pnpm exec playwright test", description = "Run all tests (unit + e2e)" }
+
+# Publish
+"publish" = { run = "pnpm run build && npm publish --access public", description = "Publish svelte-gym to npm" }
+"publish:eslint" = { run = "cd eslint-plugin && npm publish --access public", description = "Publish eslint-plugin-svelte-gym to npm" }
+"publish:all" = { depends = ["publish", "publish:eslint"], description = "Publish both packages to npm" }

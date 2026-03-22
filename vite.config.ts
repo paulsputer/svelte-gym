@@ -8,5 +8,9 @@ export default defineConfig({
 			$lib: './src/lib/',
 			$static: './static/'
 		}
+	},
+	test: {
+		include: ['src/**/*.test.{js,ts}', 'eslint-plugin/**/*.test.js'],
+		exclude: ['e2e/**', 'node_modules/**']
 	}
 });

@@ -25,6 +25,13 @@ module.exports = {
 			parser: 'svelte-eslint-parser',
 			parserOptions: {
 				parser: '@typescript-eslint/parser'
+			},
+			plugins: ['svelte-gym'],
+			rules: {
+				'svelte-gym/require-restore-props': 'warn',
+				'svelte-gym/no-duplicate-prop-names': 'warn',
+				'svelte-gym/require-props-state': 'error',
+				'svelte-gym/single-component-in-test': 'error'
 			}
 		}
 	]

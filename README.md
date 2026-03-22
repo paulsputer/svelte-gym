@@ -165,6 +165,121 @@ In your controls:
 
 <a href="https://www.buymeacoffee.com/sveltegym" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
+## ESLint Plugin
+
+Svelte Gym ships with an ESLint plugin (`eslint-plugin-svelte-gym`) to help catch common test harness setup mistakes at lint time.
+
+### Installation
+
+```bash
+# The plugin is included in the svelte-gym package
+npm install -D eslint-plugin-svelte-gym
+```
+
+Or reference it locally if using the source:
+
+```json
+{
+  "devDependencies": {
+    "eslint-plugin-svelte-gym": "file:./eslint-plugin"
+  }
+}
+```
+
+### ESLint Configuration
+
+Add to your `.eslintrc.cjs`:
+
+```js
+module.exports = {
+  overrides: [
+    {
+      files: ['*.svelte'],
+      plugins: ['svelte-gym'],
+      rules: {
+        'svelte-gym/require-restore-props': 'warn',
+        'svelte-gym/no-duplicate-prop-names': 'warn',
+        'svelte-gym/require-props-state': 'error',
+        'svelte-gym/single-component-in-test': 'error'
+      }
+    }
+  ]
+};
+```
+
+### Rules
+
+#### `svelte-gym/require-restore-props` ⚠️
+
+Warns when a file imports `TestHarness` but never calls `restoreProps()`. Without this call, URL parameters won't be restored into component state.
+
+**Correct:**
+```svelte
+<script>
+  import { TestHarness, restoreProps } from 'svelte-gym';
+  let props = $state({ label: 'Hello' });
+  restoreProps(props);
+</script>
+```
+
+**Incorrect:**
+```svelte
+<script>
+  import { TestHarness } from 'svelte-gym'; // ⚠️ Missing restoreProps
+  let props = $state({ label: 'Hello' });
+</script>
+```
+
+#### `svelte-gym/no-duplicate-prop-names` ⚠️
+
+Warns when multiple `Gym*` components use the same `name` prop. Duplicate names cause permalink parameter collisions.
+
+**Incorrect:**
+```svelte
+<GymTextbox bind:props name="label" />
+<GymSlider bind:props name="label" /> <!-- ⚠️ Duplicate "label" -->
+```
+
+#### `svelte-gym/require-props-state` ❌
+
+Errors when `restoreProps(props)` is called but `props` was not declared with `$state()`. Without `$state()`, restored values won't trigger Svelte reactivity.
+
+**Correct:**
+```svelte
+<script>
+  let props = $state({ count: 0 }); // ✅ Uses $state
+  restoreProps(props);
+</script>
+```
+
+**Incorrect:**
+```svelte
+<script>
+  let props = { count: 0 }; // ❌ Not reactive
+  restoreProps(props);
+</script>
+```
+
+#### `svelte-gym/single-component-in-test` ❌
+
+Errors when the `componentToTest` snippet contains more than one element, or when its single element is a plain HTML element (not a component). This prevents wrapper `<div>` or `<section>` tags that make things look correct in the harness but behave differently in production.
+
+**Correct:**
+```svelte
+{#snippet componentToTest()}
+    <MyComponent {...props} />
+{/snippet}
+```
+
+**Incorrect:**
+```svelte
+{#snippet componentToTest()}
+    <div class="wrapper">           <!-- ❌ HTML wrapper -->
+        <MyComponent {...props} />
+    </div>
+{/snippet}
+```
+
 ## Known Issues
 
 - **Type definitions generated as `Record<string, never>`:** If your published package emits broken `.d.ts` files where all component props are typed as `Record<string, never>`, ensure your `peerDependencies.svelte` is set to `"^5.0.0"` (not `">=3.0.0"`). The `@sveltejs/package` type generator uses this field to select the correct type shims — a range that intersects with Svelte 3 causes it to use legacy shims that don't understand `$props()`. See [sveltejs/kit#12972](https://github.com/sveltejs/kit/issues/12972) for details.
