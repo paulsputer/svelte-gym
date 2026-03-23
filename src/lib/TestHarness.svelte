@@ -134,9 +134,9 @@
 			history.scrollRestoration = 'manual';
 		}
 
-		let hasAnimations = document.getAnimations().length > 0;
+		// Always enable reset — it also stops interpolations
 		// @ts-ignore
-		props.__resetAnimations = hasAnimations ? resetAnimations : undefined;
+		props.__resetAnimations = resetAnimations;
 
 		// Track scroll height changes
 		updateMaxScroll();
@@ -170,6 +170,8 @@
 			a.cancel();
 			a.play();
 		});
+		// Stop all active interpolations
+		window.dispatchEvent(new CustomEvent('gymResetInterpolations'));
 	}
 
 	let permalinkLabel = $state('Copy Permalink');

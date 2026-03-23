@@ -1,5 +1,6 @@
 <script lang="ts">
 	import GymOverrideButtons from './GymOverrideButtons.svelte';
+	import GymInterpolateMenu from './GymInterpolateMenu.svelte';
 	import { setProp, getProp } from './helpers.js';
 
 	interface GymSliderProps {
@@ -12,6 +13,7 @@
 		fn?: ((v: number) => number) | null;
 		label?: string;
 		hideExtra?: boolean;
+		interpMenu?: GymInterpolateMenu;
 	}
 
 	let {
@@ -23,7 +25,8 @@
 		units = null,
 		fn = null,
 		label = name,
-		hideExtra = false
+		hideExtra = false,
+		interpMenu = $bindable()
 	}: GymSliderProps = $props();
 
 	const optDefault = 'NONE';
@@ -225,7 +228,16 @@
 </script>
 
 <div class="gym-control">
-	<span class="gym-label">{label ?? name}</span>
+	<span class="gym-label"><GymInterpolateMenu
+		bind:this={interpMenu}
+		mode="slider"
+		sliderMin={min ?? 0}
+		sliderMax={max ?? 100}
+		sliderValue={_initialVal}
+		{units}
+		propName={name}
+		bind:props
+	/>{label ?? name}</span>
 	<div class="gym-value">
 		<span class="value-indicator">{#if _props._override !== optDefault}{extraOpts.find(e => e.value === _props._override)?.label ?? ''}{:else}{formatVal(_initialVal)}{typeof _initialVal === 'number' || (typeof _initialVal === 'string' && !isNaN(Number(_initialVal))) ? (units ?? '') : ''}{/if}</span>
 		<input

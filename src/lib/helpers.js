@@ -89,6 +89,8 @@ export function restoreProps(props) {
     const params = new URL(window.location.href).searchParams;
 
     params.forEach((v, k) => {
+        // Skip interpolation config params (handled by GymInterpolateMenu)
+        if (k.startsWith('__interp_')) return;
         setProp(v, k, props, undefined, true);
 
     });

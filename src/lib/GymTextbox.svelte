@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { setProp, getProp } from './helpers.js';
 	import GymOverrideButtons from './GymOverrideButtons.svelte';
+	import GymInterpolateMenu from './GymInterpolateMenu.svelte';
 
 	interface GymTextboxProps {
 		props: Record<string, any>;
@@ -8,9 +9,10 @@
 		label?: string;
 		hideExtra?: boolean;
 		multiline?: boolean;
+		interpMenu?: GymInterpolateMenu;
 	}
 
-	let { props = $bindable(), name, label = name, hideExtra = false, multiline = false }: GymTextboxProps = $props();
+	let { props = $bindable(), name, label = name, hideExtra = false, multiline = false, interpMenu = $bindable() }: GymTextboxProps = $props();
 
 	const optDefault = 'NONE';
 
@@ -45,10 +47,24 @@
 	} else {
 		_props._override = optDefault;
 	}
+
+	// React to external prop changes (e.g. from interpolation)
+	$effect(() => {
+		const currentVal = getProp(name, props);
+		if (_props._override === optDefault && currentVal !== _initialVal) {
+			_initialVal = currentVal ?? '';
+		}
+	});
 </script>
 
 <div class="gym-control">
-	<span class="gym-label">{label ?? name}</span>
+	<span class="gym-label"><GymInterpolateMenu
+		bind:this={interpMenu}
+		mode="text"
+		{multiline}
+		propName={name}
+		bind:props
+	/>{label ?? name}</span>
 	<div class="gym-value">
 		{#if multiline}
 			<textarea
