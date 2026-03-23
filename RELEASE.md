@@ -1,5 +1,28 @@
 # Release Notes
 
+## v1.1.0 - SSR Compatibility, ESLint Plugin & New Components (2026-03-23)
+
+### New Features
+
+- **GymInterpolateMenu Component**: New interpolation/animation mode for `GymSlider` and `GymTextbox`. A 3-dot menu lets you start a sinusoidal animation that continuously sweeps a prop value between a configurable min/max at a given CPM (cycles per minute). For sliders this oscillates the numeric value; for textboxes it grows/shrinks lorem ipsum text. Interpolation state is persisted in the URL via `__interp_<propName>` parameters so animations auto-resume from permalinks. A global "Reset Animations" button in `TestHarness` stops all active interpolations.
+- **GymOverrideButtons Component**: Inline `null` / `undefined` override buttons extracted into a reusable component. Every control now shows compact toggle buttons for setting a prop to `null` or `undefined`, making edge-case testing a single click.
+- **GymColorPicker Component**: New color picker control supporting `null` and `undefined` values, following the same patterns as other Gym components.
+- **ESLint Plugin (`eslint-plugin-svelte-gym`)**: A companion ESLint plugin with rules for validating svelte-gym test harness pages. Published as a separate package.
+- **E2E Testing with Playwright**: Comprehensive end-to-end tests for permalink functionality, including `__grid` and `__highlight` harness parameters.
+- **Copy-to-Clipboard for Permalinks**: Permalink URLs can now be copied to clipboard directly from the harness.
+- **Slider Value Indicator**: `GymSlider` now displays the current value with decimal precision via a new inline indicator.
+
+### Improvements & Refinement
+
+- **SSR Compatibility**: Removed SvelteKit dependency (`$app/stores`, `$app/navigation`) in favour of standard browser APIs. Inlined `ress` CSS reset. The library can now be used in any Svelte project, not just SvelteKit.
+- **TypeScript Prop Interfaces**: Added proper TypeScript interfaces to all 8 components and removed `// @ts-nocheck` directives for correct `.d.ts` generation.
+- **Control Styling Refresh**: Larger override buttons and checkboxes for better readability and tap targets. Standardised component styling across all Gym controls.
+- **Scroll Mode Sync**: The scroll mode checkbox now syncs with the `__scrollY` prop via an `$effect`, and the "Reset Animations" button is always visible.
+- **GymSlider Unit Handling**: Fixed display of "autopx" when unit is set to "auto".
+- **Expanded Unit Tests**: New test scenarios for linter rules and helper functions.
+
+---
+
 ## v1.0.2 - Scroll Hijacking & Page Centering (2026-02-17)
 
 ### New Features
@@ -43,22 +66,20 @@ This release migrates all `svelte-gym` components to use Svelte 5 Runes syntax, 
 All components now use Svelte 5 Runes syntax:
 
 **Before (Svelte 4):**
+
 ```svelte
 <script>
-  export let props;
-  export let name;
-  export let label = name;
+	export let props;
+	export let name;
+	export let label = name;
 </script>
 ```
 
 **After (Svelte 5 Runes):**
+
 ```svelte
 <script>
-  let {
-    props = $bindable(),
-    name,
-    label = name
-  } = $props();
+	let { props = $bindable(), name, label = name } = $props();
 </script>
 ```
 
@@ -67,28 +88,30 @@ All components now use Svelte 5 Runes syntax:
 `TestHarness` now uses **snippets** instead of named slots:
 
 **Before:**
+
 ```svelte
 <TestHarness>
-  <svelte:fragment slot="componentToTest">
-    <MyComponent {...props} />
-  </svelte:fragment>
-  
-  <svelte:fragment slot="controls">
-    <GymCheckbox bind:props name="active" />
-  </svelte:fragment>
+	<svelte:fragment slot="componentToTest">
+		<MyComponent {...props} />
+	</svelte:fragment>
+
+	<svelte:fragment slot="controls">
+		<GymCheckbox bind:props name="active" />
+	</svelte:fragment>
 </TestHarness>
 ```
 
 **After:**
+
 ```svelte
 <TestHarness>
-  {#snippet componentToTest()}
-    <MyComponent {...props} />
-  {/snippet}
-  
-  {#snippet controls()}
-    <GymCheckbox bind:props name="active" />
-  {/snippet}
+	{#snippet componentToTest()}
+		<MyComponent {...props} />
+	{/snippet}
+
+	{#snippet controls()}
+		<GymCheckbox bind:props name="active" />
+	{/snippet}
 </TestHarness>
 ```
 
@@ -97,22 +120,24 @@ All components now use Svelte 5 Runes syntax:
 Props objects in consumer pages must use `$state()`:
 
 **Before:**
+
 ```svelte
 <script>
-  let props = {
-    label: 'default text',
-    active: true
-  };
+	let props = {
+		label: 'default text',
+		active: true
+	};
 </script>
 ```
 
 **After:**
+
 ```svelte
 <script>
-  let props = $state({
-    label: 'default text',
-    active: true
-  });
+	let props = $state({
+		label: 'default text',
+		active: true
+	});
 </script>
 ```
 
@@ -134,14 +159,16 @@ All components have been updated to Svelte 5 Runes:
 To upgrade your existing code:
 
 1. **Update your props objects** to use `$state()`:
+
    ```svelte
    let props = $state({ /* your props */ });
    ```
 
 2. **Replace slot syntax** with snippets in `TestHarness`:
+
    ```svelte
    {#snippet componentToTest()}
-     <!-- your component -->
+   	<!-- your component -->
    {/snippet}
    ```
 
@@ -159,38 +186,40 @@ Initial release of svelte-gym with Svelte 4 support.
 ## Svelte 5 & SvelteKit 2 Upgrade
 
 **Major Upgrade**:
+
 - Upgraded to Svelte 5 and SvelteKit 2.
 - Updated `vite-plugin-svelte` to v4 (compatible with Svelte 5 / Vite 5).
 - Resolved migration issues (e.g., self-closing tags).
 
 # Release v0.4.0
+
 Improvements to documentation, along with a kitchen sink example page.
 
-+ `GymTextbox` learnt `multiline` - this allows testing components that expect textarea input
+- `GymTextbox` learnt `multiline` - this allows testing components that expect textarea input
 
 # Release v0.3.0
 
 This version deprecates all previous grid settings in favour of a more structured naming convention.  
 Previous names will continue to work but emit a console warning about the deprecated name usage.
 
- + 0-grid-light-mode
- + 10-grid-light-mode
- + 20-grid-light-mode
- + 50-grid-light-mode
- + 100-grid-light-mode
- + 0-grid-dark-mode
- + 10-grid-dark-mode
- + 20-grid-dark-mode
- + 50-grid-dark-mode
- + 100-grid-dark-mode
- + 10-text-light-mode
- + 20-text-light-mode
- + 50-text-light-mode
- + 100-text-light-mode
- + 10-text-dark-mode
- + 20-text-dark-mode
- + 50-text-dark-mode
- + 100-text-dark-mode
+- 0-grid-light-mode
+- 10-grid-light-mode
+- 20-grid-light-mode
+- 50-grid-light-mode
+- 100-grid-light-mode
+- 0-grid-dark-mode
+- 10-grid-dark-mode
+- 20-grid-dark-mode
+- 50-grid-dark-mode
+- 100-grid-dark-mode
+- 10-text-light-mode
+- 20-text-light-mode
+- 50-text-light-mode
+- 100-text-light-mode
+- 10-text-dark-mode
+- 20-text-dark-mode
+- 50-text-dark-mode
+- 100-text-dark-mode
 
 # Release v0.2.1
 
@@ -204,29 +233,31 @@ HOTFIX: remove stay import breaking build once imported
 
 Now supports the following different grid backgrounds:
 
-+ none
-+ light
-+ dark
-+ black
-+ white
-+ textBlack
-+ textWhite
+- none
+- light
+- dark
+- black
+- white
+- textBlack
+- textWhite
 
 These help test various scenarios especially when testing opacity and blurs on components.
 
 To avoid any breaking changes usage of true / false continues to work.
 
 ### GymDropdown
-+ learnt to accept objects and arrays of objects
-    + array of objects default to `label` and `value` to override use `optLabel` and `optValue` attributes
-+ learnt to use jsonpath for props
+
+- learnt to accept objects and arrays of objects
+  - array of objects default to `label` and `value` to override use `optLabel` and `optValue` attributes
+- learnt to use jsonpath for props
 
 ### GymSlider
-+ learnt to accept a functor `fn` to apply to values
-    + A common usage is to get decimal percentage i.e.  `(v) => v / 100`
-+ learnt to default to useful min/max based on units if no min/max provided
+
+- learnt to accept a functor `fn` to apply to values
+  - A common usage is to get decimal percentage i.e. `(v) => v / 100`
+- learnt to default to useful min/max based on units if no min/max provided
 
 ## Bug Fixes and Other Changes
 
-+ GymSlider units attribute defaults to null to get number rather than string value
-+ Controls side bar now scrolls content to avoid page scrolling
+- GymSlider units attribute defaults to null to get number rather than string value
+- Controls side bar now scrolls content to avoid page scrolling
