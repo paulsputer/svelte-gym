@@ -9,8 +9,15 @@
 		"eslintplugin",
 		"eslint-plugin",
 		"svelte",
+		"svelte5",
 		"svelte-gym",
-		"testing"
+		"linter",
+		"lint",
+		"testing",
+		"component harness",
+		"visual testing",
+		"dev tools",
+		"rules"
 	],
 	"repository": {
 		"type": "git",
@@ -19,7 +26,8 @@
 	},
 	"files": [
 		"index.cjs",
-		"rules/"
+		"rules/",
+		"README.md"
 	],
 	"peerDependencies": {
 		"eslint": ">=8.0.0"
