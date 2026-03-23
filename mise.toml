@@ -2,21 +2,74 @@
 node = "24.9.0"
 pnpm = "10.22.0"
 
-[tasks]
 # Development
-dev = { run = "pnpm run dev", description = "Start development server" }
+[tasks.dev]
+description = "Start development server"
+run = "pnpm run dev"
 
 # Production Preview
-preview = { run = "pnpm run preview", description = "View the production build locally" }
-view = { run = "pnpm run preview", description = "Alias for preview" }
+[tasks.preview]
+description = "View the production build locally"
+run = "pnpm run preview"
+
+[tasks.view]
+description = "Alias for preview"
+run = "pnpm run preview"
 
 # Build
-build = { run = "pnpm run build", description = "Build the project for production" }
+[tasks.build]
+description = "Build the project for production"
+run = "pnpm run build"
+
+# Lint
+[tasks.lint]
+description = "Run linter (eslint + prettier)"
+run = """
+pnpm exec eslint .
+pnpm exec prettier --check .
+"""
+
+[tasks."lint:verbose"]
+description = "Run linter with section headers"
+run = """
+echo '=== ESLint ==='
+pnpm exec eslint .
+echo '\n=== Prettier ==='
+pnpm exec prettier --check .
+"""
+
+[tasks."lint:fix:prettier"]
+description = "Auto-fix prettier issues"
+run = """
+pnpm run format
+"""
+
+[tasks."lint:fix:eslint"]
+description = "Auto-fix eslint issues"
+run = """
+pnpm exec eslint . --fix
+"""
 
 # Test
-test = { run = "pnpm run test:unit && pnpm exec playwright test", description = "Run all tests (unit + e2e)" }
+[tasks.test]
+description = "Run all tests (unit + e2e)"
+run = """
+pnpm run test:unit
+pnpm exec playwright test
+"""
 
 # Publish
-"publish" = { run = "pnpm run build && npm publish --access public", description = "Publish svelte-gym to npm" }
-"publish:eslint" = { run = "cd eslint-plugin && npm publish --access public", description = "Publish eslint-plugin-svelte-gym to npm" }
-"publish:all" = { depends = ["publish", "publish:eslint"], description = "Publish both packages to npm" }
+[tasks.publish]
+description = "Publish svelte-gym to npm"
+run = """
+pnpm run build
+npm publish --access public
+"""
+
+[tasks."publish:eslint"]
+description = "Publish eslint-plugin-svelte-gym to npm"
+run = "cd eslint-plugin && npm publish --access public"
+
+[tasks."publish:all"]
+description = "Publish both packages to npm"
+depends = ["publish", "publish:eslint"]
