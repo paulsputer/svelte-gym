@@ -226,7 +226,7 @@
 
 <div class="holder">
 	<label>
-		<span class="value-indicator">{formatVal(_initialVal)}{units ?? ''}</span>
+		<span class="value-indicator">{formatVal(_initialVal)}{typeof _initialVal === 'number' || (typeof _initialVal === 'string' && !isNaN(Number(_initialVal))) ? (units ?? '') : ''}</span>
 		<input
 			type="range"
 			min={min ?? 0}

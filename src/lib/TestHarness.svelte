@@ -162,7 +162,9 @@
 		});
 	}
 
-	function gotoPermalink(e: Event) {
+	let permalinkLabel = $state('Copy Permalink');
+
+	async function copyPermalink(e: Event) {
 		e.preventDefault();
 		const url = new URL(window.location.href);
 		if (props.__scrollY != null) {
@@ -170,7 +172,9 @@
 		} else {
 			url.searchParams.delete('__scrollY');
 		}
-		history.pushState(null, '', url);
+		await navigator.clipboard.writeText(url.toString());
+		permalinkLabel = 'Copied!';
+		setTimeout(() => (permalinkLabel = 'Copy Permalink'), 1500);
 	}
 
 	$effect.pre(() => {
@@ -231,8 +235,8 @@
 		</div>
 		<div class="test-controls">
 			<span
-				><button type="button" class="link-button" onclick={gotoPermalink}
-					>Generate Permalink</button
+				><button type="button" class="link-button" onclick={copyPermalink}
+					>{permalinkLabel}</button
 				></span
 			>
 

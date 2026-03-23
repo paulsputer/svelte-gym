@@ -106,7 +106,10 @@ test.describe('Permalink Roundtrip', () => {
 		expect(bodyText).toBeDefined();
 	});
 
-	test('Generate Permalink button creates shareable URL', async ({ page }) => {
+	test('Copy Permalink button copies shareable URL to clipboard', async ({ page, context }) => {
+		// Grant clipboard permissions
+		await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+
 		// Load page with known state
 		await page.goto('/kitchen-sink?label=Shared+State&isActive=false');
 
@@ -115,16 +118,17 @@ test.describe('Permalink Roundtrip', () => {
 			{ timeout: 5000 }
 		);
 
-		// Click Generate Permalink
-		await page.getByRole('button', { name: 'Generate Permalink' }).click();
+		// Click Copy Permalink
+		await page.getByRole('button', { name: 'Copy Permalink' }).click();
 		await page.waitForTimeout(100);
 
-		// Open URL in new page context to verify it's shareable
-		const url = await browserUrl(page);
-		expect(url).toContain('label=');
+		// Verify URL was copied to clipboard
+		const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+		expect(clipboardText).toContain('label=');
 
+		// Open copied URL in new page to verify it's shareable
 		const page2 = await page.context().newPage();
-		await page2.goto(url);
+		await page2.goto(clipboardText);
 
 		await page2.waitForFunction(
 			() => document.querySelector('.test-component h1')?.textContent === 'Shared State',
