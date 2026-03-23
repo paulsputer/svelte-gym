@@ -1,5 +1,5 @@
 <script lang="ts">
-	import GymRadioGroup from './GymRadioGroup.svelte';
+	import GymOverrideButtons from './GymOverrideButtons.svelte';
 	import { setProp, getProp } from './helpers.js';
 
 	interface GymSliderProps {
@@ -224,9 +224,10 @@
 	}
 </script>
 
-<div class="holder">
-	<label>
-		<span class="value-indicator">{formatVal(_initialVal)}{typeof _initialVal === 'number' || (typeof _initialVal === 'string' && !isNaN(Number(_initialVal))) ? (units ?? '') : ''}</span>
+<div class="gym-control">
+	<span class="gym-label">{label ?? name}</span>
+	<div class="gym-value">
+		<span class="value-indicator">{#if _props._override !== optDefault}{extraOpts.find(e => e.value === _props._override)?.label ?? ''}{:else}{formatVal(_initialVal)}{typeof _initialVal === 'number' || (typeof _initialVal === 'string' && !isNaN(Number(_initialVal))) ? (units ?? '') : ''}{/if}</span>
 		<input
 			type="range"
 			min={min ?? 0}
@@ -238,30 +239,44 @@
 			}}
 			bind:value={_initialVal}
 		/>
-		<span>{label ?? name}</span>
-	</label>
+	</div>
 	{#if !hideExtra}
-		<GymRadioGroup
-			excludeFromPermalink={true}
-			bind:props={_props}
-			name="_override"
-			label=""
-			options={extraOpts}
-		/>
+		<div class="gym-overrides">
+			<GymOverrideButtons
+				options={extraOpts}
+				activeValue={_props._override}
+				{optDefault}
+				onselect={(v) => { _props._override = v; }}
+				onclear={() => { _props._override = optDefault; }}
+			/>
+		</div>
 	{/if}
 </div>
 
 <style>
-	.holder {
-		padding: 0.5em 1em;
+	.gym-control {
+		padding: 0.4em 0.75em;
 	}
 
-	.holder label {
-		color: #000;
-	}
-
-	label span {
+	.gym-label {
+		display: block;
 		text-transform: capitalize;
+		font-weight: 600;
+		color: #000;
+		text-align: left;
+	}
+
+	.gym-value {
+		padding: 0.15em 0;
+	}
+
+	.gym-overrides {
+		padding-top: 0.15em;
+	}
+
+	input[type='range'] {
+		width: 100%;
+		box-sizing: border-box;
 	}
 
 	.value-indicator {

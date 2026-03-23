@@ -1,6 +1,6 @@
 {
 	"name": "svelte-gym",
-	"version": "1.0.2",
+	"version": "1.1.0",
 	"license": "MIT",
 	"description": "Rapidly create and exercise your Svelte components.",
 	"scripts": {
@@ -69,10 +69,22 @@
 	"type": "module",
 	"keywords": [
 		"svelte",
+		"svelte5",
 		"components",
+		"component harness",
+		"component exerciser",
 		"testing",
+		"visual testing",
 		"visual regression testing",
 		"playground",
-		"visual testing"
+		"dev tools",
+		"storybook",
+		"props",
+		"UI",
+		"AI",
+		"AI testing",
+		"AI-assisted testing",
+		"LLM",
+		"AI component testing"
 	]
 }

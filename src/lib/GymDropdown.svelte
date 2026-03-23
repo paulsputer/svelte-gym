@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { setProp, getProp } from './helpers.js';
-	import GymRadioGroup from './GymRadioGroup.svelte';
+	import GymOverrideButtons from './GymOverrideButtons.svelte';
 
 	interface GymDropdownProps {
 		props: Record<string, any>;
@@ -76,9 +76,9 @@
 	}
 </script>
 
-<div class="holder">
-	<label>
-		<span>{label ?? name}</span>
+<div class="gym-control">
+	<span class="gym-label">{label ?? name}</span>
+	<div class="gym-value">
 		<select
 			bind:value={_initialVal}
 			on:input={(e) => {
@@ -93,34 +93,44 @@
 				</option>
 			{/each}
 		</select>
-	</label>
+	</div>
 	{#if !hideExtra}
-		<GymRadioGroup
-			excludeFromPermalink={true}
-			bind:props={_props}
-			name="_override"
-			label=""
-			options={extraOpts}
-		/>
+		<div class="gym-overrides">
+			<GymOverrideButtons
+				options={extraOpts}
+				activeValue={_props._override}
+				{optDefault}
+				onselect={(v) => { _props._override = v; }}
+				onclear={() => { _props._override = optDefault; }}
+			/>
+		</div>
 	{/if}
 </div>
 
 <style>
-	.holder {
-		padding: 0 1em;
+	.gym-control {
+		padding: 0.4em 0.75em;
 	}
 
-	.holder label {
-		color: #000;
-	}
-
-	label span {
+	.gym-label {
+		display: block;
 		text-transform: capitalize;
 		font-weight: 600;
-		padding-top: 0.5em;
+		color: #000;
+		text-align: left;
+	}
+
+	.gym-value {
+		padding: 0.15em 0;
+	}
+
+	.gym-overrides {
+		padding-top: 0.15em;
 	}
 
 	select {
 		background-color: #fff;
+		width: 100%;
+		box-sizing: border-box;
 	}
 </style>

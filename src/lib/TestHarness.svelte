@@ -29,6 +29,7 @@
 		__controls: true,
 		__grid: '20-grid-light-mode',
 		__highlight: true,
+		__scrollMode: false,
 		__width: 'auto',
 		__height: 'auto',
 		__fontsize: '1em',
@@ -37,6 +38,15 @@
 	});
 
 	let scrollMode = $derived(props.__scrollY != null);
+
+	// Sync __scrollMode checkbox with __scrollY
+	$effect(() => {
+		if (props.__scrollMode && props.__scrollY === undefined) {
+			props.__scrollY = (typeof window !== 'undefined' ? window.scrollY : 0) + 'px';
+		} else if (!props.__scrollMode && props.__scrollY !== undefined) {
+			props.__scrollY = undefined;
+		}
+	});
 
 	const gridOptions = [
 		{ value: '0-grid-light-mode', class: 'grid bg-0 light-mode' },
@@ -183,13 +193,7 @@
 		}
 	});
 
-	function toggleScrollMode(e: Event & { currentTarget: EventTarget & HTMLInputElement }) {
-		if ((e.currentTarget as HTMLInputElement).checked) {
-			props.__scrollY = window.scrollY + 'px';
-		} else {
-			props.__scrollY = undefined;
-		}
-	}
+
 
 	function updateScroll() {
 		// Prevent initial 0 from overwriting restored value
@@ -247,10 +251,7 @@
 					<GymCheckbox hideExtra={true} bind:props name="__controls" label="controls" />
 				</li>
 				<li>
-					<label>
-						<input type="checkbox" checked={scrollMode} onchange={toggleScrollMode} />
-						<span>scroll mode</span>
-					</label>
+					<GymCheckbox hideExtra={true} bind:props name="__scrollMode" label="scroll mode" />
 				</li>
 				<GymDropdown
 					hideExtra={true}
@@ -391,12 +392,14 @@
 		width: var(--control-area-width);
 		display: flex;
 		flex-direction: column;
-		background: #ccc;
+		background: rgba(240, 240, 240, 0.7);
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
 		height: 100vh;
 		font-family: monospace;
 		color: #000;
 		overflow: scroll;
-		border-left: 1px solid #999;
+		border-left: 1px solid rgba(0, 0, 0, 0.1);
 		z-index: 1001;
 	}
 
@@ -407,6 +410,8 @@
 	.test-controls span {
 		padding: 0.5em;
 	}
+
+
 
 	ul {
 		list-style-type: none;

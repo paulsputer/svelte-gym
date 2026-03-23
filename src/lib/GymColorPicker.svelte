@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { setProp, getProp } from './helpers.js';
-	import GymRadioGroup from './GymRadioGroup.svelte';
+	import GymOverrideButtons from './GymOverrideButtons.svelte';
 
 	interface GymColorPickerProps {
 		props: Record<string, any>;
@@ -47,9 +47,9 @@
 	}
 </script>
 
-<div class="holder">
-	<label>
-		<span>{label ?? name}</span>
+<div class="gym-control">
+	<span class="gym-label">{label ?? name}</span>
+	<div class="gym-value-row">
 		<span class="color-row">
 			<input
 				type="color"
@@ -61,31 +61,36 @@
 			/>
 			<span class="hex-value">{_initialVal}</span>
 		</span>
-	</label>
-	{#if !hideExtra}
-		<GymRadioGroup
-			excludeFromPermalink={true}
-			bind:props={_props}
-			name="_override"
-			label=""
-			options={extraOpts}
-		/>
-	{/if}
+		{#if !hideExtra}
+			<GymOverrideButtons
+				options={extraOpts}
+				activeValue={_props._override}
+				{optDefault}
+				onselect={(v) => { _props._override = v; }}
+				onclear={() => { _props._override = optDefault; }}
+			/>
+		{/if}
+	</div>
 </div>
 
 <style>
-	.holder {
-		padding: 0 1em;
+	.gym-control {
+		padding: 0.4em 0.75em;
 	}
 
-	.holder label {
-		color: #000;
-	}
-
-	label span {
+	.gym-label {
+		display: block;
 		text-transform: capitalize;
 		font-weight: 600;
-		padding-top: 0.5em;
+		color: #000;
+		text-align: left;
+	}
+
+	.gym-value-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.15em 0;
 	}
 
 	.color-row {
