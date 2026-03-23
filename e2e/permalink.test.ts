@@ -61,25 +61,32 @@ test.describe('Permalink Roundtrip', () => {
 		);
 	});
 
-	test.skip('harness __grid param is restored', async ({ page }) => {
-		// KNOWN ISSUE: harness-internal params like __grid are not reliably restored
-		// via restoreProps when loaded from URL. This needs investigation.
+	test('harness __grid param is restored', async ({ page }) => {
 		await page.goto('/kitchen-sink?__grid=50-grid-dark-mode');
 
-		await page.waitForSelector('.test-grid');
-		await page.waitForTimeout(200); // Allow restoreProps to run
+		await page.waitForFunction(
+			() => {
+				const cls = document.querySelector('.test-grid')?.className ?? '';
+				return cls.includes('dark-mode') && cls.includes('bg-50');
+			},
+			{ timeout: 5000 }
+		);
 
 		const gridClasses = await page.getAttribute('.test-grid', 'class');
 		expect(gridClasses).toContain('dark-mode');
 		expect(gridClasses).toContain('bg-50');
 	});
 
-	test.skip('harness __highlight param is restored', async ({ page }) => {
-		// KNOWN ISSUE: same as __grid — harness-internal params need investigation
+	test('harness __highlight param is restored', async ({ page }) => {
 		await page.goto('/kitchen-sink?__highlight=false');
 
-		await page.waitForSelector('.test-component');
-		await page.waitForTimeout(200);
+		await page.waitForFunction(
+			() => {
+				const el = document.querySelector('.test-component');
+				return el && !el.classList.contains('highlight');
+			},
+			{ timeout: 5000 }
+		);
 
 		const hasHighlight = await page.evaluate(
 			() => document.querySelector('.test-component')?.classList.contains('highlight') ?? false
