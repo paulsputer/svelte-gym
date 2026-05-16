@@ -1,5 +1,13 @@
 # Release Notes
 
+## v1.1.1 - Slider Unit Fallback Fix (2026-05-16)
+
+### Bug Fixes
+
+- **GymSlider**: Removed an overzealous fallback that would incorrectly append `px` to numerical strings loaded from URL parameters if no units were explicitly provided. `GymSlider` now correctly preserves unitless numerical values across page reloads.
+
+---
+
 ## v1.1.0 - SSR Compatibility, ESLint Plugin & New Components (2026-03-23)
 
 ### New Features

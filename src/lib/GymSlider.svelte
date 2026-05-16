@@ -204,10 +204,6 @@
 		if (u) {
 			units = u;
 			_initialVal = _initialVal.slice(0, -u.length);
-		} else if (!isNaN(parseFloat(_initialVal))) {
-			// If it's a number but string, assume px if checking for font size?
-			// Or just default to px generally?
-			units = 'px';
 		}
 	} else if (units) {
 		// If units provided, strip them from initial value
