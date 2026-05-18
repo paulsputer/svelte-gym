@@ -48,9 +48,16 @@
 		_props._override = optDefault;
 	}
 
+	let inputRef: HTMLInputElement | HTMLTextAreaElement;
+
 	// React to external prop changes (e.g. from interpolation)
 	$effect(() => {
 		const currentVal = getProp(name, props);
+
+		// If the user is currently typing in this exact input, do not forcefully overwrite the value
+		// as it will break their cursor position due to reactivity race conditions.
+		if (document.activeElement === inputRef) return;
+
 		if (_props._override === optDefault && currentVal !== _initialVal) {
 			_initialVal = currentVal ?? '';
 		}
@@ -68,6 +75,7 @@
 	<div class="gym-value">
 		{#if multiline}
 			<textarea
+				bind:this={inputRef}
 				bind:value={_initialVal}
 				on:input={(e) => {
 					_props._override = optDefault;
@@ -76,6 +84,7 @@
 			></textarea>
 		{:else}
 			<input
+				bind:this={inputRef}
 				type="text"
 				bind:value={_initialVal}
 				on:input={(e) => {

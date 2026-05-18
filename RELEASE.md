@@ -1,5 +1,14 @@
 # Release Notes
 
+## v1.1.2 - GymTextbox Cursor Jump Fix (2026-05-18)
+
+### Bug Fixes
+
+- **GymTextbox**: Fixed a reactivity race condition in Svelte 5 where the internal `$effect` would forcefully overwrite `bind:value` mid-keystroke if the parent component experienced a slight render delay. The textbox now correctly guards against resetting value updates while the user is actively typing in the control, preventing cursor jumps and input drops.
+- **E2E Tests**: Added a Playwright test to verify and guard against textbox reactivity desyncs during fast typing.
+
+---
+
 ## v1.1.1 - Slider Unit Fallback Fix (2026-05-16)
 
 ### Bug Fixes
