@@ -2,8 +2,10 @@
 	import GymOverrideButtons from './GymOverrideButtons.svelte';
 	import GymInterpolateMenu from './GymInterpolateMenu.svelte';
 	import { setProp, getProp } from './helpers.js';
+	import { untrack } from 'svelte';
 
 	interface GymSliderProps {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		props: Record<string, any>;
 		name: string;
 		min?: number | null;
@@ -31,116 +33,9 @@
 
 	const optDefault = 'NONE';
 
-	let _props = $state({
-		_override: optDefault
-	});
-
-	let _step = $state(step ?? 1);
-
-	$effect(() => {
-		let v = _props._override;
-
-		if (v !== optDefault) {
-			if (v === 'NaN') {
-				// Force as Number.NaN
-				v = +v;
-			}
-			setProp(v, name, props, units);
-		}
-	});
-
-	$effect(() => {
-		// Set defaults if null, based on units
-		if (min === null) {
-			switch (units) {
-				case 'em':
-				case 'rem':
-					min = 0.1;
-					break;
-				default:
-					min = 0;
-					break;
-			}
-		}
-
-		if (max === null) {
-			switch (units) {
-				case 'px':
-					// Default to a reasonable screen width if px, but for fonts 100 is better.
-					// However, GymSlider is generic.
-					// If name implies font (hacky but useful?) No, let's stick to safe defaults.
-					if (name.includes('font')) {
-						max = 100;
-					} else {
-						max = typeof window !== 'undefined' ? window.innerWidth : 1920;
-					}
-					break;
-				case 'em':
-				case 'rem':
-					max = 10;
-					break;
-				case 'vw':
-				case 'vh':
-				case 'svh':
-				case 'dvh':
-				case 'lvh':
-				case '%':
-					max = 100;
-					break;
-				default:
-					max = 100;
-					break;
-			}
-		}
-
-		// Set step based on units
-		if (step === null) {
-			switch (units) {
-				case 'em':
-				case 'rem':
-				case 'vw':
-				case 'vh':
-				case 'svh':
-				case 'dvh':
-				case 'lvh':
-					_step = 0.1;
-					break;
-				default:
-					_step = 1;
-					break;
-			}
-		}
-
-		// override functor based on units
-		// but only if no functor defined
-		if (fn === null) {
-			switch (
-				units
-				// No default functors needed anymore as we use step for precision
-			) {
-			}
-		}
-
-		// React to external prop changes (e.g. via bind:scrollTop)
-		let rawVal = getProp(name, props);
-
-		// Strip units if it matches our current units or generally parse it
-		if (typeof rawVal === 'string') {
-			const num = parseFloat(rawVal);
-			if (!isNaN(num)) {
-				// Round to nearest step to avoid floating point precision issues
-				// e.g. 1.5 -> 1.5, but 1.49999 -> 1.5
-				const prec = _step < 1 ? 10 : 1;
-				rawVal = Math.round(num * prec) / prec;
-			}
-		}
-
-		const currentVal = rawVal;
-		// Use loose equality or check for significant difference to avoid loop artifacts
-		if (currentVal != _initialVal) {
-			_initialVal = currentVal;
-		}
-	});
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let _initialVal: any = $state(0);
+	let _step = $derived(step ?? 1);
 
 	const extraOpts = [
 		// NOTE: Important to define NaN as a string else comparison won't work
@@ -167,7 +62,8 @@
 		'dvw'
 	];
 
-	function applyFunctor(v) {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	function applyFunctor(v: any) {
 		if (typeof v === 'number' && fn) {
 			return fn(v);
 		}
@@ -175,87 +71,235 @@
 		return v;
 	}
 
-	let _initialVal = $state(applyFunctor(getProp(name, props)));
+	// Synchronous initial setup for SSR and immediate hydration
+	(() => {
+		let rawPropVal = applyFunctor(getProp(name, props));
 
-	let _decimals = $derived((() => {
-		const s = String(_step);
-		const dot = s.indexOf('.');
-		return dot === -1 ? 0 : s.length - dot - 1;
-	})());
+		if (units === null && typeof rawPropVal === 'string') {
+			const possibleUnits = unitOpts.filter((e) => {
+				return rawPropVal.endsWith(e);
+			});
+			const u = possibleUnits.reduce((a: string | null, e) => {
+				return e.length > (a ?? '').length ? e : a;
+			}, null);
+			if (u) {
+				units = u;
+				rawPropVal = rawPropVal.slice(0, -u.length);
+			}
+		} else if (units) {
+			if (typeof rawPropVal === 'string' && rawPropVal.endsWith(units)) {
+				rawPropVal = rawPropVal.slice(0, -units.length);
+			}
+		}
 
-	function formatVal(v: any): string {
+		if (min === null) {
+			switch (units) {
+				case 'em':
+				case 'rem':
+					min = 0.1;
+					break;
+				default:
+					min = 0;
+					break;
+			}
+		}
+
+		if (max === null) {
+			switch (units) {
+				case 'px':
+					if (name.includes('font')) {
+						max = 100;
+					} else {
+						max = typeof window !== 'undefined' ? window.innerWidth : 1920;
+					}
+					break;
+				case 'em':
+				case 'rem':
+					max = 10;
+					break;
+				case 'vw':
+				case 'vh':
+				case 'svh':
+				case 'dvh':
+				case 'lvh':
+				case '%':
+					max = 100;
+					break;
+				default:
+					max = 100;
+					break;
+			}
+		}
+
+		if (step === null) {
+			switch (units) {
+				case 'em':
+				case 'rem':
+				case 'vw':
+				case 'vh':
+				case 'svh':
+				case 'dvh':
+				case 'lvh':
+					step = 0.1;
+					break;
+				default:
+					step = 1;
+					break;
+			}
+		}
+
+		_step = step ?? 1;
+
+		if (typeof rawPropVal === 'string') {
+			const num = parseFloat(rawPropVal);
+			if (!isNaN(num)) {
+				const prec = _step < 1 ? 10 : 1;
+				rawPropVal = Math.round(num * prec) / prec;
+			}
+		}
+
+		let res = extraOpts.find((e) => {
+			return e.value === rawPropVal || '' + e.value === String(rawPropVal);
+		});
+
+		if (!res) {
+			_initialVal = rawPropVal;
+		}
+	})();
+
+	$effect(() => {
+		// 1. Sync from props to local state
+		let rawPropVal = applyFunctor(getProp(name, props));
+
+		if (units === null && typeof rawPropVal === 'string') {
+			const possibleUnits = unitOpts.filter((e) => rawPropVal.endsWith(e));
+			const u = possibleUnits.reduce(
+				(a: string | null, e) => (e.length > (a ?? '').length ? e : a),
+				null
+			);
+			if (u) {
+				units = u;
+				rawPropVal = rawPropVal.slice(0, -u.length);
+			}
+		} else if (units && typeof rawPropVal === 'string' && rawPropVal.endsWith(units)) {
+			rawPropVal = rawPropVal.slice(0, -units.length);
+		}
+
+		let currentVal = rawPropVal;
+		if (typeof currentVal === 'string') {
+			const num = parseFloat(currentVal);
+			if (!isNaN(num)) {
+				const prec = _step < 1 ? 10 : 1;
+				currentVal = Math.round(num * prec) / prec;
+			}
+		}
+
+		let res = extraOpts.find((e) => e.value === currentVal || '' + e.value === String(currentVal));
+
+		untrack(() => {
+			if (!res && currentVal != _initialVal) {
+				console.log(`[GymSlider ${name}] Syncing props -> local:`, currentVal);
+				_initialVal = currentVal;
+			}
+		});
+	});
+
+	// Sync local state (_initialVal) to props
+	$effect(() => {
+		const numVal = Number(_initialVal);
+		console.log(
+			`[GymSlider ${name}] Syncing local -> props. _initialVal =`,
+			_initialVal,
+			'numVal =',
+			numVal
+		);
+		untrack(() => {
+			let currentPropVal = applyFunctor(getProp(name, props));
+			if (units && typeof currentPropVal === 'string' && currentPropVal.endsWith(units)) {
+				const num = parseFloat(currentPropVal.slice(0, -units.length));
+				if (!isNaN(num)) {
+					currentPropVal = num;
+				}
+			}
+
+			if (!isNaN(numVal) && currentPropVal !== numVal) {
+				console.log(`[GymSlider ${name}] Calling setProp for numVal =`, numVal);
+				setProp(applyFunctor(numVal), name, props, units ?? undefined);
+			}
+		});
+	});
+
+	let _override = $derived.by(() => {
+		let v = getProp(name, props);
+
+		if (units !== null && typeof v === 'string' && v.endsWith(units)) {
+			v = v.slice(0, -units.length);
+		}
+
+		let res = extraOpts.find((e) => {
+			return e.value === v || '' + e.value === String(v);
+		});
+
+		if (res) {
+			return res.value as string;
+		}
+
+		return optDefault;
+	});
+
+	let _decimals = $derived(
+		(() => {
+			const s = String(_step);
+			const dot = s.indexOf('.');
+			return dot === -1 ? 0 : s.length - dot - 1;
+		})()
+	);
+
+	function formatVal(v: unknown): string {
 		if (typeof v === 'number' && _decimals > 0) {
 			return v.toFixed(_decimals);
 		}
 		return String(v ?? '');
 	}
-
-	// Detect units from initial value if not provided
-	if (units === null && typeof _initialVal === 'string') {
-		const possibleUnits = unitOpts.filter((e) => {
-			return _initialVal.endsWith(e);
-		});
-
-		// Take the longest match
-		const u = possibleUnits.reduce((a, e) => {
-			return e.length > (a ?? '').length ? e : a;
-		}, null);
-
-		if (u) {
-			units = u;
-			_initialVal = _initialVal.slice(0, -u.length);
-		}
-	} else if (units) {
-		// If units provided, strip them from initial value
-		if (typeof _initialVal === 'string' && _initialVal.endsWith(units)) {
-			_initialVal = _initialVal.slice(0, -units.length);
-		}
-	}
-
-	let res = extraOpts.find((e) => {
-		return e.value === _initialVal || '' + e.value === _initialVal;
-	});
-
-	if (res) {
-		_props._override = res.value;
-	} else {
-		_props._override = optDefault;
-	}
 </script>
 
 <div class="gym-control">
-	<span class="gym-label"><GymInterpolateMenu
-		bind:this={interpMenu}
-		mode="slider"
-		sliderMin={min ?? 0}
-		sliderMax={max ?? 100}
-		sliderValue={_initialVal}
-		{units}
-		propName={name}
-		bind:props
-	/>{label ?? name}</span>
+	<span class="gym-label"
+		><GymInterpolateMenu
+			bind:this={interpMenu}
+			mode="slider"
+			sliderMin={min ?? 0}
+			sliderMax={max ?? 100}
+			sliderValue={_initialVal}
+			{units}
+			propName={name}
+			bind:props
+		/>{label ?? name}</span
+	>
 	<div class="gym-value">
-		<span class="value-indicator">{#if _props._override !== optDefault}{extraOpts.find(e => e.value === _props._override)?.label ?? ''}{:else}{formatVal(_initialVal)}{typeof _initialVal === 'number' || (typeof _initialVal === 'string' && !isNaN(Number(_initialVal))) ? (units ?? '') : ''}{/if}</span>
-		<input
-			type="range"
-			min={min ?? 0}
-			max={max ?? 100}
-			step={_step}
-			on:input={(e) => {
-				_props._override = optDefault;
-				setProp(applyFunctor(+e.target.value), name, props, units);
-			}}
-			bind:value={_initialVal}
-		/>
+		<span class="value-indicator"
+			>{#if _override !== optDefault}{extraOpts.find((e) => e.value === _override)?.label ??
+					''}{:else}{formatVal(_initialVal)}{typeof _initialVal === 'number' ||
+				(typeof _initialVal === 'string' && !isNaN(Number(_initialVal)))
+					? (units ?? '')
+					: ''}{/if}</span
+		>
+		<input type="range" min={min ?? 0} max={max ?? 100} step={_step} bind:value={_initialVal} />
 	</div>
 	{#if !hideExtra}
 		<div class="gym-overrides">
 			<GymOverrideButtons
 				options={extraOpts}
-				activeValue={_props._override}
+				activeValue={_override}
 				{optDefault}
-				onselect={(v) => { _props._override = v; }}
-				onclear={() => { _props._override = optDefault; }}
+				onselect={(v: string | number | boolean | null | undefined) => {
+					let finalV = v;
+					if (v === 'NaN') finalV = Number.NaN;
+					setProp(finalV, name, props, units ?? undefined);
+				}}
+				onclear={() => {
+					setProp(applyFunctor(_initialVal), name, props, units ?? undefined);
+				}}
 			/>
 		</div>
 	{/if}

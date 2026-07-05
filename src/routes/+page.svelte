@@ -1,10 +1,8 @@
 <script lang="ts">
-	import { TestHarness, restoreProps, GymCheckbox, GymLog, GymTextbox } from '../lib/index.js';
+	import { TestHarness, restoreProps, GymCheckbox, GymTextbox } from '../lib/index.js';
 	import ExampleButton from './ExampleButton.svelte';
-	import { page } from '$app/stores';
-	let params = $page.url.searchParams;
 
-	let log: string[] = [];
+	let log = $state<string[]>([]);
 	let props = $state({
 		label: 'default text',
 		active: true,
@@ -20,7 +18,7 @@
 	});
 </script>
 
-<TestHarness>
+<TestHarness {log}>
 	{#snippet componentToTest()}
 		<ExampleButton {...props}></ExampleButton>
 	{/snippet}
@@ -33,7 +31,6 @@
 		<div>
 			<GymTextbox bind:props name="label" />
 		</div>
-		<GymLog {log} />
 	{/snippet}
 </TestHarness>
 

@@ -1,18 +1,21 @@
 <script lang="ts">
 	import { restoreProps } from './helpers.js';
-	import { onMount, type Snippet } from 'svelte';
+	import { onMount, untrack, type Snippet } from 'svelte';
 
 	import GymCheckbox from './GymCheckbox.svelte';
 	import GymSlider from './GymSlider.svelte';
 	import GymButton from './GymButton.svelte';
 	import GymDropdown from './GymDropdown.svelte';
+	import GymLog from './GymLog.svelte';
 
 	interface TestHarnessProps {
 		maxWidth?: number | null;
 		maxHeight?: number | null;
 		maxFontSize?: number | null;
+		log?: string[];
 		componentToTest?: Snippet;
 		controls?: Snippet;
+		logs?: Snippet;
 		children?: Snippet;
 	}
 
@@ -20,12 +23,16 @@
 		maxWidth = null,
 		maxHeight = null,
 		maxFontSize = null,
+		log,
 		componentToTest,
 		controls,
+		logs,
 		children
 	}: TestHarnessProps = $props();
 
-	let props = $state({
+	let activeTab = $state(controls ? 'specific' : 'basic');
+
+	let harnessProps = $state({
 		__controls: true,
 		__grid: '20-grid-light-mode',
 		__highlight: true,
@@ -37,14 +44,14 @@
 		__scrollY: undefined as string | undefined
 	});
 
-	let scrollMode = $derived(props.__scrollY != null);
+	let scrollMode = $derived(harnessProps.__scrollY != null);
 
 	// Sync __scrollMode checkbox with __scrollY
 	$effect(() => {
-		if (props.__scrollMode && props.__scrollY === undefined) {
-			props.__scrollY = (typeof window !== 'undefined' ? window.scrollY : 0) + 'px';
-		} else if (!props.__scrollMode && props.__scrollY !== undefined) {
-			props.__scrollY = undefined;
+		if (harnessProps.__scrollMode && harnessProps.__scrollY === undefined) {
+			harnessProps.__scrollY = (typeof window !== 'undefined' ? window.scrollY : 0) + 'px';
+		} else if (!harnessProps.__scrollMode && harnessProps.__scrollY !== undefined) {
+			harnessProps.__scrollY = undefined;
 		}
 	});
 
@@ -135,16 +142,15 @@
 		}
 
 		// Always enable reset — it also stops interpolations
-		// @ts-ignore
-		props.__resetAnimations = resetAnimations;
+		harnessProps.__resetAnimations = resetAnimations;
 
 		// Track scroll height changes
 		updateMaxScroll();
 
 		// Initial scroll restoration
-		if (props.__scrollY !== undefined) {
+		if (harnessProps.__scrollY !== undefined) {
 			setTimeout(() => {
-				window.scrollTo(0, parseFloat(props.__scrollY as string));
+				window.scrollTo(0, parseFloat(harnessProps.__scrollY as string));
 				initialRestoration = false;
 			}, 100);
 		} else {
@@ -158,9 +164,13 @@
 
 		window.addEventListener('resize', updateMaxScroll);
 
+		const onPopState = () => restoreProps(harnessProps);
+		window.addEventListener('popstate', onPopState);
+
 		return () => {
 			resizeObserver.disconnect();
 			window.removeEventListener('resize', updateMaxScroll);
+			window.removeEventListener('popstate', onPopState);
 		};
 	});
 
@@ -179,8 +189,8 @@
 	async function copyPermalink(e: Event) {
 		e.preventDefault();
 		const url = new URL(window.location.href);
-		if (props.__scrollY != null) {
-			url.searchParams.set('__scrollY', '' + props.__scrollY);
+		if (harnessProps.__scrollY != null) {
+			url.searchParams.set('__scrollY', '' + harnessProps.__scrollY);
 		} else {
 			url.searchParams.delete('__scrollY');
 		}
@@ -191,46 +201,44 @@
 
 	$effect.pre(() => {
 		if (typeof window !== 'undefined') {
-			restoreProps(props);
+			untrack(() => restoreProps(harnessProps));
 		}
 	});
 
-
-
 	function updateScroll() {
 		// Prevent initial 0 from overwriting restored value
-		if (initialRestoration && props.__scrollY !== undefined) return;
+		if (initialRestoration && harnessProps.__scrollY !== undefined) return;
 
 		const y = window.scrollY;
-		if (props.__scrollY !== undefined || y > 0) {
-			props.__scrollY = y + 'px';
+		if (harnessProps.__scrollY !== undefined || y > 0) {
+			harnessProps.__scrollY = y + 'px';
 		}
 	}
 
 	$effect(() => {
 		if (
-			props.__scrollY !== undefined &&
-			Math.abs(window.scrollY - parseFloat(props.__scrollY)) > 5
+			harnessProps.__scrollY !== undefined &&
+			Math.abs(window.scrollY - parseFloat(harnessProps.__scrollY)) > 5
 		) {
-			window.scrollTo(0, parseFloat(props.__scrollY));
+			window.scrollTo(0, parseFloat(harnessProps.__scrollY));
 		}
 	});
 </script>
 
 <svelte:window onscroll={updateScroll} />
 
-<section class={props.__controls ? '' : 'hide-controls'}>
-	<div class="test-grid {getGridClassFromValue(props.__grid)}"></div>
+<section class={harnessProps.__controls ? '' : 'hide-controls'}>
+	<div class="test-grid {getGridClassFromValue(harnessProps.__grid)}"></div>
 
-	<div class="test-area" class:controls={props.__controls}>
+	<div class="test-area" class:controls={harnessProps.__controls}>
 		<div class="test-holder" class:scroll-mode={scrollMode}>
 			<div
 				class="test-component"
-				class:highlight={props.__highlight}
+				class:highlight={harnessProps.__highlight}
 				style="
-				--w:{props.__width};
-				--h:{props.__height};
-				--fs:{props.__fontsize}"
+				--w:{harnessProps.__width};
+				--h:{harnessProps.__height};
+				--fs:{harnessProps.__fontsize}"
 			>
 				{#if componentToTest}
 					{@render componentToTest()}
@@ -240,70 +248,115 @@
 			</div>
 		</div>
 		<div class="test-controls">
-			<span
-				><button type="button" class="link-button" onclick={copyPermalink}
-					>{permalinkLabel}</button
-				></span
-			>
-
-			<hr />
-			<br />
-			<ul>
-				<li>
-					<GymCheckbox hideExtra={true} bind:props name="__controls" label="controls" />
-				</li>
-				<li>
-					<GymCheckbox hideExtra={true} bind:props name="__scrollMode" label="scroll mode" />
-				</li>
-				<GymDropdown
-					hideExtra={true}
-					bind:props
-					name="__grid"
-					label="grid"
-					options={gridOptions}
-					optLabel="value"
-					optValue="value"
-				/>
-				<li>
-					<GymCheckbox hideExtra={true} bind:props name="__highlight" label="highlight" />
-				</li>
-			</ul>
-			<GymButton bind:props name="__resetAnimations" label="Reset Animations" />
-
-			<br />
-			<GymSlider
-				hideExtra={true}
-				units="px"
-				max={maxWidth}
-				bind:props
-				name="__width"
-				label="width"
-			/>
-			<GymSlider
-				hideExtra={true}
-				units="px"
-				max={maxHeight}
-				bind:props
-				name="__height"
-				label="height"
-			/>
-			<GymSlider hideExtra={true} max={maxFontSize} bind:props name="__fontsize" label="fontsize" />
-			<GymSlider
-				hideExtra={true}
-				units="px"
-				max={maxScroll}
-				bind:props
-				name="__scrollY"
-				label="scrollY"
-			/>
-
-			<br />
-			<hr />
-			<span>
+			<div class="tabs">
+				<button class:active={activeTab === 'basic'} onclick={() => (activeTab = 'basic')}
+					>Basic</button
+				>
 				{#if controls}
-					{@render controls()}
+					<button class:active={activeTab === 'specific'} onclick={() => (activeTab = 'specific')}
+						>Specific</button
+					>
 				{/if}
-			</span>
+				{#if logs || log}
+					<button class:active={activeTab === 'logs'} onclick={() => (activeTab = 'logs')}
+						>Logs</button
+					>
+				{/if}
+			</div>
+
+			<div style:display={activeTab === 'basic' ? 'block' : 'none'}>
+				<span>
+					<button type="button" class="link-button" onclick={copyPermalink}>{permalinkLabel}</button
+					>
+				</span>
+				<hr />
+				<br />
+				<ul>
+					<li>
+						<GymCheckbox
+							hideExtra={true}
+							bind:props={harnessProps}
+							name="__controls"
+							label="controls"
+						/>
+					</li>
+					<li>
+						<GymCheckbox
+							hideExtra={true}
+							bind:props={harnessProps}
+							name="__scrollMode"
+							label="scroll mode"
+						/>
+					</li>
+					<GymDropdown
+						hideExtra={true}
+						bind:props={harnessProps}
+						name="__grid"
+						label="grid"
+						options={gridOptions}
+						optLabel="value"
+						optValue="value"
+					/>
+					<li>
+						<GymCheckbox
+							hideExtra={true}
+							bind:props={harnessProps}
+							name="__highlight"
+							label="highlight"
+						/>
+					</li>
+				</ul>
+				<GymButton props={harnessProps} name="__resetAnimations" label="Reset Animations" />
+
+				<br />
+				<GymSlider
+					hideExtra={true}
+					units="px"
+					max={maxWidth}
+					bind:props={harnessProps}
+					name="__width"
+					label="width"
+				/>
+				<GymSlider
+					hideExtra={true}
+					units="px"
+					max={maxHeight}
+					bind:props={harnessProps}
+					name="__height"
+					label="height"
+				/>
+				<GymSlider
+					hideExtra={true}
+					max={maxFontSize}
+					bind:props={harnessProps}
+					name="__fontsize"
+					label="fontsize"
+				/>
+				<GymSlider
+					hideExtra={true}
+					units="px"
+					max={maxScroll}
+					bind:props={harnessProps}
+					name="__scrollY"
+					label="scrollY"
+				/>
+			</div>
+
+			<div style:display={activeTab === 'specific' ? 'block' : 'none'}>
+				<span>
+					{#if controls}
+						{@render controls()}
+					{/if}
+				</span>
+			</div>
+
+			<div style:display={activeTab === 'logs' ? 'flex' : 'none'} class="logs-tab">
+				{#if logs}
+					{@render logs()}
+				{:else if log}
+					<GymLog {log} />
+				{/if}
+			</div>
 		</div>
 	</div>
 </section>
@@ -411,9 +464,42 @@
 
 	.test-controls span {
 		padding: 0.5em;
+		display: block;
 	}
 
+	.tabs {
+		display: flex;
+		border-bottom: 1px solid #ccc;
+		background: rgba(250, 250, 250, 0.9);
+	}
 
+	.tabs button {
+		flex: 1;
+		padding: 0.75em 0.5em;
+		border: none;
+		background: none;
+		cursor: pointer;
+		font: inherit;
+		font-weight: normal;
+		border-bottom: 2px solid transparent;
+		color: #555;
+	}
+
+	.tabs button:hover {
+		background: rgba(0, 0, 0, 0.05);
+	}
+
+	.tabs button.active {
+		border-bottom: 2px solid #000;
+		font-weight: bold;
+		color: #000;
+	}
+
+	.logs-tab {
+		flex-direction: column;
+		height: 100%;
+		overflow: hidden;
+	}
 
 	ul {
 		list-style-type: none;

@@ -1,7 +1,4 @@
 {
-    "editor.formatOnSave": true,
-    "cSpell.words": [
-        "ress",
-        "Textbox"
-    ]
+	"editor.formatOnSave": true,
+	"cSpell.words": ["ress", "Textbox"]
 }

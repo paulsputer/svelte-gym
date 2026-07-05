@@ -42,18 +42,13 @@ module.exports = {
 			SvelteElement(node) {
 				if (!node.name || !node.name.name) return;
 
-				const componentName =
-					typeof node.name.name === 'string' ? node.name.name : node.name.name;
+				const componentName = typeof node.name.name === 'string' ? node.name.name : node.name.name;
 
 				if (!GYM_COMPONENTS.has(componentName)) return;
 
 				// Find the `name` attribute
 				for (const attr of node.startTag.attributes) {
-					if (
-						attr.type === 'SvelteAttribute' &&
-						attr.key &&
-						attr.key.name === 'name'
-					) {
+					if (attr.type === 'SvelteAttribute' && attr.key && attr.key.name === 'name') {
 						// Get the string value
 						let nameValue = null;
 						if (attr.value && attr.value.length > 0) {

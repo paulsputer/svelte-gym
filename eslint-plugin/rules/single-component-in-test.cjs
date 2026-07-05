@@ -14,8 +14,7 @@ module.exports = {
 	meta: {
 		type: 'problem',
 		docs: {
-			description:
-				'Require componentToTest snippet to contain exactly one component element',
+			description: 'Require componentToTest snippet to contain exactly one component element',
 			category: 'Possible Errors',
 			recommended: true
 		},
@@ -63,8 +62,7 @@ module.exports = {
 				// Check: the single element should be a component (PascalCase), not HTML
 				if (elements.length === 1) {
 					const el = elements[0];
-					const tagName =
-						el.name && typeof el.name.name === 'string' ? el.name.name : null;
+					const tagName = el.name && typeof el.name.name === 'string' ? el.name.name : null;
 					if (tagName) {
 						// HTML elements are lowercase, components are PascalCase
 						const isComponent = /^[A-Z]/.test(tagName);

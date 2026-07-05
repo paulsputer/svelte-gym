@@ -1,9 +1,9 @@
 <script lang="ts">
 	interface GymOverrideButtonsProps {
-		options: Array<{ label: string; value: any }>;
-		activeValue: any;
+		options: Array<{ label: string; value: unknown }>;
+		activeValue: unknown;
 		optDefault: string;
-		onselect: (value: any) => void;
+		onselect: (value: unknown) => void;
 		onclear: () => void;
 	}
 

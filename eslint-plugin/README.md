@@ -17,8 +17,8 @@ Add `svelte-gym` to the plugins section of your ESLint configuration and use the
 ```js
 // .eslintrc.cjs
 module.exports = {
-  plugins: ['svelte-gym'],
-  extends: ['plugin:svelte-gym/recommended']
+	plugins: ['svelte-gym'],
+	extends: ['plugin:svelte-gym/recommended']
 };
 ```
 
@@ -26,24 +26,24 @@ Or configure individual rules manually:
 
 ```js
 module.exports = {
-  plugins: ['svelte-gym'],
-  rules: {
-    'svelte-gym/require-restore-props': 'warn',
-    'svelte-gym/no-duplicate-prop-names': 'warn',
-    'svelte-gym/require-props-state': 'error',
-    'svelte-gym/single-component-in-test': 'error'
-  }
+	plugins: ['svelte-gym'],
+	rules: {
+		'svelte-gym/require-restore-props': 'warn',
+		'svelte-gym/no-duplicate-prop-names': 'warn',
+		'svelte-gym/require-props-state': 'error',
+		'svelte-gym/single-component-in-test': 'error'
+	}
 };
 ```
 
 ## Rules
 
-| Rule | Default | Description |
-|------|---------|-------------|
-| [`require-restore-props`](#require-restore-props) | ⚠️ warn | Require `restoreProps()` call when `TestHarness` is imported |
-| [`no-duplicate-prop-names`](#no-duplicate-prop-names) | ⚠️ warn | Disallow duplicate `name` props across Gym components |
-| [`require-props-state`](#require-props-state) | 🛑 error | Require the props object passed to `restoreProps()` to use `$state()` |
-| [`single-component-in-test`](#single-component-in-test) | 🛑 error | Require `componentToTest` snippet to contain exactly one component |
+| Rule                                                    | Default  | Description                                                           |
+| ------------------------------------------------------- | -------- | --------------------------------------------------------------------- |
+| [`require-restore-props`](#require-restore-props)       | ⚠️ warn  | Require `restoreProps()` call when `TestHarness` is imported          |
+| [`no-duplicate-prop-names`](#no-duplicate-prop-names)   | ⚠️ warn  | Disallow duplicate `name` props across Gym components                 |
+| [`require-props-state`](#require-props-state)           | 🛑 error | Require the props object passed to `restoreProps()` to use `$state()` |
+| [`single-component-in-test`](#single-component-in-test) | 🛑 error | Require `componentToTest` snippet to contain exactly one component    |
 
 ### `require-restore-props`
 
@@ -113,20 +113,20 @@ Errors when the `componentToTest` snippet contains more than one child element, 
 ```svelte
 <!-- ❌ Bad — wrapper div hides real layout behavior -->
 {#snippet componentToTest()}
-  <div>
-    <MyComponent {...props} />
-  </div>
+	<div>
+		<MyComponent {...props} />
+	</div>
 {/snippet}
 
 <!-- ❌ Bad — multiple elements -->
 {#snippet componentToTest()}
-  <MyComponent {...props} />
-  <AnotherComponent />
+	<MyComponent {...props} />
+	<AnotherComponent />
 {/snippet}
 
 <!-- ✅ Good -->
 {#snippet componentToTest()}
-  <MyComponent {...props} />
+	<MyComponent {...props} />
 {/snippet}
 ```
 

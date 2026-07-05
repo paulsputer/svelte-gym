@@ -3,48 +3,53 @@
 	import GymOverrideButtons from './GymOverrideButtons.svelte';
 
 	interface GymColorPickerProps {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		props: Record<string, any>;
 		name: string;
 		label?: string;
 		hideExtra?: boolean;
 	}
 
-	let { props = $bindable(), name, label = name, hideExtra = false }: GymColorPickerProps = $props();
+	let {
+		props = $bindable(),
+		name,
+		label = name,
+		hideExtra = false
+	}: GymColorPickerProps = $props();
 
 	const optDefault = 'NONE';
-
-	let _props = $state({
-		_override: optDefault
-	});
-
-	$effect(() => {
-		let v = _props._override;
-
-		if (v !== optDefault) {
-			_initialVal = '#000000';
-			setProp(v, name, props);
-		}
-	});
 
 	const extraOpts = [
 		{ label: 'null', value: null },
 		{ label: 'undefined', value: 'undefined' }
 	];
 
-	let _initialVal = $state(getProp(name, props) ?? '#000000');
-	let res = extraOpts.filter((e) => {
-		if (e.value === _initialVal || '' + e.value === _initialVal) {
-			return true;
+	let _initialVal = $state('#000000');
+
+	$effect(() => {
+		let v = getProp(name, props) ?? '#000000';
+
+		let res = extraOpts.filter((e) => {
+			return e.value === v || '' + e.value === String(v);
+		});
+
+		if (res.length > 0) {
+			_initialVal = '#000000';
+		} else {
+			_initialVal = v as string;
 		}
 	});
 
-	if (res.length > 0) {
-		// @ts-ignore - value can be null for override
-		_props._override = res[0].value;
-		_initialVal = '#000000';
-	} else {
-		_props._override = optDefault;
-	}
+	let _override = $derived.by(() => {
+		let v = getProp(name, props) ?? '#000000';
+		let res = extraOpts.filter((e) => {
+			return e.value === v || '' + e.value === String(v);
+		});
+		if (res.length > 0) {
+			return res[0].value as string;
+		}
+		return optDefault;
+	});
 </script>
 
 <div class="gym-control">
@@ -55,7 +60,6 @@
 				type="color"
 				bind:value={_initialVal}
 				oninput={(e) => {
-					_props._override = optDefault;
 					setProp((e.target as HTMLInputElement).value, name, props);
 				}}
 			/>
@@ -64,10 +68,14 @@
 		{#if !hideExtra}
 			<GymOverrideButtons
 				options={extraOpts}
-				activeValue={_props._override}
+				activeValue={_override}
 				{optDefault}
-				onselect={(v) => { _props._override = v; }}
-				onclear={() => { _props._override = optDefault; }}
+				onselect={(v: string | number | boolean | null | undefined) => {
+					setProp(v, name, props);
+				}}
+				onclear={() => {
+					setProp('#000000', name, props);
+				}}
 			/>
 		{/if}
 	</div>

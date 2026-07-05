@@ -185,4 +185,3 @@ describe('restoreProps', () => {
 		expect(history.replaceState).not.toHaveBeenCalled();
 	});
 });
-

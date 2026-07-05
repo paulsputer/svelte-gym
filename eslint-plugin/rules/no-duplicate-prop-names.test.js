@@ -74,10 +74,7 @@ ruleTester.run('no-duplicate-prop-names', rule, {
 				<GymDropdown name="x" />
 			`,
 			filename: 'Test.svelte',
-			errors: [
-				{ messageId: 'duplicatePropName' },
-				{ messageId: 'duplicatePropName' }
-			]
+			errors: [{ messageId: 'duplicatePropName' }, { messageId: 'duplicatePropName' }]
 		}
 	]
 });

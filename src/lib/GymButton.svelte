@@ -1,5 +1,6 @@
 <script lang="ts">
 	interface GymButtonProps {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		props: Record<string, any>;
 		name: string;
 		label?: string;
@@ -9,15 +10,11 @@
 
 	let disabled = $derived(typeof props[name] === 'undefined');
 
-	function trigger(e) {
+	function trigger() {
 		switch (typeof props[name]) {
 			case 'function':
 				{
 					props[name]();
-				}
-				break;
-			case 'undefined':
-				{
 				}
 				break;
 		}
@@ -27,7 +24,7 @@
 </script>
 
 <div class="holder">
-	<button on:click={trigger} {disabled}>{label ?? name}</button>
+	<button onclick={trigger} {disabled}>{label ?? name}</button>
 </div>
 
 <style>

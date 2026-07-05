@@ -7,12 +7,11 @@
 		GymSlider,
 		GymDropdown,
 		GymRadioGroup,
-		GymColorPicker,
-		GymLog
+		GymColorPicker
 	} from '$lib';
 
 	/** @type {string[]} */
-	let log = [];
+	let log = $state([]);
 
 	let props = $state({
 		label: 'Kitchen Sink',
@@ -34,12 +33,14 @@
 		}
 	});
 
+	import { untrack } from 'svelte';
+
 	$effect.pre(() => {
-		restoreProps(props);
+		untrack(() => restoreProps(props));
 	});
 </script>
 
-<TestHarness>
+<TestHarness {log}>
 	{#snippet componentToTest()}
 		<div class="demo-component" class:dark={props.settings.theme === 'dark'}>
 			<h1>{props.label}</h1>
@@ -54,7 +55,7 @@
 			<p>Selection: {props.selection}</p>
 			<p>Radio: {props.radioSelection}</p>
 			<p>Accent: <span style="color: {props.accentColor}">{props.accentColor}</span></p>
-			<button on:click={props.clickMe}>Log Interaction</button>
+			<button onclick={props.clickMe}>Log Interaction</button>
 		</div>
 	{/snippet}
 
@@ -103,9 +104,6 @@
 				<GymColorPicker bind:props name="accentColor" label="Accent Color" />
 			</li>
 		</ul>
-
-		<h3>Logs</h3>
-		<GymLog {log} />
 	{/snippet}
 </TestHarness>
 

@@ -1,0 +1,24 @@
+{
+	"name": "test-v4-project",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"preview": "vite preview",
+		"check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
+	},
+	"dependencies": {
+		"svelte-gym": "link:..",
+		"svelte-loading-spinners": "^0.3.4"
+	},
+	"devDependencies": {
+		"@sveltejs/vite-plugin-svelte": "^3.1.2",
+		"@tsconfig/svelte": "^5.0.8",
+		"svelte": "^4.2.19",
+		"svelte-check": "^3.6.0",
+		"typescript": "^5.0.0",
+		"vite": "^5.4.11"
+	}
+}

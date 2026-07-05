@@ -10,8 +10,7 @@ module.exports = {
 	meta: {
 		type: 'suggestion',
 		docs: {
-			description:
-				'Require restoreProps() call when TestHarness is imported from svelte-gym',
+			description: 'Require restoreProps() call when TestHarness is imported from svelte-gym',
 			category: 'Best Practices',
 			recommended: true
 		},
@@ -31,12 +30,15 @@ module.exports = {
 		return {
 			ImportDeclaration(node) {
 				const source = node.source.value;
-				if (source === 'svelte-gym' || source === '$lib' || source === '$lib/index' ||
-					source.endsWith('/TestHarness.svelte')) {
+				if (
+					source === 'svelte-gym' ||
+					source === '$lib' ||
+					source === '$lib/index' ||
+					source.endsWith('/TestHarness.svelte')
+				) {
 					for (const specifier of node.specifiers) {
 						if (
-							(specifier.type === 'ImportSpecifier' &&
-								specifier.imported.name === 'TestHarness') ||
+							(specifier.type === 'ImportSpecifier' && specifier.imported.name === 'TestHarness') ||
 							(specifier.type === 'ImportDefaultSpecifier' &&
 								specifier.local.name === 'TestHarness')
 						) {
@@ -47,10 +49,7 @@ module.exports = {
 				}
 			},
 			CallExpression(node) {
-				if (
-					node.callee.type === 'Identifier' &&
-					node.callee.name === 'restoreProps'
-				) {
+				if (node.callee.type === 'Identifier' && node.callee.name === 'restoreProps') {
 					hasRestorePropsCall = true;
 				}
 			},

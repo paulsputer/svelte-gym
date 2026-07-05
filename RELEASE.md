@@ -1,5 +1,23 @@
 # Release Notes
 
+## v2.0.0 - Svelte 4 Backward Compatibility & Parity Linting (2026-07-05)
+
+### New Features
+
+- **Svelte 4 Compatibility**: Full backward compatibility for Svelte 4 projects. You can now use `svelte-gym` in Svelte 4 applications by importing from `svelte-gym/v4`.
+- **v4 Components & Helpers**: Added Svelte 4 implementations under the `/v4` path for all core components (`TestHarness`, `GymButton`, `GymCheckbox`, `GymColorPicker`, `GymDropdown`, `GymInterpolateMenu`, `GymLog`, `GymOverrideButtons`, `GymRadioGroup`, `GymSlider`, `GymTextbox`) and internal state restore helpers.
+- **Svelte 4 vs Svelte 5 API Parity Linter**: Added an API parity check (`mise run lint:api` via `scripts/lint-api-sync.js`) integrated into the main `lint` task that automatically compares v4 and v5 components to ensure their exposed properties and API signatures remain 100% synchronized.
+- **Multi-Version Testing Matrix**: Integrated a Svelte 4 test application (`test-v4-project`) to verify that the Svelte 4 components compile and function correctly alongside the Svelte 5 ones.
+
+### Improvements & Refinement
+
+- **Control Tabs**: Control separated into core/basic controls of test harness, specific component controls, and logs
+- **Simplified Logging**: Logs can now be passed as a prop to the TestHarness
+- **Peer Dependency Extension**: Relaxed `peerDependencies` in `package.json` to allow `svelte` `^4.0.0` or `^5.0.0`.
+- **Enhanced Test Suites**: Expanded Playwright E2E and Vitest unit testing to run verification checks on both Svelte 4 and Svelte 5 component APIs and rendering behavior.
+
+---
+
 ## v1.1.2 - GymTextbox Cursor Jump Fix (2026-05-18)
 
 ### Bug Fixes

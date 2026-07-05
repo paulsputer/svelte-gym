@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { TestHarness, GymLog, GymDropdown } from '../../lib/index.js';
+	import { TestHarness, GymDropdown } from '../../lib/index.js';
 	import { restoreProps } from '../../lib/helpers.js';
 
 	let log: string[] = [];
@@ -24,7 +24,7 @@
 	});
 </script>
 
-<TestHarness>
+<TestHarness {log}>
 	{#snippet componentToTest()}
 		<section>
 			<div>
@@ -58,7 +58,6 @@
 				optValue="val2"
 			/>
 		</div>
-		<GymLog {log} />
 	{/snippet}
 </TestHarness>
 

@@ -25,9 +25,14 @@ run = "pnpm run build"
 [tasks.lint]
 description = "Run linter (eslint + prettier)"
 run = """
+pnpm run lint:api
 pnpm exec eslint .
 pnpm exec prettier --check .
 """
+
+[tasks."lint:api"]
+description = "Run custom API parity check"
+run = "pnpm exec node scripts/lint-api-sync.js"
 
 [tasks."lint:verbose"]
 description = "Run linter with section headers"
@@ -73,3 +78,8 @@ run = "cd eslint-plugin && npm publish --access public"
 [tasks."publish:all"]
 description = "Publish both packages to npm"
 depends = ["publish", "publish:eslint"]
+
+[tasks."dev:v4"]
+description = "Start development server for Svelte 4 test project"
+dir = "test-v4-project"
+run = "pnpm run dev"

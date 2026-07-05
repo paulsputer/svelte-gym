@@ -1,6 +1,6 @@
 <script lang="ts">
 	interface GymLogProps {
-		log: any[];
+		log: unknown[];
 	}
 
 	let { log }: GymLogProps = $props();

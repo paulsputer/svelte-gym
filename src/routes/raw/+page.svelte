@@ -1,17 +1,9 @@
 <script lang="ts">
-	import {
-		TestHarness,
-		GymSlider,
-		GymLog,
-		GymTextbox,
-		GymDropdown,
-		GymCheckbox
-	} from '../../lib/index.js';
-	import { page } from '$app/stores';
+	import { TestHarness, GymSlider, GymTextbox, GymDropdown, GymCheckbox } from '../../lib/index.js';
 	import { restoreProps } from '../../lib/helpers.js';
 
-	let log: string[] = [];
-	let props = {
+	let log = $state<string[]>([]);
+	let props = $state({
 		label: '',
 		label_nest: {
 			label: '',
@@ -48,15 +40,15 @@
 				dropdown: ''
 			}
 		}
-	};
+	});
 
 	$effect.pre(() => {
 		restoreProps(props);
 	});
 </script>
 
-<TestHarness>
-	<svelte:fragment slot="componentToTest">
+<TestHarness {log}>
+	{#snippet componentToTest()}
 		<section>
 			<div>
 				<h1>Label</h1>
@@ -106,9 +98,9 @@
 				</ul>
 			</div>
 		</section>
-	</svelte:fragment>
+	{/snippet}
 
-	<svelte:fragment slot="controls">
+	{#snippet controls()}
 		<div>
 			<GymTextbox bind:props name="label" label="L0 label" />
 			<GymTextbox bind:props name="label_nest.label" label="L1 label" />
@@ -155,8 +147,7 @@
 			<GymCheckbox bind:props name="flag_nest.flagArray.0" label="Nested Array 0" />
 			<GymCheckbox bind:props name="flag_nest.flagArray.1" label="Nested Array 1" />
 		</div>
-		<GymLog {log} />
-	</svelte:fragment>
+	{/snippet}
 </TestHarness>
 
 <style>

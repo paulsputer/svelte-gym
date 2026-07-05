@@ -3,6 +3,7 @@
 	import GymOverrideButtons from './GymOverrideButtons.svelte';
 
 	interface GymCheckboxProps {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		props: Record<string, any>;
 		name: string;
 		label?: string;
@@ -13,47 +14,65 @@
 
 	const optDefault = 'NONE';
 
-	let _props = $state({
-		_override: optDefault
-	});
-
-	$effect(() => {
-		let v = _props._override;
-
-		if (v !== optDefault) {
-			_initialVal = false;
-			setProp(v, name, props);
-		}
-	});
-
 	const extraOpts = [
 		{ label: 'null', value: null },
 		{ label: 'undefined', value: 'undefined' }
 	];
 
-	let _initialVal = $state(getProp(name, props));
+	let _initialVal = $state(false);
 
-	// Coerce to bool
-	if (_initialVal === 'true' || _initialVal === 1) {
-		_initialVal = true;
-		setProp(true, name, props);
-	} else if (_initialVal === 'false' || _initialVal === 0) {
-		_initialVal = false;
-		setProp(false, name, props);
-	}
+	// Synchronous initial setup for SSR and immediate hydration
+	(() => {
+		let v = getProp(name, props);
+		if (v === 'true' || v === 1) {
+			setProp(true, name, props);
+		} else if (v === 'false' || v === 0) {
+			setProp(false, name, props);
+		}
+	})();
 
-	let res = extraOpts.filter((e) => {
-		if (e.value === _initialVal || '' + e.value === _initialVal) {
-			return true;
+	$effect(() => {
+		let v = getProp(name, props);
+
+		// Coerce to bool
+		if (v === 'true' || v === 1) {
+			v = true;
+			setProp(true, name, props);
+		} else if (v === 'false' || v === 0) {
+			v = false;
+			setProp(false, name, props);
+		}
+
+		// Coerce to bool
+		if (v === 'true' || v === 1) {
+			v = true;
+			setProp(true, name, props);
+		} else if (v === 'false' || v === 0) {
+			v = false;
+			setProp(false, name, props);
+		}
+
+		let res = extraOpts.filter((e) => {
+			return e.value === v || '' + e.value === String(v);
+		});
+
+		if (res.length > 0) {
+			_initialVal = false;
+		} else {
+			_initialVal = v as boolean;
 		}
 	});
 
-	if (res.length > 0) {
-		_props._override = res[0].value;
-		_initialVal = false;
-	} else {
-		_props._override = optDefault;
-	}
+	let _override = $derived.by(() => {
+		let v = getProp(name, props);
+		let res = extraOpts.filter((e) => {
+			return e.value === v || '' + e.value === String(v);
+		});
+		if (res.length > 0) {
+			return res[0].value as string;
+		}
+		return optDefault;
+	});
 </script>
 
 {#if hideExtra}
@@ -62,9 +81,8 @@
 			<input
 				type="checkbox"
 				checked={_initialVal}
-				on:input={(e) => {
-					_props._override = optDefault;
-					setProp(e.target.checked, name, props);
+				oninput={(e) => {
+					setProp((e.target as HTMLInputElement).checked, name, props);
 				}}
 			/>
 			<span>{label ?? name}</span>
@@ -78,18 +96,21 @@
 				<input
 					type="checkbox"
 					checked={_initialVal}
-					on:input={(e) => {
-						_props._override = optDefault;
-						setProp(e.target.checked, name, props);
+					oninput={(e) => {
+						setProp((e.target as HTMLInputElement).checked, name, props);
 					}}
 				/>
 			</label>
 			<GymOverrideButtons
 				options={extraOpts}
-				activeValue={_props._override}
+				activeValue={_override}
 				{optDefault}
-				onselect={(v) => { _props._override = v; }}
-				onclear={() => { _props._override = optDefault; }}
+				onselect={(v: string | number | boolean | null | undefined) => {
+					setProp(v, name, props);
+				}}
+				onclear={() => {
+					setProp(false, name, props);
+				}}
 			/>
 		</div>
 	</div>

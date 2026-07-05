@@ -3,4 +3,8 @@
 	import ScrollingDemo from './ScrollingDemo.svelte';
 </script>
 
-<TestHarness componentToTest={ScrollingDemo} />
+<TestHarness>
+	{#snippet componentToTest()}
+		<ScrollingDemo />
+	{/snippet}
+</TestHarness>

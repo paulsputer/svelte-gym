@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { TestHarness, GymLog } from '../../lib/index.ts';
+	import { TestHarness } from '../../lib/index.ts';
 	import { restoreProps } from '../../lib/helpers.js';
 	import GymSlider from '$lib/GymSlider.svelte';
 
@@ -21,7 +21,7 @@
 	});
 </script>
 
-<TestHarness>
+<TestHarness {log}>
 	{#snippet componentToTest()}
 		<section>
 			<div>
@@ -52,7 +52,6 @@
 			<GymSlider bind:props units="rem" name="rem" label="auto scale rem" />
 			<GymSlider bind:props units="%" name="pc" label="auto scale pc" />
 		</div>
-		<GymLog {log} />
 	{/snippet}
 </TestHarness>
 

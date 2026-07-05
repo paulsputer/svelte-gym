@@ -15,12 +15,12 @@ First release of `eslint-plugin-svelte-gym` — a companion ESLint plugin for va
 
 ### Rules
 
-| Rule | Default | Description |
-|------|---------|-------------|
-| `require-restore-props` | ⚠️ warn | Require a `restoreProps()` call when `TestHarness` is imported |
-| `no-duplicate-prop-names` | ⚠️ warn | Disallow duplicate `name` props across Gym components |
-| `require-props-state` | 🛑 error | Require the props object passed to `restoreProps()` to use `$state()` |
-| `single-component-in-test` | 🛑 error | Require `componentToTest` snippet to contain exactly one component |
+| Rule                       | Default  | Description                                                           |
+| -------------------------- | -------- | --------------------------------------------------------------------- |
+| `require-restore-props`    | ⚠️ warn  | Require a `restoreProps()` call when `TestHarness` is imported        |
+| `no-duplicate-prop-names`  | ⚠️ warn  | Disallow duplicate `name` props across Gym components                 |
+| `require-props-state`      | 🛑 error | Require the props object passed to `restoreProps()` to use `$state()` |
+| `single-component-in-test` | 🛑 error | Require `componentToTest` snippet to contain exactly one component    |
 
 ### Features
 

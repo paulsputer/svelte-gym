@@ -6,23 +6,22 @@
 
 **Rapidly create, exercise, and share Svelte component states via URL-encoded permalinks.**
 
-
 ## Why Svelte Gym?
 
 Developing and testing components should be seamless. Svelte Gym provides a playground environment to exercise your components and ensure they respond correctly to various inputs and constraints.
 
 **Key Features:**
 
-*   **URL-Driven State:** Every control and property is reflected in the URL. Share a link, share a state.
-*   **Visual Regression Ready:** Deterministic URLs make it easy to use tools like [BackstopJS](https://github.com/garris/BackstopJS) to detect visual regressions.
-*   **LLM Friendly:** The URL structure provides a context-rich, text-based representation of your component's state, making it ideal for AI-assisted development and debugging.
+- **URL-Driven State:** Every control and property is reflected in the URL. Share a link, share a state.
+- **Visual Regression Ready:** Deterministic URLs make it easy to use tools like [BackstopJS](https://github.com/garris/BackstopJS) to detect visual regressions.
+- **LLM Friendly:** The URL structure provides a context-rich, text-based representation of your component's state, making it ideal for AI-assisted development and debugging.
 
 ### Use Cases
 
-*   **Responsive Testing:** How does the component respond when the parent element resizes?
-*   **Style Verification:** Is the font size on the parent element respected?
-*   **Edge Cases:** Does text overflow expectedly? Is bad data (null, NaN, undefined) handled gracefully?
-*   **Collaboration:** Share a specific component state with a colleague or an LLM to reproduce a bug.
+- **Responsive Testing:** How does the component respond when the parent element resizes?
+- **Style Verification:** Is the font size on the parent element respected?
+- **Edge Cases:** Does text overflow expectedly? Is bad data (null, NaN, undefined) handled gracefully?
+- **Collaboration:** Share a specific component state with a colleague or an LLM to reproduce a bug.
 
 ## Getting Started
 
@@ -36,40 +35,62 @@ pnpm install -D svelte-gym
 bun install -D svelte-gym
 ```
 
-### Basic Usage
+### Svelte 4 Support
+
+Svelte Gym is written in Svelte 5. If you are still using Svelte 4, you can import the Svelte 4-compatible versions of the components from the `/v4` subpath:
+
+```svelte
+<script lang="ts">
+	import { TestHarness, restoreProps, GymCheckbox, GymTextbox } from 'svelte-gym/v4';
+	// ... rest of your code ...
+</script>
+
+<TestHarness>
+	<!-- Use slots instead of snippets for Svelte 4 -->
+	<div slot="componentToTest">
+		<MyComponent {...props} />
+	</div>
+
+	<ul slot="controls">
+		<li><GymCheckbox bind:props name="isActive" /></li>
+	</ul>
+</TestHarness>
+```
+
+### Basic Usage (Svelte 5)
 
 Create a `+page.svelte` route for your component (e.g., `src/routes/gym/my-component/+page.svelte`):
 
 ```svelte
 <script lang="ts">
-    import { TestHarness, restoreProps, GymCheckbox, GymTextbox } from "svelte-gym";
-    import MyComponent from '$lib/MyComponent.svelte';
+	import { TestHarness, restoreProps, GymCheckbox, GymTextbox } from 'svelte-gym';
+	import MyComponent from '$lib/MyComponent.svelte';
 
-    // 1. Define your component properties
-    let props = $state({
-        label: "Hello World",
-        isActive: true,
-        count: 0
-    });
+	// 1. Define your component properties
+	let props = $state({
+		label: 'Hello World',
+		isActive: true,
+		count: 0
+	});
 
-    // 2. Restore properties from URL parameters automatically
-    // This allows the URL to drive the component state
-    restoreProps(props);
+	// 2. Restore properties from URL parameters automatically
+	// This allows the URL to drive the component state
+	restoreProps(props);
 </script>
 
 <!-- 3. Wrap your component in the TestHarness -->
 <TestHarness>
-    {#snippet componentToTest()}
-        <MyComponent {...props} />
-    {/snippet}
+	{#snippet componentToTest()}
+		<MyComponent {...props} />
+	{/snippet}
 
-    <!-- 4. Add controls to manipulate props -->
-    {#snippet controls()}
-        <ul>
-             <li><GymCheckbox bind:props name="isActive" /></li>
-             <li><GymTextbox bind:props name="label" /></li>
-        </ul>
-    {/snippet}
+	<!-- 4. Add controls to manipulate props -->
+	{#snippet controls()}
+		<ul>
+			<li><GymCheckbox bind:props name="isActive" /></li>
+			<li><GymTextbox bind:props name="label" /></li>
+		</ul>
+	{/snippet}
 </TestHarness>
 ```
 
@@ -78,18 +99,22 @@ Create a `+page.svelte` route for your component (e.g., `src/routes/gym/my-compo
 Svelte Gym is designed to be "interpreter-friendly." To ensure the best results and visual parity when using LLMs for component development:
 
 ### 1. Minimal `componentToTest` Snippet
-The `componentToTest` snippet should **only** contain the component being tested. 
+
+The `componentToTest` snippet should **only** contain the component being tested.
+
 > [!IMPORTANT]
 > **Avoid wrapping the component in extra `div` or `section` tags.** This ensures that the component's layout and styles are tested in isolation, matching how it will appear when deployed.
 
 **Correct:**
+
 ```svelte
 {#snippet componentToTest()}
-    <MyComponent {...props} />
+	<MyComponent {...props} />
 {/snippet}
 ```
 
 **Incorrect:**
+
 ```svelte
 {#snippet componentToTest()}
     <div class="wrapper"> <!-- ❌ DON'T DO THIS -->
@@ -98,14 +123,17 @@ The `componentToTest` snippet should **only** contain the component being tested
 ```
 
 ### 2. Use `Gym*` Input Components
+
 Always use the built-in `Gym` prefixed input components (e.g., `GymSlider`, `GymTextbox`, `GymCheckbox`) in the `controls` snippet.
+
 > [!IMPORTANT]
 > **Do not use standard HTML inputs or other custom components.** `Gym*` inputs are specifically designed to handle and test edge cases like `null`, `undefined`, `NaN`, and `Infinity`, which are critical for robust component testing and are not supported by standard inputs.
 
 ### 3. URL-Driven State & Reproductions
+
 1.  **Describe the Issue:** "My component breaks when the label is too long."
 2.  **Generate a Reproduction:** The LLM can generate a Svelte Gym URL with a long label string encoded in the parameters.
-    *   *Example:* `http://localhost:5173/gym/button?label=Super+Long+Label+That+Breaks+Layout`
+    - _Example:_ `http://localhost:5173/gym/button?label=Super+Long+Label+That+Breaks+Layout`
 3.  **Fix and Verify:** You can verify the fix visually, and the URL serves as a regression test case.
 
 ## API Reference
@@ -116,14 +144,14 @@ The main wrapper for your component playground.
 
 **Props:**
 
-*   `maxWidth` (number, optional): Maximum width constraint for the test area.
-*   `maxHeight` (number, optional): Maximum height constraint for the test area.
-*   `maxFontSize` (number, optional): Maximum font size for the test area.
+- `maxWidth` (number, optional): Maximum width constraint for the test area.
+- `maxHeight` (number, optional): Maximum height constraint for the test area.
+- `maxFontSize` (number, optional): Maximum font size for the test area.
 
 **Snippets:**
 
-*   `componentToTest`: Place the component you want to test here.
-*   `controls`: Place `Gym*` controls here to modify `props`.
+- `componentToTest`: Place the component you want to test here.
+- `controls`: Place `Gym*` controls here to modify `props`.
 
 ### `restoreProps(props)`
 
@@ -133,12 +161,12 @@ Synchronizes the URL search parameters with your local `props` object. This must
 
 All controls support `bind:props` and a `name` attribute corresponding to the property key in `props`.
 
-*   `GymCheckbox`: Boolean toggle.
-*   `GymTextbox`: String input.
-*   `GymSlider`: Numeric slider (requires `min`, `max`).
-*   `GymDropdown`: Select from a list of options.
-*   `GymRadioGroup`: Radio button group.
-*   `GymLog`: Displays a log of events (passed as an array of strings).
+- `GymCheckbox`: Boolean toggle.
+- `GymTextbox`: String input.
+- `GymSlider`: Numeric slider (requires `min`, `max`).
+- `GymDropdown`: Select from a list of options.
+- `GymRadioGroup`: Radio button group.
+- `GymLog`: Displays a log of events (passed as an array of strings).
 
 ### JSON Path Support
 
@@ -146,13 +174,13 @@ Svelte Gym supports nested properties using dot notation. This is useful for com
 
 ```svelte
 <script lang="ts">
-let props = $state({
-    config: {
-        theme: {
-            mode: 'dark'
-        }
-    }
-});
+	let props = $state({
+		config: {
+			theme: {
+				mode: 'dark'
+			}
+		}
+	});
 </script>
 ```
 
@@ -161,6 +189,7 @@ In your controls:
 ```svelte
 <GymDropdown bind:props name="config.theme.mode" options={['light', 'dark']} />
 ```
+
 ## Support
 
 <a href="https://www.buymeacoffee.com/sveltegym" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
@@ -180,9 +209,9 @@ Or reference it locally if using the source:
 
 ```json
 {
-  "devDependencies": {
-    "eslint-plugin-svelte-gym": "file:./eslint-plugin"
-  }
+	"devDependencies": {
+		"eslint-plugin-svelte-gym": "file:./eslint-plugin"
+	}
 }
 ```
 
@@ -192,18 +221,18 @@ Add to your `.eslintrc.cjs`:
 
 ```js
 module.exports = {
-  overrides: [
-    {
-      files: ['*.svelte'],
-      plugins: ['svelte-gym'],
-      rules: {
-        'svelte-gym/require-restore-props': 'warn',
-        'svelte-gym/no-duplicate-prop-names': 'warn',
-        'svelte-gym/require-props-state': 'error',
-        'svelte-gym/single-component-in-test': 'error'
-      }
-    }
-  ]
+	overrides: [
+		{
+			files: ['*.svelte'],
+			plugins: ['svelte-gym'],
+			rules: {
+				'svelte-gym/require-restore-props': 'warn',
+				'svelte-gym/no-duplicate-prop-names': 'warn',
+				'svelte-gym/require-props-state': 'error',
+				'svelte-gym/single-component-in-test': 'error'
+			}
+		}
+	]
 };
 ```
 
@@ -214,19 +243,21 @@ module.exports = {
 Warns when a file imports `TestHarness` but never calls `restoreProps()`. Without this call, URL parameters won't be restored into component state.
 
 **Correct:**
+
 ```svelte
 <script>
-  import { TestHarness, restoreProps } from 'svelte-gym';
-  let props = $state({ label: 'Hello' });
-  restoreProps(props);
+	import { TestHarness, restoreProps } from 'svelte-gym';
+	let props = $state({ label: 'Hello' });
+	restoreProps(props);
 </script>
 ```
 
 **Incorrect:**
+
 ```svelte
 <script>
-  import { TestHarness } from 'svelte-gym'; // ⚠️ Missing restoreProps
-  let props = $state({ label: 'Hello' });
+	import { TestHarness } from 'svelte-gym'; // ⚠️ Missing restoreProps
+	let props = $state({ label: 'Hello' });
 </script>
 ```
 
@@ -235,9 +266,11 @@ Warns when a file imports `TestHarness` but never calls `restoreProps()`. Withou
 Warns when multiple `Gym*` components use the same `name` prop. Duplicate names cause permalink parameter collisions.
 
 **Incorrect:**
+
 ```svelte
 <GymTextbox bind:props name="label" />
-<GymSlider bind:props name="label" /> <!-- ⚠️ Duplicate "label" -->
+<GymSlider bind:props name="label" />
+<!-- ⚠️ Duplicate "label" -->
 ```
 
 #### `svelte-gym/require-props-state` ❌
@@ -245,18 +278,20 @@ Warns when multiple `Gym*` components use the same `name` prop. Duplicate names 
 Errors when `restoreProps(props)` is called but `props` was not declared with `$state()`. Without `$state()`, restored values won't trigger Svelte reactivity.
 
 **Correct:**
+
 ```svelte
 <script>
-  let props = $state({ count: 0 }); // ✅ Uses $state
-  restoreProps(props);
+	let props = $state({ count: 0 }); // ✅ Uses $state
+	restoreProps(props);
 </script>
 ```
 
 **Incorrect:**
+
 ```svelte
 <script>
-  let props = { count: 0 }; // ❌ Not reactive
-  restoreProps(props);
+	let props = { count: 0 }; // ❌ Not reactive
+	restoreProps(props);
 </script>
 ```
 
@@ -265,18 +300,21 @@ Errors when `restoreProps(props)` is called but `props` was not declared with `$
 Errors when the `componentToTest` snippet contains more than one element, or when its single element is a plain HTML element (not a component). This prevents wrapper `<div>` or `<section>` tags that make things look correct in the harness but behave differently in production.
 
 **Correct:**
+
 ```svelte
 {#snippet componentToTest()}
-    <MyComponent {...props} />
+	<MyComponent {...props} />
 {/snippet}
 ```
 
 **Incorrect:**
+
 ```svelte
 {#snippet componentToTest()}
-    <div class="wrapper">           <!-- ❌ HTML wrapper -->
-        <MyComponent {...props} />
-    </div>
+	<div class="wrapper">
+		<!-- ❌ HTML wrapper -->
+		<MyComponent {...props} />
+	</div>
 {/snippet}
 ```
 

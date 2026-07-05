@@ -20,7 +20,7 @@ module.exports = {
 		messages: {
 			propsNotState:
 				'restoreProps({{name}}) is called but "{{name}}" was not declared with $state(). ' +
-				'Without $state(), URL parameters will be set but won\'t trigger reactive updates. ' +
+				"Without $state(), URL parameters will be set but won't trigger reactive updates. " +
 				'Use: let {{name}} = $state({ ... })'
 		}
 	},

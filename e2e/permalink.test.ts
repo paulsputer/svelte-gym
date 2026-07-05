@@ -1,10 +1,5 @@
 import { test, expect } from '@playwright/test';
 
-/** Read the actual browser URL (reflects replaceState changes) */
-async function browserUrl(page: import('@playwright/test').Page): Promise<string> {
-	return page.evaluate(() => window.location.href);
-}
-
 test.describe('Permalink Roundtrip', () => {
 	test('flat URL params are restored on page load', async ({ page }) => {
 		await page.goto('/kitchen-sink?label=Direct+URL&isActive=false');
@@ -41,8 +36,9 @@ test.describe('Permalink Roundtrip', () => {
 
 		// Verify the dark class is applied
 		const hasDarkClass = await page.evaluate(
-			() => document.querySelector('.test-component.demo-component')?.classList.contains('dark') ?? 
-			       document.querySelector('.demo-component.dark') !== null
+			() =>
+				document.querySelector('.test-component.demo-component')?.classList.contains('dark') ??
+				document.querySelector('.demo-component.dark') !== null
 		);
 		// The component applies class:dark={props.settings.theme === 'dark'}
 		expect(hasDarkClass).toBe(true);
@@ -118,6 +114,9 @@ test.describe('Permalink Roundtrip', () => {
 			{ timeout: 5000 }
 		);
 
+		// Select the "Basic" tab to expose the "Copy Permalink" button
+		await page.getByRole('button', { name: 'Basic', exact: true }).click();
+
 		// Click Copy Permalink
 		await page.getByRole('button', { name: 'Copy Permalink' }).click();
 		await page.waitForTimeout(100);
@@ -161,5 +160,16 @@ test.describe('Permalink Roundtrip', () => {
 			() => document.querySelector('.test-component')?.classList.contains('highlight') ?? false
 		);
 		expect(hasHighlight).toBe(false);
+	});
+
+	test('harness width and height are restored', async ({ page }) => {
+		await page.goto('/kitchen-sink?__width=1032px&__height=1583px');
+
+		await page.waitForTimeout(1000);
+
+		const style = await page.getAttribute('.test-component', 'style');
+		console.log('TEST COMPONENT STYLE:', style);
+		expect(style).toContain('--w: 1032px');
+		expect(style).toContain('--h: 1583px');
 	});
 });

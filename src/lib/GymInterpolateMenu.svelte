@@ -10,6 +10,7 @@
 		sliderValue?: number;
 		units?: string | null;
 		propName: string;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		props: Record<string, any>;
 	}
 
@@ -18,7 +19,6 @@
 		multiline = false,
 		sliderMin = 0,
 		sliderMax = 100,
-		sliderValue = 50,
 		units = null,
 		propName,
 		props = $bindable()
@@ -50,11 +50,11 @@
 	});
 
 	function getEffectiveMin() {
-		return useCustomRange ? interpMin : (mode === 'slider' ? sliderMin : 0);
+		return useCustomRange ? interpMin : mode === 'slider' ? sliderMin : 0;
 	}
 
 	function getEffectiveMax() {
-		return useCustomRange ? interpMax : (mode === 'slider' ? sliderMax : (multiline ? 500 : 120));
+		return useCustomRange ? interpMax : mode === 'slider' ? sliderMax : multiline ? 500 : 120;
 	}
 
 	function toggleMenu(e: MouseEvent) {
@@ -79,7 +79,7 @@
 			if (mode === 'slider') {
 				const value = eMin + (eMax - eMin) * sine;
 				const rounded = Math.round(value);
-				setProp(rounded, propName, props, units ?? undefined);
+				setProp(rounded, propName, props, units ?? undefined, true);
 			} else {
 				// Text mode: grow/shrink lorem ipsum
 				const len = Math.floor(eMin + (eMax - eMin) * sine);
@@ -89,7 +89,7 @@
 					text += LOREM;
 				}
 				text = text.slice(0, len);
-				setProp(text, propName, props);
+				setProp(text, propName, props, undefined, true);
 			}
 
 			animFrameId = requestAnimationFrame(animate);
@@ -120,14 +120,22 @@
 			multiline
 		});
 		url.searchParams.set(`__interp_${propName}`, config);
-		history.replaceState(null, '', url);
+		history.replaceState(null, '', url.toString());
 	}
 
 	function removePermalink() {
 		if (typeof window === 'undefined') return;
 		const url = new URL(window.location.href);
 		url.searchParams.delete(`__interp_${propName}`);
-		history.replaceState(null, '', url);
+
+		// Ensure the final interpolated value is persisted in the URL
+		const keys = propName.split('.');
+		const currentVal = keys.reduce((acc, key) => acc?.[key], props);
+		if (currentVal !== undefined) {
+			url.searchParams.set(propName, '' + currentVal);
+		}
+
+		history.replaceState(null, '', url.toString());
 	}
 
 	// Restore from permalink on mount + listen for global reset
@@ -168,7 +176,7 @@
 		};
 	});
 	// Close menu when clicking outside
-	function handleClickOutside(e: MouseEvent) {
+	function handleClickOutside() {
 		if (open) {
 			open = false;
 		}
@@ -202,7 +210,7 @@
 					type="button"
 					class="toggle-btn"
 					class:running={active}
-					onclick={() => active ? stopInterpolation() : startInterpolation()}
+					onclick={() => (active ? stopInterpolation() : startInterpolation())}
 				>
 					{active ? '■ Stop' : '▶ Start'}
 				</button>
@@ -215,14 +223,26 @@
 
 			<label class="field">
 				<span>Min</span>
-				<input type="number" bind:value={interpMin} step={1}
-					oninput={() => { useCustomRange = true; }} />
+				<input
+					type="number"
+					bind:value={interpMin}
+					step={1}
+					oninput={() => {
+						useCustomRange = true;
+					}}
+				/>
 			</label>
 
 			<label class="field">
 				<span>Max</span>
-				<input type="number" bind:value={interpMax} step={1}
-					oninput={() => { useCustomRange = true; }} />
+				<input
+					type="number"
+					bind:value={interpMax}
+					step={1}
+					oninput={() => {
+						useCustomRange = true;
+					}}
+				/>
 			</label>
 		</div>
 	{/if}
@@ -263,8 +283,13 @@
 	}
 
 	@keyframes pulse {
-		0%, 100% { opacity: 1; }
-		50% { opacity: 0.5; }
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.5;
+		}
 	}
 
 	.interp-popup {

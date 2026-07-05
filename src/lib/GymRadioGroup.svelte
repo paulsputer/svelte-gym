@@ -3,12 +3,13 @@
 	import GymOverrideButtons from './GymOverrideButtons.svelte';
 
 	interface GymRadioGroupProps {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		props: Record<string, any>;
 		name: string;
 		label?: string;
 		excludeFromPermalink?: boolean;
 		hideExtra?: boolean;
-		options?: Array<{ label: string; value: any }> | string[];
+		options?: Array<{ label: string; value: unknown }> | string[];
 	}
 
 	let {
@@ -25,41 +26,28 @@
 			if (typeof options[0] === 'string') {
 				return (options as string[]).map((e) => ({ label: e, value: e }));
 			}
-			return options as Array<{ label: string; value: any }>;
+			return options as Array<{ label: string; value: unknown }>;
 		}
 		return [];
 	});
 
 	const optDefault = 'NONE';
-	let _props = $state({
-		_override: optDefault
-	});
-
-	$effect(() => {
-		let v = _props._override;
-		if (v !== optDefault) {
-			setProp(v, name, props, undefined, excludeFromPermalink);
-		}
-	});
 
 	const extraOpts = [
 		{ label: 'null', value: null },
 		{ label: 'undefined', value: 'undefined' }
 	];
 
-	let _initialVal = $state(getProp(name, props));
-
-	let res = extraOpts.filter((e) => {
-		if (e.value === _initialVal || '' + e.value === _initialVal) {
-			return true;
+	let _override = $derived.by(() => {
+		let v = getProp(name, props);
+		let res = extraOpts.filter((e) => {
+			return e.value === v || '' + e.value === String(v);
+		});
+		if (res.length > 0) {
+			return res[0].value as string;
 		}
+		return optDefault;
 	});
-
-	if (res.length > 0) {
-		_props._override = res[0].value;
-	} else {
-		_props._override = optDefault;
-	}
 
 	let _counter = 0;
 	const groupId = `gym-radio-${_counter++}-${Date.now()}`;
@@ -73,9 +61,8 @@
 				<input
 					type="radio"
 					name={groupId}
-					on:change={(e) => {
-						_props._override = optDefault;
-						props[name] = e.target.value;
+					onchange={(e) => {
+						props[name] = (e.target as HTMLInputElement).value;
 
 						if (!(excludeFromPermalink ?? false) && typeof window !== 'undefined') {
 							const url = new URL(window.location.href);
@@ -94,10 +81,22 @@
 		<div class="gym-overrides">
 			<GymOverrideButtons
 				options={extraOpts}
-				activeValue={_props._override}
+				activeValue={_override}
 				{optDefault}
-				onselect={(v) => { _props._override = v; }}
-				onclear={() => { _props._override = optDefault; }}
+				onselect={(v: string | number | boolean | null | undefined) => {
+					setProp(v, name, props, undefined, excludeFromPermalink);
+				}}
+				onclear={() => {
+					setProp(
+						_options.length > 0
+							? (_options[0].value as string | number | boolean | null | undefined)
+							: false,
+						name,
+						props,
+						undefined,
+						excludeFromPermalink
+					);
+				}}
 			/>
 		</div>
 	{/if}

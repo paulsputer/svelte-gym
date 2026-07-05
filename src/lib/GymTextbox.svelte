@@ -4,6 +4,7 @@
 	import GymInterpolateMenu from './GymInterpolateMenu.svelte';
 
 	interface GymTextboxProps {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		props: Record<string, any>;
 		name: string;
 		label?: string;
@@ -12,74 +13,72 @@
 		interpMenu?: GymInterpolateMenu;
 	}
 
-	let { props = $bindable(), name, label = name, hideExtra = false, multiline = false, interpMenu = $bindable() }: GymTextboxProps = $props();
+	let {
+		props = $bindable(),
+		name,
+		label = name,
+		hideExtra = false,
+		multiline = false,
+		interpMenu = $bindable()
+	}: GymTextboxProps = $props();
 
 	const optDefault = 'NONE';
-
-	let _props = $state({
-		_override: optDefault
-	});
-
-	$effect(() => {
-		let v = _props._override;
-
-		if (v !== optDefault) {
-			_initialVal = '';
-			setProp(v, name, props);
-		}
-	});
 
 	const extraOpts = [
 		{ label: 'null', value: null },
 		{ label: 'undefined', value: 'undefined' }
 	];
 
-	let _initialVal = $state(getProp(name, props));
-	let res = extraOpts.filter((e) => {
-		if (e.value === _initialVal || '' + e.value === _initialVal) {
-			return true;
+	let _initialVal = $state('');
+	let inputRef: HTMLInputElement | HTMLTextAreaElement | undefined = $state();
+
+	$effect(() => {
+		let v = getProp(name, props);
+
+		let res = extraOpts.filter((e) => {
+			return e.value === v || '' + e.value === String(v);
+		});
+
+		if (res.length > 0) {
+			_initialVal = '';
+		} else {
+			// If the user is currently typing in this exact input, do not forcefully overwrite the value
+			// as it will break their cursor position due to reactivity race conditions.
+			if (document.activeElement !== inputRef) {
+				_initialVal = v ?? '';
+			}
 		}
 	});
 
-	if (res.length > 0) {
-		_props._override = res[0].value;
-		_initialVal = '';
-	} else {
-		_props._override = optDefault;
-	}
-
-	let inputRef: HTMLInputElement | HTMLTextAreaElement;
-
-	// React to external prop changes (e.g. from interpolation)
-	$effect(() => {
-		const currentVal = getProp(name, props);
-
-		// If the user is currently typing in this exact input, do not forcefully overwrite the value
-		// as it will break their cursor position due to reactivity race conditions.
-		if (document.activeElement === inputRef) return;
-
-		if (_props._override === optDefault && currentVal !== _initialVal) {
-			_initialVal = currentVal ?? '';
+	let _override = $derived.by(() => {
+		let v = getProp(name, props);
+		let res = extraOpts.filter((e) => {
+			return e.value === v || '' + e.value === String(v);
+		});
+		if (res.length > 0) {
+			return res[0].value as string;
 		}
+		return optDefault;
 	});
 </script>
 
 <div class="gym-control">
-	<span class="gym-label"><GymInterpolateMenu
-		bind:this={interpMenu}
-		mode="text"
-		{multiline}
-		propName={name}
-		bind:props
-	/>{label ?? name}</span>
+	<span class="gym-label"
+		><GymInterpolateMenu
+			bind:this={interpMenu}
+			mode="text"
+			{multiline}
+			propName={name}
+			bind:props
+		/>{label ?? name}</span
+	>
 	<div class="gym-value">
 		{#if multiline}
 			<textarea
 				bind:this={inputRef}
 				bind:value={_initialVal}
-				on:input={(e) => {
-					_props._override = optDefault;
-					setProp(e.target.value, name, props);
+				oninput={(e) => {
+					setProp((e.target as HTMLTextAreaElement).value, name, props);
 				}}
 			></textarea>
 		{:else}
@@ -87,9 +86,8 @@
 				bind:this={inputRef}
 				type="text"
 				bind:value={_initialVal}
-				on:input={(e) => {
-					_props._override = optDefault;
-					setProp(e.target.value, name, props);
+				oninput={(e) => {
+					setProp((e.target as HTMLInputElement).value, name, props);
 				}}
 			/>
 		{/if}
@@ -98,10 +96,14 @@
 		<div class="gym-overrides">
 			<GymOverrideButtons
 				options={extraOpts}
-				activeValue={_props._override}
+				activeValue={_override}
 				{optDefault}
-				onselect={(v) => { _props._override = v; }}
-				onclear={() => { _props._override = optDefault; }}
+				onselect={(v: string | number | boolean | null | undefined) => {
+					setProp(v, name, props);
+				}}
+				onclear={() => {
+					setProp('', name, props);
+				}}
 			/>
 		</div>
 	{/if}

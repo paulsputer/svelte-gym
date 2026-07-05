@@ -1,0 +1,816 @@
+
+> svelte-gym@2.0.0 check /Users/paulmartin/code/svelte-gym
+> svelte-check --tsconfig ./tsconfig.json
+
+
+====================================
+Loading svelte-check in workspace: /Users/paulmartin/code/svelte-gym
+Getting Svelte diagnostics...
+
+/Users/paulmartin/code/svelte-gym/src/lib/helpers.js:49:2
+Error: Unused '@ts-expect-error' directive. 
+	console.log(`[setProp debug] name=${name} setting value on base:`, base ? JSON.stringify(base) : 'null', `to finalVal=${finalVal}`);
+	// @ts-expect-error: base might be typed as object and not indexable
+	if (base) {
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/helpers.js:93:21
+Error: Type 'boolean' is not assignable to type 'string'. 
+		let val = v;
+		if (v === 'true') val = true;
+		else if (v === 'false') val = false;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/helpers.js:94:27
+Error: Type 'boolean' is not assignable to type 'string'. 
+		if (v === 'true') val = true;
+		else if (v === 'false') val = false;
+		else if (v === 'null') val = null;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/helpers.js:95:26
+Error: Type 'null' is not assignable to type 'string'. 
+		else if (v === 'false') val = false;
+		else if (v === 'null') val = null;
+		else if (v === 'undefined') val = 'undefined';
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymCheckbox.svelte:35:35
+Warn: This reference only captures the initial value of `name`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+
+	let _initialVal = $state(getProp(name, props));
+
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymCheckbox.svelte:38:6
+Warn: This reference only captures the initial value of `_initialVal`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+	// Coerce to bool
+	if (_initialVal === 'true' || _initialVal === 1) {
+		_initialVal = true;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymCheckbox.svelte:38:32
+Warn: This reference only captures the initial value of `_initialVal`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+	// Coerce to bool
+	if (_initialVal === 'true' || _initialVal === 1) {
+		_initialVal = true;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymCheckbox.svelte:40:17
+Warn: This reference only captures the initial value of `name`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+		_initialVal = true;
+		setProp(true, name, props);
+	} else if (_initialVal === 'false' || _initialVal === 0) {
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymCheckbox.svelte:41:13
+Warn: This reference only captures the initial value of `_initialVal`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+		setProp(true, name, props);
+	} else if (_initialVal === 'false' || _initialVal === 0) {
+		_initialVal = false;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymCheckbox.svelte:41:40
+Warn: This reference only captures the initial value of `_initialVal`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+		setProp(true, name, props);
+	} else if (_initialVal === 'false' || _initialVal === 0) {
+		_initialVal = false;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymCheckbox.svelte:43:18
+Warn: This reference only captures the initial value of `name`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+		_initialVal = false;
+		setProp(false, name, props);
+	}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymCheckbox.svelte:53:3
+Error: Type 'string | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'. (ts)
+	if (res.length > 0) {
+		_props._override = res[0].value;
+		_initialVal = false;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymCheckbox.svelte:93:6
+Error: Type 'unknown' is not assignable to type 'string'. (ts)
+				onselect={(v) => {
+					_props._override = v;
+				}}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymSlider.svelte:39:21
+Warn: This reference only captures the initial value of `step`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+
+	let _step = $state(step ?? 1);
+
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymSlider.svelte:170:48
+Warn: This reference only captures the initial value of `name`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+
+	let _initialVal = $state(applyFunctor(getProp(name, props)));
+
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymSlider.svelte:188:6
+Warn: This reference only captures the initial value of `units`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+	// Detect units from initial value if not provided
+	if (units === null && typeof _initialVal === 'string') {
+		const possibleUnits = unitOpts.filter((e) => {
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymSlider.svelte:188:31
+Warn: This reference only captures the initial value of `_initialVal`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+	// Detect units from initial value if not provided
+	if (units === null && typeof _initialVal === 'string') {
+		const possibleUnits = unitOpts.filter((e) => {
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymSlider.svelte:200:18
+Warn: This reference only captures the initial value of `_initialVal`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+			units = u;
+			_initialVal = _initialVal.slice(0, -u.length);
+		}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymSlider.svelte:202:13
+Warn: This reference only captures the initial value of `units`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+		}
+	} else if (units) {
+		// If units provided, strip them from initial value
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymSlider.svelte:204:14
+Warn: This reference only captures the initial value of `_initialVal`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+		// If units provided, strip them from initial value
+		if (typeof _initialVal === 'string' && _initialVal.endsWith(units)) {
+			_initialVal = _initialVal.slice(0, -units.length);
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymSlider.svelte:204:42
+Warn: This reference only captures the initial value of `_initialVal`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+		// If units provided, strip them from initial value
+		if (typeof _initialVal === 'string' && _initialVal.endsWith(units)) {
+			_initialVal = _initialVal.slice(0, -units.length);
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymSlider.svelte:204:63
+Warn: This reference only captures the initial value of `units`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+		// If units provided, strip them from initial value
+		if (typeof _initialVal === 'string' && _initialVal.endsWith(units)) {
+			_initialVal = _initialVal.slice(0, -units.length);
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymSlider.svelte:205:18
+Warn: This reference only captures the initial value of `_initialVal`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+		if (typeof _initialVal === 'string' && _initialVal.endsWith(units)) {
+			_initialVal = _initialVal.slice(0, -units.length);
+		}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymSlider.svelte:205:40
+Warn: This reference only captures the initial value of `units`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+		if (typeof _initialVal === 'string' && _initialVal.endsWith(units)) {
+			_initialVal = _initialVal.slice(0, -units.length);
+		}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymSlider.svelte:47:5
+Error: Type 'number' is not assignable to type 'string'. (ts)
+				// Force as Number.NaN
+				v = +v;
+			}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymSlider.svelte:49:28
+Error: Argument of type 'string | null' is not assignable to parameter of type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'. (ts)
+			}
+			setProp(v, name, props, units);
+		}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymSlider.svelte:194:34
+Error: No overload matches this call.
+  Overload 1 of 3, '(callbackfn: (previousValue: string, currentValue: string, currentIndex: number, array: string[]) => string, initialValue: string): string', gave the following error.
+    Argument of type '(a: null, e: string) => string | null' is not assignable to parameter of type '(previousValue: string, currentValue: string, currentIndex: number, array: string[]) => string'.
+      Types of parameters 'a' and 'previousValue' are incompatible.
+        Type 'string' is not assignable to type 'null'.
+  Overload 2 of 3, '(callbackfn: (previousValue: null, currentValue: string, currentIndex: number, array: string[]) => null, initialValue: null): null', gave the following error.
+    Argument of type '(a: null, e: string) => string | null' is not assignable to parameter of type '(previousValue: null, currentValue: string, currentIndex: number, array: string[]) => null'.
+      Type 'string | null' is not assignable to type 'null'.
+        Type 'string' is not assignable to type 'null'. (ts)
+		// Take the longest match
+		const u = possibleUnits.reduce((a, e) => {
+			return e.length > (a ?? '').length ? e : a;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymSlider.svelte:214:3
+Error: Type 'string | number | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'. (ts)
+	if (res) {
+		_props._override = res.value;
+	} else {
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymSlider.svelte:252:45
+Error: Argument of type 'string | null' is not assignable to parameter of type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'. (ts)
+				_props._override = optDefault;
+				setProp(applyFunctor(val), name, props, units);
+			}}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymSlider.svelte:263:6
+Error: Type 'unknown' is not assignable to type 'string'. (ts)
+				onselect={(v) => {
+					_props._override = v;
+				}}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymDropdown.svelte:65:35
+Warn: This reference only captures the initial value of `name`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+
+	let _initialVal = $state(getProp(name, props));
+
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymDropdown.svelte:74:3
+Error: Type 'string | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'. (ts)
+	if (res.length > 0) {
+		_props._override = res[0].value;
+		_initialVal = false;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymDropdown.svelte:88:5
+Error: Unused '@ts-expect-error' directive. (ts)
+				_props._override = optDefault;
+				// @ts-expect-error: props is Record<string, any> and setProp handles typing
+				setProp((e.target as HTMLSelectElement).value, name, props, undefined, undefined);
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymDropdown.svelte:106:6
+Error: Type 'unknown' is not assignable to type 'string'. (ts)
+				onselect={(v) => {
+					_props._override = v;
+				}}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/TestHarness.svelte:344:2
+Warn: Do not use empty rulesets (css)
+
+	.test-area {
+	}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/TestHarness.svelte:617:3
+Warn: Also define the standard property 'appearance' for compatibility (css)
+	:global([type='search']) {
+		-webkit-appearance: textfield;
+		outline-offset: -2px;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/TestHarness.svelte:678:3
+Warn: Also define the standard property 'appearance' for compatibility (css)
+	:global([type='submit']) {
+		-webkit-appearance: button;
+	}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/TestHarness.svelte:698:3
+Warn: Also define the standard property 'appearance' for compatibility (css)
+	:global(select) {
+		-moz-appearance: none;
+		-webkit-appearance: none;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/TestHarness.svelte:699:3
+Warn: Also define the standard property 'appearance' for compatibility (css)
+		-moz-appearance: none;
+		-webkit-appearance: none;
+	}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/TestHarness.svelte:26:24
+Error: Block-scoped variable '$props' used before its declaration. (ts)
+		children
+	}: TestHarnessProps = $props();
+
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/TestHarness.svelte:138:3
+Error: Unused '@ts-expect-error' directive. (ts)
+		// Always enable reset — it also stops interpolations
+		// @ts-expect-error: __resetAnimations is dynamically added to props
+		props.__resetAnimations = resetAnimations;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/TestHarness.svelte:272:15
+Error: Cannot use 'bind:' with this property. It is declared as non-bindable inside the component.
+To mark a property as bindable: 'let { props = $bindable() } = $props()' (ts)
+			</ul>
+			<GymButton bind:props name="__resetAnimations" label="Reset Animations" />
+
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/TestHarness.svelte:26:24
+Error: Cannot use 'props' as a store. 'props' needs to be an object with a subscribe method on it.
+
+No overload matches this call.
+  Overload 1 of 2, '(store: SvelteStore<any>): any', gave the following error.
+    Argument of type '{ __controls: boolean; __grid: string; __highlight: boolean; __scrollMode: boolean; __width: string; __height: string; __fontsize: string; __resetAnimations: () => void; __scrollY: string | undefined; }' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type '{ __controls: boolean; __grid: string; __highlight: boolean; __scrollMode: boolean; __width: string; __height: string; __fontsize: string; __resetAnimations: () => void; __scrollY: string | undefined; }' but required in type 'SvelteStore<any>'.
+  Overload 2 of 2, '(store: SvelteStore<any> | null | undefined): any', gave the following error.
+    Argument of type '{ __controls: boolean; __grid: string; __highlight: boolean; __scrollMode: boolean; __width: string; __height: string; __fontsize: string; __resetAnimations: () => void; __scrollY: string | undefined; }' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type '{ __controls: boolean; __grid: string; __highlight: boolean; __scrollMode: boolean; __width: string; __height: string; __fontsize: string; __resetAnimations: () => void; __scrollY: string | undefined; }' but required in type 'SvelteStore<any>'. (ts)
+		children
+	}: TestHarnessProps = $props();
+
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymTextbox.svelte:45:35
+Warn: This reference only captures the initial value of `name`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+
+	let _initialVal = $state(getProp(name, props));
+	let res = extraOpts.filter((e) => {
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymTextbox.svelte:53:3
+Error: Type 'string | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'. (ts)
+	if (res.length > 0) {
+		_props._override = res[0].value;
+		_initialVal = '';
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymTextbox.svelte:114:6
+Error: Type 'unknown' is not assignable to type 'string'. (ts)
+				onselect={(v) => {
+					_props._override = v;
+				}}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymRadioGroup.svelte:51:35
+Warn: This reference only captures the initial value of `name`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+
+	let _initialVal = $state(getProp(name, props));
+
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymRadioGroup.svelte:60:3
+Error: Type 'string | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'. (ts)
+	if (res.length > 0) {
+		_props._override = res[0].value;
+	} else {
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymRadioGroup.svelte:101:6
+Error: Type 'unknown' is not assignable to type 'string'. (ts)
+				onselect={(v) => {
+					_props._override = v;
+				}}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymColorPicker.svelte:40:35
+Warn: This reference only captures the initial value of `name`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+
+	let _initialVal = $state(getProp(name, props) ?? '#000000');
+	let res = extraOpts.filter((e) => {
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/GymColorPicker.svelte:76:6
+Error: Type 'unknown' is not assignable to type 'string'. (ts)
+				onselect={(v) => {
+					_props._override = v;
+				}}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymCheckbox.svelte:23:6
+Error: Variable '_initialVal' implicitly has type 'any' in some locations where its type cannot be determined. (ts)
+
+	let _initialVal;
+
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymCheckbox.svelte:31:7
+Error: Variable '_initialVal' implicitly has an 'any' type. (ts)
+
+		if (_initialVal !== v) {
+			_initialVal = v;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymCheckbox.svelte:42:19
+Error: Variable '_initialVal' implicitly has an 'any' type. (ts)
+	$: res = extraOpts.filter((e) => {
+		if (e.value === _initialVal || '' + e.value === _initialVal) {
+			return true;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymCheckbox.svelte:42:51
+Error: Variable '_initialVal' implicitly has an 'any' type. (ts)
+	$: res = extraOpts.filter((e) => {
+		if (e.value === _initialVal || '' + e.value === _initialVal) {
+			return true;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymCheckbox.svelte:49:4
+Error: Type 'string | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'. (ts)
+		if (res.length > 0) {
+			_props._override = res[0].value;
+		} else {
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymCheckbox.svelte:55:24
+Error: Parameter 'v' implicitly has an 'any' type. (ts)
+
+	function handleSelect(v) {
+		_props._override = v;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymCheckbox.svelte:63:11
+Error: Variable '_initialVal' implicitly has an 'any' type. (ts)
+		_props._override = optDefault;
+		setProp(_initialVal, name, props);
+		props = props;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymCheckbox.svelte:73:14
+Error: Variable '_initialVal' implicitly has an 'any' type. (ts)
+				type="checkbox"
+				checked={_initialVal}
+				on:input={(e) => {
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymCheckbox.svelte:76:20
+Error: 'e.target' is possibly 'null'. (ts)
+					_props._override = optDefault;
+					_initialVal = e.target.checked;
+					setProp(e.target.checked, name, props);
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymCheckbox.svelte:76:29
+Error: Property 'checked' does not exist on type 'EventTarget'. (ts)
+					_props._override = optDefault;
+					_initialVal = e.target.checked;
+					setProp(e.target.checked, name, props);
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymCheckbox.svelte:77:14
+Error: 'e.target' is possibly 'null'. (ts)
+					_initialVal = e.target.checked;
+					setProp(e.target.checked, name, props);
+					props = props;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymCheckbox.svelte:77:23
+Error: Property 'checked' does not exist on type 'EventTarget'. (ts)
+					_initialVal = e.target.checked;
+					setProp(e.target.checked, name, props);
+					props = props;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymCheckbox.svelte:91:15
+Error: Variable '_initialVal' implicitly has an 'any' type. (ts)
+					type="checkbox"
+					checked={_initialVal}
+					on:input={(e) => {
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymCheckbox.svelte:94:21
+Error: 'e.target' is possibly 'null'. (ts)
+						_props._override = optDefault;
+						_initialVal = e.target.checked;
+						setProp(e.target.checked, name, props);
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymCheckbox.svelte:94:30
+Error: Property 'checked' does not exist on type 'EventTarget'. (ts)
+						_props._override = optDefault;
+						_initialVal = e.target.checked;
+						setProp(e.target.checked, name, props);
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymCheckbox.svelte:95:15
+Error: 'e.target' is possibly 'null'. (ts)
+						_initialVal = e.target.checked;
+						setProp(e.target.checked, name, props);
+						props = props;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymCheckbox.svelte:95:24
+Error: Property 'checked' does not exist on type 'EventTarget'. (ts)
+						_initialVal = e.target.checked;
+						setProp(e.target.checked, name, props);
+						props = props;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymInterpolateMenu.svelte:9:13
+Warn: Component has unused export property 'sliderValue'. If it is for external reference only, please consider using `export const sliderValue`
+https://svelte.dev/e/export_let_unused (svelte)
+	export let sliderMax: number = 100;
+	export let sliderValue: number = 50;
+	export let units: string | null = null;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymSlider.svelte:128:24
+Error: Parameter 'v' implicitly has an 'any' type. (ts)
+
+	function applyFunctor(v) {
+		if (typeof v === 'number' && fn) {
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymSlider.svelte:158:35
+Error: No overload matches this call.
+  Overload 1 of 3, '(callbackfn: (previousValue: string, currentValue: string, currentIndex: number, array: string[]) => string, initialValue: string): string', gave the following error.
+    Argument of type '(a: null, e: string) => string | null' is not assignable to parameter of type '(previousValue: string, currentValue: string, currentIndex: number, array: string[]) => string'.
+      Types of parameters 'a' and 'previousValue' are incompatible.
+        Type 'string' is not assignable to type 'null'.
+  Overload 2 of 3, '(callbackfn: (previousValue: null, currentValue: string, currentIndex: number, array: string[]) => null, initialValue: null): null', gave the following error.
+    Argument of type '(a: null, e: string) => string | null' is not assignable to parameter of type '(previousValue: null, currentValue: string, currentIndex: number, array: string[]) => null'.
+      Type 'string | null' is not assignable to type 'null'.
+        Type 'string' is not assignable to type 'null'. (ts)
+
+			const u = possibleUnits.reduce((a, e) => {
+				return e.length > (a ?? '').length ? e : a;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymSlider.svelte:180:4
+Error: Type 'string | number | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'. (ts)
+		if (res) {
+			_props._override = res.value;
+		} else {
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymSlider.svelte:186:24
+Error: Parameter 'v' implicitly has an 'any' type. (ts)
+
+	function handleSelect(v) {
+		_props._override = v;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymSlider.svelte:231:20
+Error: 'e.target' is possibly 'null'. (ts)
+				_props._override = optDefault;
+				_initialVal = +e.target.value;
+				setProp(applyFunctor(+e.target.value), name, props, units ?? undefined);
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymSlider.svelte:231:29
+Error: Property 'value' does not exist on type 'EventTarget'. (ts)
+				_props._override = optDefault;
+				_initialVal = +e.target.value;
+				setProp(applyFunctor(+e.target.value), name, props, units ?? undefined);
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymSlider.svelte:232:27
+Error: 'e.target' is possibly 'null'. (ts)
+				_initialVal = +e.target.value;
+				setProp(applyFunctor(+e.target.value), name, props, units ?? undefined);
+				props = props;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymSlider.svelte:232:36
+Error: Property 'value' does not exist on type 'EventTarget'. (ts)
+				_initialVal = +e.target.value;
+				setProp(applyFunctor(+e.target.value), name, props, units ?? undefined);
+				props = props;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymButton.svelte:10:19
+Error: Parameter 'e' implicitly has an 'any' type. (ts)
+
+	function trigger(e) {
+		switch (typeof props[name]) {
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymDropdown.svelte:54:4
+Error: Type 'string | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'. (ts)
+		if (res.length > 0) {
+			_props._override = res[0].value;
+		} else {
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymDropdown.svelte:60:24
+Error: Parameter 'v' implicitly has an 'any' type. (ts)
+
+	function handleSelect(v) {
+		_props._override = v;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymDropdown.svelte:79:19
+Error: 'e.target' is possibly 'null'. (ts)
+			on:input={(e) => {
+				_initialVal = e.target.value;
+				_props._override = optDefault;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymDropdown.svelte:79:28
+Error: Property 'value' does not exist on type 'EventTarget'. (ts)
+			on:input={(e) => {
+				_initialVal = e.target.value;
+				_props._override = optDefault;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/TestHarness.svelte:326:2
+Warn: Do not use empty rulesets (css)
+
+	.test-area {
+	}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/TestHarness.svelte:599:3
+Warn: Also define the standard property 'appearance' for compatibility (css)
+	:global([type='search']) {
+		-webkit-appearance: textfield;
+		outline-offset: -2px;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/TestHarness.svelte:660:3
+Warn: Also define the standard property 'appearance' for compatibility (css)
+	:global([type='submit']) {
+		-webkit-appearance: button;
+	}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/TestHarness.svelte:680:3
+Warn: Also define the standard property 'appearance' for compatibility (css)
+	:global(select) {
+		-moz-appearance: none;
+		-webkit-appearance: none;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/TestHarness.svelte:681:3
+Warn: Also define the standard property 'appearance' for compatibility (css)
+		-moz-appearance: none;
+		-webkit-appearance: none;
+	}
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymTextbox.svelte:36:4
+Error: Type 'string | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'. (ts)
+		if (res.length > 0) {
+			_props._override = res[0].value;
+		} else {
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymTextbox.svelte:56:24
+Error: Parameter 'v' implicitly has an 'any' type. (ts)
+
+	function handleSelect(v) {
+		_props._override = v;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymTextbox.svelte:86:14
+Error: 'e.target' is possibly 'null'. (ts)
+					_props._override = optDefault;
+					setProp(e.target.value, name, props);
+					props = props;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymTextbox.svelte:86:23
+Error: Property 'value' does not exist on type 'EventTarget'. (ts)
+					_props._override = optDefault;
+					setProp(e.target.value, name, props);
+					props = props;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymTextbox.svelte:97:14
+Error: 'e.target' is possibly 'null'. (ts)
+					_props._override = optDefault;
+					setProp(e.target.value, name, props);
+					props = props;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymTextbox.svelte:97:23
+Error: Property 'value' does not exist on type 'EventTarget'. (ts)
+					_props._override = optDefault;
+					setProp(e.target.value, name, props);
+					props = props;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymRadioGroup.svelte:44:4
+Error: Type 'string | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'. (ts)
+		if (res.length > 0) {
+			_props._override = res[0].value;
+		} else {
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymRadioGroup.svelte:50:24
+Error: Parameter 'v' implicitly has an 'any' type. (ts)
+
+	function handleSelect(v) {
+		_props._override = v;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymRadioGroup.svelte:76:21
+Error: 'e.target' is possibly 'null'. (ts)
+						_props._override = optDefault;
+						props[name] = e.target.value;
+
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymRadioGroup.svelte:76:30
+Error: Property 'value' does not exist on type 'EventTarget'. (ts)
+						_props._override = optDefault;
+						props[name] = e.target.value;
+
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymColorPicker.svelte:40:24
+Error: Parameter 'v' implicitly has an 'any' type. (ts)
+
+	function handleSelect(v) {
+		_props._override = v;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymColorPicker.svelte:61:20
+Error: 'e.target' is possibly 'null'. (ts)
+				on:input={(e) => {
+					_initialVal = e.target.value;
+					_props._override = optDefault;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymColorPicker.svelte:61:29
+Error: Property 'value' does not exist on type 'EventTarget'. (ts)
+				on:input={(e) => {
+					_initialVal = e.target.value;
+					_props._override = optDefault;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymColorPicker.svelte:63:14
+Error: 'e.target' is possibly 'null'. (ts)
+					_props._override = optDefault;
+					setProp(e.target.value, name, props);
+					props = props;
+
+
+/Users/paulmartin/code/svelte-gym/src/lib/v4/GymColorPicker.svelte:63:23
+Error: Property 'value' does not exist on type 'EventTarget'. (ts)
+					_props._override = optDefault;
+					setProp(e.target.value, name, props);
+					props = props;
+
+
+/Users/paulmartin/code/svelte-gym/src/routes/kitchen-sink/+page.svelte:12:9
+Error: Cannot find module '$lib' or its corresponding type declarations. (js)
+		GymLog
+	} from '$lib';
+
+
+
+/Users/paulmartin/code/svelte-gym/src/routes/raw/+page.svelte:58:2
+Error: Element implicitly has an 'any' type because expression of type '"componentToTest"' can't be used to index type '{}'.
+  Property 'componentToTest' does not exist on type '{}'. (ts)
+<TestHarness>
+	<svelte:fragment slot="componentToTest">
+		<section>
+
+
+/Users/paulmartin/code/svelte-gym/src/routes/raw/+page.svelte:110:2
+Error: Element implicitly has an 'any' type because expression of type '"controls"' can't be used to index type '{}'.
+  Property 'controls' does not exist on type '{}'. (ts)
+
+	<svelte:fragment slot="controls">
+		<div>
+
+
+/Users/paulmartin/code/svelte-gym/src/routes/scrolling-test/+page.svelte:6:14
+Error: Type '__sveltets_2_IsomorphicComponent<{ [x: string]: never; }, { [evt: string]: CustomEvent<any>; }, {}, {}, string>' is not assignable to type 'Snippet<[]>'.
+  Target signature provides too few arguments. Expected 2 or more, but got 0. (js)
+
+<TestHarness componentToTest={ScrollingDemo} />
+
+
+====================================
+svelte-check found 73 errors and 33 warnings in 21 files
+ ELIFECYCLE  Command failed with exit code 1.
