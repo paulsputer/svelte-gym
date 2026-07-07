@@ -90,7 +90,6 @@
 	</div>
 {:else}
 	<div class="gym-control">
-		<span class="gym-label">{label ?? name}</span>
 		<div class="gym-value-row">
 			<label>
 				<input
@@ -100,6 +99,7 @@
 						setProp((e.target as HTMLInputElement).checked, name, props);
 					}}
 				/>
+				<span>{label ?? name}</span>
 			</label>
 			<GymOverrideButtons
 				options={extraOpts}
