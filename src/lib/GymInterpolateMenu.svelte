@@ -59,7 +59,11 @@
 
 	function toggleMenu(e: MouseEvent) {
 		e.stopPropagation();
-		open = !open;
+		const willOpen = !open;
+		if (willOpen) {
+			window.dispatchEvent(new CustomEvent('gymCloseOtherInterpolations'));
+		}
+		open = willOpen;
 	}
 
 	function startInterpolation() {
@@ -168,8 +172,14 @@
 		}
 		window.addEventListener('gymResetInterpolations', handleReset);
 
+		function handleCloseOthers() {
+			open = false;
+		}
+		window.addEventListener('gymCloseOtherInterpolations', handleCloseOthers);
+
 		return () => {
 			window.removeEventListener('gymResetInterpolations', handleReset);
+			window.removeEventListener('gymCloseOtherInterpolations', handleCloseOthers);
 			if (animFrameId !== null) {
 				cancelAnimationFrame(animFrameId);
 			}
