@@ -172,4 +172,18 @@ test.describe('Permalink Roundtrip', () => {
 		expect(style).toContain('--w: 1032px');
 		expect(style).toContain('--h: 1583px');
 	});
+
+	test('harness __anchor param is restored and style applied', async ({ page }) => {
+		await page.goto('/kitchen-sink?__anchor=top-left');
+		await page.waitForTimeout(500);
+
+		const holderStyle = await page.getAttribute('.test-holder', 'style');
+		const componentStyle = await page.getAttribute('.test-component', 'style');
+
+		expect(holderStyle).toContain('--holder-justify: flex-start');
+		expect(holderStyle).toContain('--holder-align: flex-start');
+		expect(componentStyle).toContain('--component-justify: flex-start');
+		expect(componentStyle).toContain('--component-align: flex-start');
+		expect(componentStyle).toContain('--component-margin: 0');
+	});
 });

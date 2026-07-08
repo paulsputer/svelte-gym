@@ -8,6 +8,7 @@
 		"build": "vite build && npm run package",
 		"preview": "vite preview",
 		"package": "svelte-package && publint",
+		"package:watch": "svelte-package -w",
 		"prepublishOnly": "npm run package",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",

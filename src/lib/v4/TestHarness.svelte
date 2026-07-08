@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { restoreProps } from './helpers.js';
+	import { restoreProps, setProp } from './helpers.js';
 	import { onMount } from 'svelte';
 
 	import GymCheckbox from './GymCheckbox.svelte';
@@ -23,6 +23,7 @@
 		__width: 'auto',
 		__height: 'auto',
 		__fontsize: '1em',
+		__anchor: 'center-center',
 		__resetAnimations: () => {},
 		__scrollY: undefined as string | undefined
 	};
@@ -113,6 +114,37 @@
 		return '';
 	}
 
+	/**
+	 * Translates anchor settings to CSS alignment values.
+	 * Format: 'vertical-horizontal' (e.g., 'top-left', 'center-right').
+	 * Default: 'center-center'
+	 */
+	function getAnchorStyles(anchor: string | undefined) {
+		const a = anchor || 'center-center';
+		switch (a) {
+			case 'top-left':
+				return { justify: 'flex-start', align: 'flex-start', margin: '0' };
+			case 'top-center':
+				return { justify: 'center', align: 'flex-start', margin: '0' };
+			case 'top-right':
+				return { justify: 'flex-end', align: 'flex-start', margin: '0' };
+			case 'center-left':
+				return { justify: 'flex-start', align: 'center', margin: '0' };
+			case 'center-center':
+				return { justify: 'center', align: 'center', margin: 'auto' };
+			case 'center-right':
+				return { justify: 'flex-end', align: 'center', margin: '0' };
+			case 'bottom-left':
+				return { justify: 'flex-start', align: 'flex-end', margin: '0' };
+			case 'bottom-center':
+				return { justify: 'center', align: 'flex-end', margin: '0' };
+			case 'bottom-right':
+				return { justify: 'flex-end', align: 'flex-end', margin: '0' };
+			default:
+				return { justify: 'center', align: 'center', margin: 'auto' };
+		}
+	}
+
 	let maxScroll = 0;
 
 	function updateMaxScroll() {
@@ -201,6 +233,7 @@
 			window.scrollTo(0, parseFloat(props.__scrollY));
 		}
 	}
+	$: anchorStyles = getAnchorStyles(props.__anchor);
 </script>
 
 <svelte:window on:scroll={updateScroll} />
@@ -209,13 +242,25 @@
 	<div class="test-grid {getGridClassFromValue(props.__grid)}"></div>
 
 	<div class="test-area" class:controls={props.__controls}>
-		<div class="test-holder" class:scroll-mode={scrollMode}>
+		<div
+			class="test-holder"
+			class:scroll-mode={scrollMode}
+			style="
+				--holder-justify: {anchorStyles.justify};
+				--holder-align: {anchorStyles.align};
+			"
+		>
 			<div
 				class="test-component"
 				class:highlight={props.__highlight}
-				style:--w={props.__width}
-				style:--h={props.__height}
-				style:--fs={props.__fontsize}
+				style="
+					--w: {props.__width};
+					--h: {props.__height};
+					--fs: {props.__fontsize};
+					--component-justify: {anchorStyles.justify};
+					--component-align: {anchorStyles.align};
+					--component-margin: {anchorStyles.margin};
+				"
 			>
 				{#if $$slots.componentToTest}
 					<slot name="componentToTest" />
@@ -269,6 +314,24 @@
 						<GymCheckbox hideExtra={true} bind:props name="__highlight" label="highlight" />
 					</li>
 				</ul>
+				<div class="gym-control">
+					<span class="gym-label">anchor</span>
+					<div class="anchor-grid">
+						{#each ['top-left', 'top-center', 'top-right', 'center-left', 'center-center', 'center-right', 'bottom-left', 'bottom-center', 'bottom-right'] as anchorOption}
+							<button
+								type="button"
+								class="anchor-btn"
+								class:active={props.__anchor === anchorOption}
+								title={anchorOption}
+								on:click={() => {
+									props.__anchor = anchorOption;
+									setProp(anchorOption, '__anchor', props);
+								}}
+							>
+							</button>
+						{/each}
+					</div>
+				</div>
 				<GymButton bind:props name="__resetAnimations" label="Reset Animations" />
 
 				<br />
@@ -324,7 +387,7 @@
 
 <style>
 	:root {
-		--control-area-width: 20em;
+		--control-area-width: 320px;
 		--bg-color: #fff;
 	}
 
@@ -363,12 +426,17 @@
 		width: 100%;
 	}
 
+	.test-area.controls .test-holder {
+		padding-right: var(--control-area-width);
+	}
+
 	.test-holder {
 		display: flex;
-		justify-content: center;
-		align-items: center;
+		justify-content: var(--holder-justify, center);
+		align-items: var(--holder-align, center);
 		min-height: 100vh;
 		width: 100%;
+		box-sizing: border-box;
 	}
 
 	.test-holder.scroll-mode {
@@ -389,12 +457,12 @@
 	.test-component {
 		position: relative;
 		display: flex;
-		align-items: center;
-		justify-content: center;
+		align-items: var(--component-align, center);
+		justify-content: var(--component-justify, center);
 		height: var(--h);
 		width: var(--w);
 		font-size: var(--fs);
-		margin: auto;
+		margin: var(--component-margin, auto);
 	}
 
 	.highlight {
@@ -540,6 +608,52 @@
 		background-repeat: repeat;
 		background-size: 140px 30px;
 		background-color: var(--bg-color);
+	}
+
+	.gym-control {
+		padding: 0.4em 0.75em;
+	}
+
+	.gym-label {
+		display: block;
+		text-transform: capitalize;
+		font-weight: 600;
+		color: #000;
+		text-align: left;
+		margin-bottom: 0.25em;
+	}
+
+	.anchor-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 6px;
+		width: 108px;
+		height: 108px;
+		margin-top: 0.4em;
+		background: rgba(0, 0, 0, 0.02);
+		border: 1px solid rgba(0, 0, 0, 0.08);
+		border-radius: 6px;
+		padding: 6px;
+	}
+
+	.anchor-btn {
+		background: rgba(0, 0, 0, 0.05);
+		border: 1px solid rgba(0, 0, 0, 0.08);
+		border-radius: 4px;
+		cursor: pointer;
+		transition: all 0.15s ease-in-out;
+		padding: 0;
+	}
+
+	.anchor-btn:hover {
+		background: rgba(0, 0, 0, 0.12);
+		transform: scale(1.05);
+	}
+
+	.anchor-btn.active {
+		background: #333;
+		border-color: #3e3e3e;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 	}
 
 	/* ================================================================

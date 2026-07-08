@@ -80,6 +80,9 @@ description = "Publish both packages to npm"
 depends = ["publish", "publish:eslint"]
 
 [tasks."dev:v4"]
-description = "Start development server for Svelte 4 test project"
+description = "Start development server for Svelte 4 test project with auto-rebuild"
 dir = "test-v4-project"
-run = "pnpm run dev"
+run = """
+pnpm --dir .. run package:watch &
+pnpm run dev
+"""
