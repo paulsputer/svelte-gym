@@ -14,6 +14,17 @@
 	export let log: string[] | undefined = undefined;
 
 	let activeTab = $$slots.controls ? 'specific' : 'basic';
+	if (typeof window !== 'undefined') {
+		const tab = new URL(window.location.href).searchParams.get('__tab');
+		if (tab === 'basic' || tab === 'specific' || tab === 'logs') {
+			activeTab = tab;
+		}
+	}
+	let logsFullscreen = false;
+
+	$: if (activeTab !== 'logs') {
+		logsFullscreen = false;
+	}
 
 	let props = {
 		__controls: true,
@@ -215,6 +226,29 @@
 		setTimeout(() => (permalinkLabel = 'Copy Permalink'), 1500);
 	}
 
+	function resetProps() {
+		const url = new URL(window.location.href);
+		const keys = Array.from(url.searchParams.keys());
+		
+		for (const key of keys) {
+			let isBasic = false;
+			if (key.startsWith('__interp_')) {
+				isBasic = key.startsWith('__interp___');
+			} else {
+				isBasic = key.startsWith('__');
+			}
+
+			if (activeTab === 'basic' && isBasic) {
+				url.searchParams.delete(key);
+			} else if (activeTab === 'specific' && !isBasic) {
+				url.searchParams.delete(key);
+			}
+		}
+
+		url.searchParams.set('__tab', activeTab);
+		window.location.href = url.toString();
+	}
+
 	function updateScroll() {
 		if (initialRestoration && props.__scrollY !== undefined) return;
 
@@ -269,7 +303,7 @@
 				{/if}
 			</div>
 		</div>
-		<div class="test-controls">
+		<div class="test-controls" class:logs-fullscreen={logsFullscreen}>
 			<div class="tabs">
 				<button class:active={activeTab === 'basic'} on:click={() => (activeTab = 'basic')}
 					>Basic</button
@@ -280,17 +314,19 @@
 					>
 				{/if}
 				{#if $$slots.logs || log}
-					<button class:active={activeTab === 'logs'} on:click={() => (activeTab = 'logs')}
-						>Logs</button
-					>
+					<button class:active={activeTab === 'logs'} on:click={() => (activeTab = 'logs')}>
+						Logs
+						{#if log && log.length > 0}
+							<span class="log-count">{log.length}</span>
+						{/if}
+					</button>
 				{/if}
 			</div>
 
 			<div style:display={activeTab === 'basic' ? 'block' : 'none'}>
-				<span>
-					<button type="button" class="link-button" on:click={copyPermalink}
-						>{permalinkLabel}</button
-					>
+				<span style="display: flex; justify-content: space-between; align-items: center;">
+					<button type="button" class="link-button" on:click={copyPermalink}>{permalinkLabel}</button>
+					<button type="button" class="link-button" on:click={resetProps}>Reset</button>
 				</span>
 				<hr />
 				<br />
@@ -369,12 +405,23 @@
 			</div>
 
 			<div style:display={activeTab === 'specific' ? 'block' : 'none'}>
+				<span style="display: flex; justify-content: space-between; align-items: center;">
+					<button type="button" class="link-button" on:click={copyPermalink}>{permalinkLabel}</button>
+					<button type="button" class="link-button" on:click={resetProps}>Reset</button>
+				</span>
+				<hr />
+				<br />
 				<span>
 					<slot name="controls" />
 				</span>
 			</div>
 
 			<div style:display={activeTab === 'logs' ? 'flex' : 'none'} class="logs-tab">
+				<span class="logs-header" style="display: flex; justify-content: space-between; align-items: center;">
+					<button type="button" class="link-button" on:click={() => logsFullscreen = !logsFullscreen}>{logsFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</button>
+					<button type="button" class="link-button" on:click={() => { if (log) { log.length = 0; log = log; } }}>Reset</button>
+				</span>
+				<hr />
 				{#if $$slots.logs}
 					<slot name="logs" />
 				{:else if log}
@@ -487,6 +534,17 @@
 		z-index: 1001;
 	}
 
+	.test-controls.logs-fullscreen {
+		width: 100vw;
+		background: rgba(250, 250, 250, 0.95);
+	}
+
+	.test-controls.logs-fullscreen .tabs,
+	.test-controls.logs-fullscreen .logs-header {
+		width: var(--control-area-width);
+		align-self: flex-end;
+	}
+
 	.hide-controls .test-controls {
 		display: none;
 	}
@@ -512,6 +570,7 @@
 		font-weight: normal;
 		border-bottom: 2px solid transparent;
 		color: #555;
+		position: relative;
 	}
 
 	.tabs button:hover {
@@ -522,6 +581,25 @@
 		border-bottom: 2px solid #000;
 		font-weight: bold;
 		color: #000;
+	}
+
+	.log-count {
+		position: absolute;
+		top: 4px;
+		right: 4px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: #e65100;
+		color: #fff;
+		font-size: 10px;
+		font-weight: bold;
+		border-radius: 10px;
+		height: 16px;
+		min-width: 16px;
+		padding: 0 4px;
+		box-sizing: border-box;
+		line-height: 1;
 	}
 
 	.logs-tab {
