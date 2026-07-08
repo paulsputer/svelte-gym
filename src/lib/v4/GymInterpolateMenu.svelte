@@ -18,8 +18,8 @@
 
 	// Interpolation config
 	let cpm = 20;
-	let interpMin = 0;
-	let interpMax = 100;
+	let interpMin = mode === 'slider' ? sliderMin : 0;
+	let interpMax = mode === 'slider' ? sliderMax : multiline ? 500 : 120;
 	let useCustomRange = false;
 
 	// Lorem ipsum for text mode

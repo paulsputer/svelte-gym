@@ -21,6 +21,7 @@
 		description: 'A long description\nthat spans multiple lines.',
 		isActive: true,
 		count: 5,
+		offset: 0,
 		settings: {
 			theme: 'light',
 			notifications: {
@@ -76,6 +77,7 @@
 			<p style="white-space: pre-wrap;">{kitchenSinkProps.description}</p>
 			<p>Status: {kitchenSinkProps.isActive ? 'Active' : 'Inactive'}</p>
 			<p>Count: {kitchenSinkProps.count}</p>
+			<p>Offset: {kitchenSinkProps.offset}</p>
 			<p>Theme: {kitchenSinkProps.settings.theme}</p>
 			<p>
 				Notifications: {kitchenSinkProps.settings.notifications.email ? 'Email' : ''}
@@ -106,6 +108,9 @@
 				<li><GymCheckbox bind:props={kitchenSinkProps} name="isActive" label="Is Active?" /></li>
 				<li>
 					<GymSlider bind:props={kitchenSinkProps} name="count" min={0} max={10} label="Count" />
+				</li>
+				<li>
+					<GymSlider bind:props={kitchenSinkProps} name="offset" min={-20} max={20} label="Offset" />
 				</li>
 			</ul>
 

@@ -18,6 +18,7 @@
 		description: 'A long description\nthat spans multiple lines.',
 		isActive: true,
 		count: 5,
+		offset: 0,
 		settings: {
 			theme: 'light',
 			notifications: {
@@ -47,6 +48,7 @@
 			<p style="white-space: pre-wrap;">{props.description}</p>
 			<p>Status: {props.isActive ? 'Active' : 'Inactive'}</p>
 			<p>Count: {props.count}</p>
+			<p>Offset: {props.offset}</p>
 			<p>Theme: {props.settings.theme}</p>
 			<p>
 				Notifications: {props.settings.notifications.email ? 'Email' : ''}
@@ -66,6 +68,7 @@
 			<li><GymTextbox bind:props name="description" label="Description" multiline={true} /></li>
 			<li><GymCheckbox bind:props name="isActive" label="Is Active?" /></li>
 			<li><GymSlider bind:props name="count" min={0} max={10} label="Count" /></li>
+			<li><GymSlider bind:props name="offset" min={-20} max={20} label="Offset" /></li>
 		</ul>
 
 		<h3>Nested Properties (JSON Path)</h3>

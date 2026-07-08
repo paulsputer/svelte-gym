@@ -31,8 +31,8 @@
 
 	// Interpolation config
 	let cpm = $state(20);
-	let interpMin = $state(0);
-	let interpMax = $state(100);
+	let interpMin = $state(mode === 'slider' ? sliderMin : 0);
+	let interpMax = $state(mode === 'slider' ? sliderMax : multiline ? 500 : 120);
 	let useCustomRange = $state(false);
 
 	// Lorem ipsum for text mode
