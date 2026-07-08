@@ -14,6 +14,8 @@
 	export let hideExtra: boolean = false;
 	export let interpMenu: GymInterpolateMenu | undefined = undefined;
 
+	let isMenuOpen = false;
+
 	$: _label = label ?? name;
 
 	const optDefault = 'NONE';
@@ -216,10 +218,10 @@
 	<span class="gym-label"
 		><GymInterpolateMenu
 			bind:this={interpMenu}
+			bind:open={isMenuOpen}
 			mode="slider"
 			sliderMin={min ?? 0}
 			sliderMax={max ?? 100}
-			sliderValue={_initialVal}
 			{units}
 			propName={name}
 			bind:props
@@ -234,6 +236,7 @@
 					: ''}{/if}</span
 		>
 		<input
+			class:highlight-active={isMenuOpen}
 			type="range"
 			min={min ?? 0}
 			max={max ?? 100}
@@ -258,6 +261,7 @@
 <style>
 	.gym-control {
 		padding: 0.4em 0.75em;
+		position: relative;
 	}
 
 	.gym-label {
@@ -290,5 +294,10 @@
 		line-height: 1;
 		margin: 0;
 		padding: 0;
+	}
+
+	.highlight-active {
+		outline: 2px solid #e65100;
+		outline-offset: -1px;
 	}
 </style>

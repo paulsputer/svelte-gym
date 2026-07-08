@@ -31,6 +31,7 @@
 
 	let _initialVal = $state('');
 	let inputRef: HTMLInputElement | HTMLTextAreaElement | undefined = $state();
+	let isMenuOpen = $state(false);
 
 	$effect(() => {
 		let v = getProp(name, props);
@@ -66,6 +67,7 @@
 	<span class="gym-label"
 		><GymInterpolateMenu
 			bind:this={interpMenu}
+			bind:open={isMenuOpen}
 			mode="text"
 			{multiline}
 			propName={name}
@@ -75,6 +77,7 @@
 	<div class="gym-value">
 		{#if multiline}
 			<textarea
+				class:highlight-active={isMenuOpen}
 				bind:this={inputRef}
 				bind:value={_initialVal}
 				oninput={(e) => {
@@ -83,6 +86,7 @@
 			></textarea>
 		{:else}
 			<input
+				class:highlight-active={isMenuOpen}
 				bind:this={inputRef}
 				type="text"
 				bind:value={_initialVal}
@@ -112,6 +116,7 @@
 <style>
 	.gym-control {
 		padding: 0.4em 0.75em;
+		position: relative;
 	}
 
 	.gym-label {
@@ -140,5 +145,10 @@
 	textarea {
 		min-height: 100px;
 		resize: vertical;
+	}
+
+	.highlight-active {
+		outline: 2px solid #e65100;
+		outline-offset: -1px;
 	}
 </style>

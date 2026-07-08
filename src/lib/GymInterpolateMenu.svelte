@@ -1,17 +1,18 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { setProp } from './helpers.js';
+	import GymOverrideButtons from './GymOverrideButtons.svelte';
 
 	interface GymInterpolateMenuProps {
 		mode: 'slider' | 'text';
 		multiline?: boolean;
 		sliderMin?: number;
 		sliderMax?: number;
-		sliderValue?: number;
 		units?: string | null;
 		propName: string;
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		props: Record<string, any>;
+		open?: boolean;
 	}
 
 	let {
@@ -21,31 +22,221 @@
 		sliderMax = 100,
 		units = null,
 		propName,
-		props = $bindable()
+		props = $bindable(),
+		open = $bindable(false)
 	}: GymInterpolateMenuProps = $props();
 
-	let open = $state(false);
 	let active = $state(false);
 	let animFrameId: number | null = $state(null);
 	let startTime: number = 0;
 
 	// Interpolation config
 	let cpm = $state(20);
-	let interpMin = $state(mode === 'slider' ? sliderMin : 0);
-	let interpMax = $state(mode === 'slider' ? sliderMax : multiline ? 500 : 120);
+	
+	// 'text' sub-modes
+	let textModeOverride = $state<'text' | 'number' | 'date' | 'time' | null>(null);
+	let detectedTextMode = $state<'text' | 'number' | 'date' | 'time'>('text');
+	
+	let effectiveTextMode = $derived.by(() => {
+		if (mode === 'slider') return 'slider';
+		if (textModeOverride) return textModeOverride;
+		return detectedTextMode;
+	});
+
+	let interpMin = $state(0);
+	let interpMax = $state(100);
 	let useCustomRange = $state(false);
+
+	let interpMinDate = $state('');
+	let interpMaxDate = $state('');
+	let useCustomDateRange = $state(false);
+
+	let dateFormatOverride = $state<'mm-dd' | 'dd-mm' | null>(null);
+
+	function detectDateFormat(str: string): 'mm-dd' | 'dd-mm' {
+		const tokens = [...str.matchAll(/\d+/g)].map(m => m[0]);
+		const yearIdx = tokens.findIndex(t => t.length === 4);
+		const otherTokens = tokens.filter((t, i) => i !== yearIdx);
+		if (otherTokens.length >= 2) {
+			const num0 = parseInt(otherTokens[0], 10);
+			const num1 = parseInt(otherTokens[1], 10);
+			if (num0 > 12) return 'dd-mm';
+			if (num1 > 12) return 'mm-dd';
+		}
+		return 'mm-dd';
+	}
+
+	let effectiveDateFormat = $derived.by(() => {
+		if (dateFormatOverride) return dateFormatOverride;
+		const val = getCurrentVal();
+		return detectDateFormat(typeof val === 'string' ? val : String(val));
+	});
 
 	// Lorem ipsum for text mode
 	const LOREM = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra.`;
 
-	// Derive defaults from slider props
+	function getCurrentVal() {
+		const keys = propName.split('.');
+		return keys.reduce((acc, key) => acc?.[key], props);
+	}
+
+	function detectType(val: any): 'text' | 'number' | 'date' | 'time' {
+		if (typeof val !== 'string') return 'text';
+		if (val.trim() === '') return 'text';
+		
+		// If it's purely numeric
+		if (!isNaN(Number(val))) return 'number';
+		
+		// If it has dates (e.g. contains 202x, dashes, slashes, colons)
+		// Try parsing as date
+		const d = new Date(val);
+		if (!isNaN(d.getTime())) {
+			// Avoid parsing simple words as dates
+			const hasNum = /\d/.test(val);
+			if (hasNum) return 'date';
+		}
+
+		// Fallback for non-standard dates (e.g. DD-MM-YYYY) that JS Date rejects
+		const tokens = [...val.matchAll(/\d+/g)].map(m => m[0]);
+		if (tokens.length >= 3 && tokens.some(t => t.length === 4)) {
+			return 'date';
+		}
+
+		// Fallback for pure time strings (e.g. 09:24 or 09:24:12)
+		if (/^\s*\d{1,2}:\d{2}(:\d{2})?\s*$/.test(val)) {
+			return 'time';
+		}
+		
+		return 'text';
+	}
+
+	$effect(() => {
+		if (open && mode === 'text' && !active) {
+			const val = getCurrentVal();
+			detectedTextMode = detectType(val);
+		}
+	});
+
+	// Date format utilities
+	function parseDateTokens(str: string, mmddFormat: 'mm-dd' | 'dd-mm') {
+		const tokens = [...str.matchAll(/\d+/g)].map(m => ({ val: m[0], index: m.index, length: m[0].length }));
+		const mapping: Record<string, {val: string, index: number, length: number}> = {};
+		
+		const isTimeOnly = /^\s*\d{1,2}:\d{2}(:\d{2})?\s*$/.test(str);
+		
+		if (isTimeOnly) {
+			if (tokens.length > 0) mapping['Hour'] = tokens[0];
+			if (tokens.length > 1) mapping['Minute'] = tokens[1];
+			if (tokens.length > 2) mapping['Second'] = tokens[2];
+			return mapping;
+		}
+
+		const yearIdx = tokens.findIndex(t => t.length === 4);
+		
+		if (yearIdx !== -1) {
+			mapping['Year'] = tokens[yearIdx];
+			tokens.splice(yearIdx, 1);
+		}
+		
+		if (tokens.length >= 2) {
+			if (mmddFormat === 'dd-mm') {
+				mapping['Day'] = tokens[0];
+				mapping['Month'] = tokens[1];
+			} else {
+				mapping['Month'] = tokens[0];
+				mapping['Day'] = tokens[1];
+			}
+			tokens.splice(0, 2);
+		} else if (tokens.length === 1) {
+			mapping['Month'] = tokens[0];
+			tokens.splice(0, 1);
+		}
+		
+		if (tokens.length > 0) mapping['Hour'] = tokens[0];
+		if (tokens.length > 1) mapping['Minute'] = tokens[1];
+		if (tokens.length > 2) mapping['Second'] = tokens[2];
+		
+		return mapping;
+	}
+
+	function parseToTimestamp(str: string, mmddFormat: 'mm-dd' | 'dd-mm'): number {
+		const mapping = parseDateTokens(str, mmddFormat);
+		const now = new Date();
+		let y = now.getFullYear(), m = 0, d = 1, h = 0, min = 0, s = 0;
+		if (mapping['Year']) { y = parseInt(mapping['Year'].val, 10); }
+		if (mapping['Month']) { m = parseInt(mapping['Month'].val, 10) - 1; }
+		if (mapping['Day']) { d = parseInt(mapping['Day'].val, 10); }
+		if (mapping['Hour']) { h = parseInt(mapping['Hour'].val, 10); }
+		if (mapping['Minute']) { min = parseInt(mapping['Minute'].val, 10); }
+		if (mapping['Second']) { s = parseInt(mapping['Second'].val, 10); }
+		return new Date(y, m, d, h, min, s).getTime();
+	}
+
+	function formatTimestamp(ts: number, baseStr: string, mapping: Record<string, {val: string, index: number, length: number}>) {
+		const d = new Date(ts);
+		let resultStr = baseStr;
+		const parts = Object.entries(mapping).map(([k, v]) => ({ block: k, ...v })).sort((a, b) => b.index - a.index);
+		
+		for (const p of parts) {
+			let num = 0;
+			if (p.block === 'Year') { num = d.getFullYear();}
+			else if (p.block === 'Month') { num = d.getMonth() + 1;}
+			else if (p.block === 'Day') { num = d.getDate();}
+			else if (p.block === 'Hour') { num = d.getHours();}
+			else if (p.block === 'Minute') { num = d.getMinutes();}
+			else if (p.block === 'Second') { num = d.getSeconds();}
+			
+			let padStr = String(num).padStart(p.length, '0');
+			resultStr = resultStr.substring(0, p.index) + padStr + resultStr.substring(p.index + p.length);
+		}
+		return resultStr;
+	}
+
+	// Derive defaults
 	$effect(() => {
 		if (mode === 'slider' && !useCustomRange) {
 			interpMin = sliderMin;
 			interpMax = sliderMax;
-		} else if (mode === 'text' && !useCustomRange) {
-			interpMin = 0;
-			interpMax = multiline ? 500 : 120;
+		} else if (mode === 'text') {
+			if (effectiveTextMode === 'number' && !useCustomRange) {
+				const val = getCurrentVal();
+				const num = parseFloat(val);
+				if (!isNaN(num)) {
+					if (num === 0) {
+						interpMin = -10;
+						interpMax = 10;
+					} else {
+						let spread = Math.abs(num) * 0.5;
+						interpMin = num - spread;
+						interpMax = num + spread;
+					}
+				}
+			} else if (effectiveTextMode === 'text' && !useCustomRange) {
+				interpMin = 0;
+				interpMax = multiline ? 500 : 120;
+			} else if (effectiveTextMode === 'date' && !useCustomDateRange) {
+				const val = getCurrentVal();
+				const strVal = typeof val === 'string' ? val : String(val);
+				const ts = parseToTimestamp(strVal, effectiveDateFormat);
+				if (!isNaN(ts)) {
+					const minTs = ts - 7 * 24 * 60 * 60 * 1000;
+					const maxTs = ts + 7 * 24 * 60 * 60 * 1000;
+					const mapping = parseDateTokens(strVal, effectiveDateFormat);
+					interpMinDate = formatTimestamp(minTs, strVal, mapping);
+					interpMaxDate = formatTimestamp(maxTs, strVal, mapping);
+				}
+			} else if (effectiveTextMode === 'time' && !useCustomDateRange) {
+				const val = getCurrentVal();
+				const strVal = typeof val === 'string' ? val : String(val);
+				const ts = parseToTimestamp(strVal, effectiveDateFormat);
+				if (!isNaN(ts)) {
+					const minTs = ts - 6 * 60 * 60 * 1000; // -6 hours
+					const maxTs = ts + 6 * 60 * 60 * 1000;
+					const mapping = parseDateTokens(strVal, effectiveDateFormat);
+					interpMinDate = formatTimestamp(minTs, strVal, mapping);
+					interpMaxDate = formatTimestamp(maxTs, strVal, mapping);
+				}
+			}
 		}
 	});
 
@@ -68,26 +259,51 @@
 
 	function startInterpolation() {
 		if (active) return;
+		useCustomRange = true;
+		useCustomDateRange = true;
 		active = true;
 		startTime = performance.now();
+		
+		const baseVal = getCurrentVal();
+		let baseStr = typeof baseVal === 'string' ? baseVal : String(baseVal);
+		let decimalsMatch = baseStr.match(/\.(\d+)/);
+		let baseDecimals = decimalsMatch ? decimalsMatch[1].length : 0;
+
+		let baseDateMapping = (effectiveTextMode === 'date' || effectiveTextMode === 'time') ? parseDateTokens(baseStr, effectiveDateFormat) : null;
+		let minDateTs = 0, maxDateTs = 0;
+		if ((effectiveTextMode === 'date' || effectiveTextMode === 'time') && baseDateMapping) {
+			minDateTs = parseToTimestamp(interpMinDate, effectiveDateFormat);
+			maxDateTs = parseToTimestamp(interpMaxDate, effectiveDateFormat);
+		}
 
 		function animate(now: number) {
 			if (!active) return;
 			const elapsed = (now - startTime) / 1000;
 			const frequency = cpm / 60;
-			const sine = 0.5 + 0.5 * Math.sin(2 * Math.PI * frequency * elapsed);
-
-			const eMin = getEffectiveMin();
-			const eMax = getEffectiveMax();
+			const sine = Math.sin(2 * Math.PI * frequency * elapsed); // -1 to 1
+			const sine01 = 0.5 + 0.5 * sine; // 0 to 1
 
 			if (mode === 'slider') {
-				const value = eMin + (eMax - eMin) * sine;
+				const eMin = getEffectiveMin();
+				const eMax = getEffectiveMax();
+				const value = eMin + (eMax - eMin) * sine01;
 				const rounded = Math.round(value);
 				setProp(rounded, propName, props, units ?? undefined, true);
+			} else if (effectiveTextMode === 'number') {
+				const eMin = getEffectiveMin();
+				const eMax = getEffectiveMax();
+				const value = eMin + (eMax - eMin) * sine01;
+				
+				setProp(value.toFixed(baseDecimals), propName, props, undefined, true);
+			} else if ((effectiveTextMode === 'date' || effectiveTextMode === 'time') && baseDateMapping) {
+				const currentTs = minDateTs + (maxDateTs - minDateTs) * sine01;
+				const resultStr = formatTimestamp(currentTs, baseStr, baseDateMapping);
+				setProp(resultStr, propName, props, undefined, true);
 			} else {
-				// Text mode: grow/shrink lorem ipsum
-				const len = Math.floor(eMin + (eMax - eMin) * sine);
-				// Build text from lorem, repeating if needed
+				// Text length mode
+				const eMin = getEffectiveMin();
+				const eMax = getEffectiveMax();
+				const len = Math.floor(eMin + (eMax - eMin) * sine01);
 				let text = '';
 				while (text.length < len) {
 					text += LOREM;
@@ -112,7 +328,6 @@
 		removePermalink();
 	}
 
-	// Permalink integration: store interpolation config as URL params
 	function updatePermalink() {
 		if (typeof window === 'undefined') return;
 		const url = new URL(window.location.href);
@@ -121,7 +336,11 @@
 			cpm,
 			min: getEffectiveMin(),
 			max: getEffectiveMax(),
-			multiline
+			multiline,
+			textModeOverride,
+			dateFormatOverride,
+			interpMinDate,
+			interpMaxDate
 		});
 		url.searchParams.set(`__interp_${propName}`, config);
 		history.replaceState(null, '', url.toString());
@@ -132,9 +351,7 @@
 		const url = new URL(window.location.href);
 		url.searchParams.delete(`__interp_${propName}`);
 
-		// Ensure the final interpolated value is persisted in the URL
-		const keys = propName.split('.');
-		const currentVal = keys.reduce((acc, key) => acc?.[key], props);
+		const currentVal = getCurrentVal();
 		if (currentVal !== undefined) {
 			url.searchParams.set(propName, '' + currentVal);
 		}
@@ -142,9 +359,7 @@
 		history.replaceState(null, '', url.toString());
 	}
 
-	// Restore from permalink on mount + listen for global reset
 	onMount(() => {
-		// Restore interpolation config from URL
 		const params = new URL(window.location.href).searchParams;
 		const configStr = params.get(`__interp_${propName}`);
 		if (configStr) {
@@ -159,14 +374,25 @@
 					interpMax = config.max;
 					useCustomRange = true;
 				}
-				// Auto-start from permalink
+				if (config.textModeOverride) {textModeOverride = config.textModeOverride;}
+
+				if (config.dateFormatOverride) {dateFormatOverride = config.dateFormatOverride;}
+				
+				if (config.interpMinDate) {
+					interpMinDate = config.interpMinDate;
+					useCustomDateRange = true;
+				}
+				if (config.interpMaxDate) {
+					interpMaxDate = config.interpMaxDate;
+					useCustomDateRange = true;
+				}
+				
 				startInterpolation();
 			} catch {
 				// ignore bad config
 			}
 		}
 
-		// Listen for global reset (fired by TestHarness "Reset Animations")
 		function handleReset() {
 			stopInterpolation();
 		}
@@ -185,7 +411,7 @@
 			}
 		};
 	});
-	// Close menu when clicking outside
+
 	function handleClickOutside() {
 		if (open) {
 			open = false;
@@ -226,41 +452,107 @@
 				</button>
 			</div>
 
+			{#if mode === 'text'}
+				<div class="field-col">
+					<span>Mode</span>
+					<GymOverrideButtons 
+						options={[
+							{ label: 'Text', value: 'text' },
+							{ label: 'Num', value: 'number' },
+							{ label: 'Date', value: 'date' },
+							{ label: 'Time', value: 'time' }
+						]}
+						activeValue={effectiveTextMode}
+						optDefault=""
+						onselect={(v) => { textModeOverride = v as any; }}
+						onclear={() => { textModeOverride = null; }}
+					/>
+				</div>
+			{/if}
+
 			<label class="field">
 				<span>CPM</span>
 				<input type="number" bind:value={cpm} min={1} max={600} step={1} />
 			</label>
 
-			<label class="field">
-				<span>Min</span>
-				<input
-					type="number"
-					bind:value={interpMin}
-					step={1}
-					oninput={() => {
-						useCustomRange = true;
-					}}
-				/>
-			</label>
+			{#if mode === 'slider' || effectiveTextMode === 'text' || effectiveTextMode === 'number'}
+				<label class="field">
+					<span>{mode === 'text' && effectiveTextMode === 'text' ? 'Len Lo' : 'Min'}</span>
+					<input
+						type="number"
+						bind:value={interpMin}
+						step="any"
+						oninput={() => {
+							useCustomRange = true;
+						}}
+					/>
+				</label>
 
-			<label class="field">
-				<span>Max</span>
-				<input
-					type="number"
-					bind:value={interpMax}
-					step={1}
-					oninput={() => {
-						useCustomRange = true;
-					}}
-				/>
-			</label>
+				<label class="field">
+					<span>{mode === 'text' && effectiveTextMode === 'text' ? 'Len Hi' : 'Max'}</span>
+					<input
+						type="number"
+						bind:value={interpMax}
+						step="any"
+						oninput={() => {
+							useCustomRange = true;
+						}}
+					/>
+				</label>
+			{/if}
+
+			{#if effectiveTextMode === 'date' || effectiveTextMode === 'time'}
+				<label class="field date-field">
+					<span>Min</span>
+					<input
+						type="text"
+						bind:value={interpMinDate}
+						oninput={() => {
+							useCustomDateRange = true;
+						}}
+					/>
+				</label>
+				
+				<label class="field date-field">
+					<span>Max</span>
+					<input
+						type="text"
+						bind:value={interpMaxDate}
+						oninput={() => {
+							useCustomDateRange = true;
+						}}
+					/>
+				</label>
+
+				{#if effectiveTextMode === 'date'}
+					<div class="field-col">
+						<span>Format Rule</span>
+						<GymOverrideButtons 
+							options={[
+								{ label: 'MM-DD', value: 'mm-dd' },
+								{ label: 'DD-MM', value: 'dd-mm' }
+							]}
+							activeValue={effectiveDateFormat}
+							optDefault=""
+							onselect={(v) => { 
+								dateFormatOverride = v as any; 
+								useCustomDateRange = false;
+							}}
+							onclear={() => { 
+								dateFormatOverride = null; 
+								useCustomDateRange = false;
+							}}
+						/>
+					</div>
+				{/if}
+			{/if}
+
 		</div>
 	{/if}
 </span>
 
 <style>
 	.interp-menu-container {
-		position: relative;
 		display: inline-flex;
 		align-items: center;
 		margin-right: 4px;
@@ -314,6 +606,7 @@
 		padding: 8px;
 		min-width: 160px;
 		font-size: 11px;
+		margin-top: 2px;
 	}
 
 	.popup-header {
@@ -357,7 +650,7 @@
 		display: flex;
 		align-items: center;
 		gap: 6px;
-		margin-bottom: 4px;
+		margin-bottom: 6px;
 	}
 
 	.field span {
@@ -377,5 +670,21 @@
 		font-size: 11px;
 		font-family: monospace;
 		background: #fafafa;
+	}
+	
+	.date-field input {
+		width: 100px;
+	}
+	
+	.field-col {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		margin-bottom: 8px;
+	}
+	
+	.field-col span {
+		font-weight: 600;
+		color: #666;
 	}
 </style>

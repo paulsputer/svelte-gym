@@ -29,6 +29,9 @@
 		selection: 'Option A',
 		radioSelection: 'radio1',
 		accentColor: '#3b82f6',
+		numericString: '123.45',
+		isoDate: '2024-12-01T10:00:00Z',
+		usDate: '12-01-2024',
 		clickMe: () => {
 			log = [`Clicked at ${new Date().toLocaleTimeString()}`, ...log];
 		}
@@ -57,6 +60,9 @@
 			<p>Selection: {props.selection}</p>
 			<p>Radio: {props.radioSelection}</p>
 			<p>Accent: <span style="color: {props.accentColor}">{props.accentColor}</span></p>
+			<p>Numeric String: {props.numericString}</p>
+			<p>ISO Date: {props.isoDate}</p>
+			<p>US Date: {props.usDate}</p>
 			<button onclick={props.clickMe}>Log Interaction</button>
 		</div>
 	{/snippet}
@@ -66,6 +72,9 @@
 		<ul>
 			<li><GymTextbox bind:props name="label" label="Label Text" /></li>
 			<li><GymTextbox bind:props name="description" label="Description" multiline={true} /></li>
+			<li><GymTextbox bind:props name="numericString" label="Numeric String" /></li>
+			<li><GymTextbox bind:props name="isoDate" label="ISO Date" /></li>
+			<li><GymTextbox bind:props name="usDate" label="US Date" /></li>
 			<li><GymCheckbox bind:props name="isActive" label="Is Active?" /></li>
 			<li><GymSlider bind:props name="count" min={0} max={10} label="Count" /></li>
 			<li><GymSlider bind:props name="offset" min={-20} max={20} label="Offset" /></li>

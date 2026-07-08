@@ -36,6 +36,7 @@
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let _initialVal: any = $state(0);
 	let _step = $derived(step ?? 1);
+	let isMenuOpen = $state(false);
 
 	const extraOpts = [
 		// NOTE: Important to define NaN as a string else comparison won't work
@@ -267,6 +268,7 @@
 	<span class="gym-label"
 		><GymInterpolateMenu
 			bind:this={interpMenu}
+			bind:open={isMenuOpen}
 			mode="slider"
 			sliderMin={min ?? 0}
 			sliderMax={max ?? 100}
@@ -284,7 +286,7 @@
 					? (units ?? '')
 					: ''}{/if}</span
 		>
-		<input type="range" min={min ?? 0} max={max ?? 100} step={_step} bind:value={_initialVal} />
+		<input type="range" class:highlight-active={isMenuOpen} min={min ?? 0} max={max ?? 100} step={_step} bind:value={_initialVal} />
 	</div>
 	{#if !hideExtra}
 		<div class="gym-overrides">
@@ -308,6 +310,7 @@
 <style>
 	.gym-control {
 		padding: 0.4em 0.75em;
+		position: relative;
 	}
 
 	.gym-label {
@@ -340,5 +343,10 @@
 		line-height: 1;
 		margin: 0;
 		padding: 0;
+	}
+
+	.highlight-active {
+		outline: 2px solid #e65100;
+		outline-offset: 1px;
 	}
 </style>

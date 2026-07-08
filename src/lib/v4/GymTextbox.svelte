@@ -10,6 +10,8 @@
 	export let multiline: boolean = false;
 	export let interpMenu: GymInterpolateMenu | undefined = undefined;
 
+	let isMenuOpen = false;
+
 	$: _label = label ?? name;
 
 	const optDefault = 'NONE';
@@ -77,6 +79,7 @@
 	<span class="gym-label"
 		><GymInterpolateMenu
 			bind:this={interpMenu}
+			bind:open={isMenuOpen}
 			mode="text"
 			{multiline}
 			propName={name}
@@ -85,9 +88,9 @@
 	>
 	<div class="gym-value">
 		{#if multiline}
-			<textarea bind:this={inputRef} bind:value={_initialVal} on:input={handleInput}></textarea>
+			<textarea class:highlight-active={isMenuOpen} bind:this={inputRef} bind:value={_initialVal} on:input={handleInput}></textarea>
 		{:else}
-			<input bind:this={inputRef} type="text" bind:value={_initialVal} on:input={handleInput} />
+			<input class:highlight-active={isMenuOpen} bind:this={inputRef} type="text" bind:value={_initialVal} on:input={handleInput} />
 		{/if}
 	</div>
 	{#if !hideExtra}
@@ -106,6 +109,7 @@
 <style>
 	.gym-control {
 		padding: 0.4em 0.75em;
+		position: relative;
 	}
 
 	.gym-label {
@@ -134,5 +138,10 @@
 	textarea {
 		min-height: 100px;
 		resize: vertical;
+	}
+
+	.highlight-active {
+		outline: 2px solid #e65100;
+		outline-offset: -1px;
 	}
 </style>

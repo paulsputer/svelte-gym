@@ -32,6 +32,9 @@
 		selection: 'Option A',
 		radioSelection: 'radio1',
 		accentColor: '#3b82f6',
+		numericString: '123.45',
+		isoDate: '2024-12-01T10:00:00Z',
+		usDate: '12-01-2024',
 		clickMe: () => {
 			kitchenSinkLog = [`Clicked at ${new Date().toLocaleTimeString()}`, ...kitchenSinkLog];
 		}
@@ -86,32 +89,29 @@
 			<p>Selection: {kitchenSinkProps.selection}</p>
 			<p>Radio: {kitchenSinkProps.radioSelection}</p>
 			<p>
-				Accent: <span style="color: {kitchenSinkProps.accentColor}"
-					>{kitchenSinkProps.accentColor}</span
-				>
+				Accent Color:
+				<span
+					style="display:inline-block; width:1em; height:1em; background-color:{kitchenSinkProps.accentColor};"
+				></span>
+				{kitchenSinkProps.accentColor}
 			</p>
-			<button on:click={kitchenSinkProps.clickMe}>Log Interaction</button>
+			<p>Numeric String: {kitchenSinkProps.numericString}</p>
+			<p>ISO Date: {kitchenSinkProps.isoDate}</p>
+			<p>US Date: {kitchenSinkProps.usDate}</p>
+			<button on:click={kitchenSinkProps.clickMe}>Click Me</button>
 		</div>
 
 		<div slot="controls">
 			<h3>Basic Types</h3>
 			<ul>
 				<li><GymTextbox bind:props={kitchenSinkProps} name="label" label="Label Text" /></li>
-				<li>
-					<GymTextbox
-						bind:props={kitchenSinkProps}
-						name="description"
-						label="Description"
-						multiline={true}
-					/>
-				</li>
+				<li><GymTextbox bind:props={kitchenSinkProps} name="description" label="Description" multiline={true}/></li>
+				<li><GymTextbox bind:props={kitchenSinkProps} name="numericString" label="Numeric String" /></li>
+				<li><GymTextbox bind:props={kitchenSinkProps} name="isoDate" label="ISO Date" /></li>
+				<li><GymTextbox bind:props={kitchenSinkProps} name="usDate" label="US Date" /></li>
 				<li><GymCheckbox bind:props={kitchenSinkProps} name="isActive" label="Is Active?" /></li>
-				<li>
-					<GymSlider bind:props={kitchenSinkProps} name="count" min={0} max={10} label="Count" />
-				</li>
-				<li>
-					<GymSlider bind:props={kitchenSinkProps} name="offset" min={-20} max={20} label="Offset" />
-				</li>
+				<li><GymSlider bind:props={kitchenSinkProps} name="count" min={0} max={10} label="Count" /></li>
+				<li><GymSlider bind:props={kitchenSinkProps} name="offset" min={-20} max={20} label="Offset" /></li>
 			</ul>
 
 			<h3>Nested Properties (JSON Path)</h3>
