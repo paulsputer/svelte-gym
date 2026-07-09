@@ -102,7 +102,10 @@
 		</div>
 
 		<div slot="controls">
-			<h3>Basic Types</h3>
+		<article>
+			<header>
+				<h1>Basic Types</h1>
+			</header>
 			<ul>
 				<li><GymTextbox bind:props={kitchenSinkProps} name="label" label="Label Text" /></li>
 				<li>
@@ -132,8 +135,12 @@
 					/>
 				</li>
 			</ul>
+		</article>
 
-			<h3>Nested Properties (JSON Path)</h3>
+		<article>
+			<header>
+				<h1>Nested Properties (JSON Path)</h1>
+			</header>
 			<ul>
 				<li>
 					<GymDropdown
@@ -158,8 +165,12 @@
 					/>
 				</li>
 			</ul>
+		</article>
 
-			<h3>Selection</h3>
+		<article>
+			<header>
+				<h1>Selection</h1>
+			</header>
 			<ul>
 				<li>
 					<GymDropdown
@@ -181,6 +192,7 @@
 					<GymColorPicker bind:props={kitchenSinkProps} name="accentColor" label="Accent Color" />
 				</li>
 			</ul>
+		</article>
 		</div>
 	</TestHarness>
 {:else}

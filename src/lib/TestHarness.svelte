@@ -837,7 +837,8 @@
 		z-index: 2;
 	}
 
-	.gym-badge {
+	.gym-badge,
+	:global(.gym-badge) {
 		font-size: 10px;
 		padding: 2px 4px;
 		border-radius: 3px;
@@ -866,7 +867,8 @@
 		border-color: #fff59d;
 	}
 
-	.gym-section-header {
+	.gym-section-header,
+	.test-controls :global(article > header) {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -876,6 +878,21 @@
 		border-bottom: 1px solid var(--gym-border);
 		margin-top: 1em;
 		margin-bottom: 0.75em;
+	}
+
+	.test-controls :global(article > header > h1),
+	.test-controls :global(article > header > h2),
+	.test-controls :global(article > header > h3),
+	.test-controls :global(article > header > h4),
+	.test-controls :global(article > header > h5),
+	.test-controls :global(article > header > h6) {
+		display: block;
+		text-transform: capitalize;
+		font-weight: 600;
+		color: #000;
+		text-align: left;
+		margin-bottom: 0;
+		font-size: 1em;
 	}
 
 	/* ================================================================

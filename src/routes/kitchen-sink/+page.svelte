@@ -68,7 +68,10 @@
 	{/snippet}
 
 	{#snippet controls()}
-		<h3>Basic Types</h3>
+	<article>
+		<header>
+		<h1>Basic Types</h1>
+		</header>
 		<ul>
 			<li><GymTextbox bind:props name="label" label="Label Text" /></li>
 			<li><GymTextbox bind:props name="description" label="Description" multiline={true} /></li>
@@ -79,43 +82,53 @@
 			<li><GymSlider bind:props name="count" min={0} max={10} label="Count" /></li>
 			<li><GymSlider bind:props name="offset" min={-20} max={20} label="Offset" /></li>
 		</ul>
+		</article>
 
-		<h3>Nested Properties (JSON Path)</h3>
-		<ul>
-			<li>
-				<GymDropdown
-					bind:props
-					name="settings.theme"
-					options={['light', 'dark', 'system']}
-					label="Theme"
-				/>
-			</li>
-			<li><GymCheckbox bind:props name="settings.notifications.email" label="Email Notifs" /></li>
-			<li><GymCheckbox bind:props name="settings.notifications.push" label="Push Notifs" /></li>
-		</ul>
+		<article>
+		<header>
+			<h1>Nested Properties (JSON Path)</h1>
+		</header>
+			<ul>
+				<li>
+					<GymDropdown
+						bind:props
+						name="settings.theme"
+						options={['light', 'dark', 'system']}
+						label="Theme"
+					/>
+				</li>
+				<li><GymCheckbox bind:props name="settings.notifications.email" label="Email Notifs" /></li>
+				<li><GymCheckbox bind:props name="settings.notifications.push" label="Push Notifs" /></li>
+			</ul>
 
-		<h3>Selection</h3>
-		<ul>
-			<li>
-				<GymDropdown
-					bind:props
-					name="selection"
-					options={['Option A', 'Option B', 'Option C']}
-					label="Dropdown"
-				/>
-			</li>
-			<li>
-				<GymRadioGroup
-					bind:props
-					name="radioSelection"
-					options={['radio1', 'radio2', 'radio3']}
-					label="Radio Group"
-				/>
-			</li>
-			<li>
-				<GymColorPicker bind:props name="accentColor" label="Accent Color" />
-			</li>
-		</ul>
+		</article>
+
+		<article>
+		<header>
+			<h1>Selection</h1>
+		</header>
+			<ul>
+				<li>
+					<GymDropdown
+						bind:props
+						name="selection"
+						options={['Option A', 'Option B', 'Option C']}
+						label="Dropdown"
+					/>
+				</li>
+				<li>
+					<GymRadioGroup
+						bind:props
+						name="radioSelection"
+						options={['radio1', 'radio2', 'radio3']}
+						label="Radio Group"
+					/>
+				</li>
+				<li>
+					<GymColorPicker bind:props name="accentColor" label="Accent Color" />
+				</li>
+			</ul>
+		</article>
 	{/snippet}
 </TestHarness>
 
