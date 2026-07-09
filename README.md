@@ -157,6 +157,29 @@ The main wrapper for your component playground.
 
 Synchronizes the URL search parameters with your local `props` object. This must be called in your component's `<script>` section.
 
+### Formatting Controls
+
+You can group your controls into semantic sections in the sidebar by wrapping them in HTML `<article>` tags. The first header element (`<h1>` through `<h6>`) inside the article will be automatically styled as the section's title.
+
+```svelte
+{#snippet controls()}
+	<article>
+		<h1>Basic Settings</h1>
+		<ul>
+			<li><GymCheckbox bind:props name="isActive" /></li>
+			<li><GymTextbox bind:props name="label" /></li>
+		</ul>
+	</article>
+
+	<article>
+		<h1>Advanced Settings</h1>
+		<ul>
+			<li><GymSlider bind:props name="count" min={0} max={10} /></li>
+		</ul>
+	</article>
+{/snippet}
+```
+
 ### Controls (`Gym*` Components)
 
 All controls support `bind:props` and a `name` attribute corresponding to the property key in `props`.

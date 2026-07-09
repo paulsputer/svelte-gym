@@ -1,5 +1,24 @@
 # Release Notes
 
+## v2.1.0 - Advanced Interpolation & CSS Variables Analysis (2026-07-09)
+
+### New Features
+
+- **TestHarness CSS Variable Analysis**: The test harness now automatically extracts and displays CSS variables, showing their status (defined, inherited, unset, and unused) to aid in theme development and debugging.
+- **Advanced Text Interpolation**: `GymTextbox` interpolation now includes auto-detection for numbers, dates, and times, providing more realistic changing data for component testing.
+- **GymLog Enhancements**: The log component now features a fullscreen mode and notification badges for improved visibility of log events.
+- **Control Grouping with `<article>`**: Controls in the sidebar can now be grouped into semantic sections by wrapping them in HTML `<article>` tags. The first header inside the article is styled as the section title.
+- **Anchor Positioning Control**: Added a new built-in control to the `TestHarness` for manipulating anchor positioning.
+
+### Improvements & Refinement
+
+- **Single Interpolation Menu**: Refactored `GymInterpolateMenu` to ensure only a single interpolation menu can be shown at any given time across all controls.
+- **Slider Interpolation Defaults**: `GymSlider` interpolation min/max bounds now correctly default to match the component's `min` and `max` props.
+- **Checkbox Label Layout**: Moved the text value inside the label of `GymCheckbox` when not hiding extra options for better alignment.
+- **Global Reset**: Added global reset functionality to easily stop interpolation animations and revert state on a per tab basis.
+
+---
+
 ## v2.0.0 - Svelte 4 Backward Compatibility & Parity Linting (2026-07-05)
 
 ### New Features

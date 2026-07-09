@@ -1,0 +1,50 @@
+# Svelte Gym - LLM Context
+
+This is a Svelte component testing library that provides a playground environment (`TestHarness`) for exercising components.
+It heavily relies on URL parameters to persist the state of the component so that URLs can be easily shared or used for regression testing.
+
+## Core Concepts
+
+- **TestHarness**: The main wrapper. It takes two snippets: `componentToTest` (the subject) and `controls` (where you place the `Gym*` inputs).
+- **restoreProps**: A function called in `<script>` to initialize `$state` variables from the URL parameters.
+- **Gym Components**: Specialized inputs (`GymCheckbox`, `GymTextbox`, `GymSlider`, `GymDropdown`, `GymRadioGroup`, `GymColorPicker`) that support edge cases like `null`, `undefined`, `NaN`, and interpolation.
+- **Svelte 5**: The library is built with Svelte 5 Runes (`$state`, `$derived`, `$props`, `$effect`). For Svelte 4, use imports from `svelte-gym/v4` and use slots instead of snippets.
+
+## Best Practices for LLMs Writing Tests
+
+1.  **Do NOT wrap `componentToTest` in extra divs**:
+    ```svelte
+    <!-- GOOD -->
+    {#snippet componentToTest()}
+        <MyComponent {...props} />
+    {/snippet}
+
+    <!-- BAD -->
+    {#snippet componentToTest()}
+        <div class="wrapper">
+            <MyComponent {...props} />
+        </div>
+    {/snippet}
+    ```
+2.  **Use `Gym*` inputs for controls**, not standard HTML inputs, as they handle special testing edge cases natively (`null`, `undefined`, etc).
+3.  **Group controls with `<article>`**:
+    ```svelte
+    {#snippet controls()}
+        <article>
+            <h3>Basic Settings</h3>
+            <ul>
+                <li><GymCheckbox bind:props name="isActive" /></li>
+            </ul>
+        </article>
+    {/snippet}
+    ```
+4.  **Use `bind:props` and `name` attribute** for all Gym controls. Nested properties are supported via dot notation (e.g., `name="config.theme"`).
+5.  **Use `$state` for props object**, otherwise `restoreProps` will not be reactive.
+
+## Available Capabilities
+
+- **CSS Variables Analysis**: `TestHarness` automatically extracts and analyzes CSS variables from the tested component (identifying defined, inherited, unset, and unused items).
+- **Interpolation**: Sliders and textboxes support automatic value interpolation/animation (accessible via the 3-dot menu on the control). Textboxes auto-detect numbers, dates, and times.
+- **Logging**: The `GymLog` component can display application logs within the test harness. It supports fullscreen mode and notification badges.
+- **Overrides**: Every Gym control has built-in override buttons to quickly test `null` or `undefined` states.
+- **Anchor Positioning**: `TestHarness` has built-in controls for testing anchor positioning behavior.
