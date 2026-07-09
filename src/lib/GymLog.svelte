@@ -6,28 +6,18 @@
 	let { log }: GymLogProps = $props();
 </script>
 
-<div class="holder">
-	<hr />
-	<div class="heading">Log</div>
+<article>
+	<header>
+		<h1>Log</h1>
+	</header>
 	<div class="mono">
 		{#each log as l}
 			<div>{l}</div>
 		{/each}
 	</div>
-</div>
+</article>
 
 <style>
-	.holder {
-		padding-top: 1em;
-		color: #000;
-	}
-
-	.heading {
-		text-transform: capitalize;
-		font-weight: 600;
-		padding-top: 0.5em;
-	}
-
 	.mono {
 		font-family: 'Courier New', Courier, monospace;
 		font-size: 0.8em;
