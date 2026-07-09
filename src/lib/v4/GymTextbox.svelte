@@ -9,6 +9,8 @@
 	export let hideExtra: boolean = false;
 	export let multiline: boolean = false;
 	export let interpMenu: GymInterpolateMenu | undefined = undefined;
+	export let subLabel: string | undefined = undefined;
+	export let fallback: any = undefined;
 
 	let isMenuOpen = false;
 
@@ -20,10 +22,7 @@
 		_override: optDefault
 	};
 
-	const extraOpts = [
-		{ label: 'null', value: null },
-		{ label: 'undefined', value: 'undefined' }
-	];
+	const extraOpts = [{ label: 'null', value: null }];
 
 	let _initialVal = getProp(name, props);
 
@@ -86,11 +85,27 @@
 			bind:props
 		/>{_label}</span
 	>
+	{#if subLabel}
+		<div class="gym-sublabel" title={subLabel}>{subLabel}</div>
+	{/if}
 	<div class="gym-value">
 		{#if multiline}
-			<textarea class:highlight-active={isMenuOpen} bind:this={inputRef} bind:value={_initialVal} on:input={handleInput}></textarea>
+			<textarea
+				class:highlight-active={isMenuOpen}
+				bind:this={inputRef}
+				bind:value={_initialVal}
+				placeholder={fallback ?? ''}
+				on:input={handleInput}
+			></textarea>
 		{:else}
-			<input class:highlight-active={isMenuOpen} bind:this={inputRef} type="text" bind:value={_initialVal} on:input={handleInput} />
+			<input
+				class:highlight-active={isMenuOpen}
+				bind:this={inputRef}
+				type="text"
+				bind:value={_initialVal}
+				placeholder={fallback ?? ''}
+				on:input={handleInput}
+			/>
 		{/if}
 	</div>
 	{#if !hideExtra}
@@ -133,6 +148,26 @@
 		background-color: #fff;
 		width: 100%;
 		box-sizing: border-box;
+	}
+
+	.gym-sublabel {
+		font-size: 0.65rem;
+		color: #888;
+		margin-top: -0.25em;
+		margin-bottom: 0.4em;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-family: monospace;
+	}
+
+	.gym-value input {
+		width: 100%;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		background: #fff;
+		padding: 4px;
+		font-family: monospace;
 	}
 
 	textarea {

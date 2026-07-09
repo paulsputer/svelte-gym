@@ -18,11 +18,11 @@
 
 	// Interpolation config
 	let cpm = 20;
-	
+
 	// 'text' sub-modes
 	let textModeOverride: 'text' | 'number' | 'date' | 'time' | null = null;
 	let detectedTextMode: 'text' | 'number' | 'date' | 'time' = 'text';
-	
+
 	$: effectiveTextMode = (() => {
 		if (mode === 'slider') return 'slider';
 		if (textModeOverride) return textModeOverride;
@@ -40,8 +40,8 @@
 	let dateFormatOverride: 'mm-dd' | 'dd-mm' | null = null;
 
 	function detectDateFormat(str: string): 'mm-dd' | 'dd-mm' {
-		const tokens = [...str.matchAll(/\d+/g)].map(m => m[0]);
-		const yearIdx = tokens.findIndex(t => t.length === 4);
+		const tokens = [...str.matchAll(/\d+/g)].map((m) => m[0]);
+		const yearIdx = tokens.findIndex((t) => t.length === 4);
 		const otherTokens = tokens.filter((t, i) => i !== yearIdx);
 		if (otherTokens.length >= 2) {
 			const num0 = parseInt(otherTokens[0], 10);
@@ -69,10 +69,10 @@
 	function detectType(val: any): 'text' | 'number' | 'date' | 'time' {
 		if (typeof val !== 'string') return 'text';
 		if (val.trim() === '') return 'text';
-		
+
 		// If it's purely numeric
 		if (!isNaN(Number(val))) return 'number';
-		
+
 		// If it has dates (e.g. contains 202x, dashes, slashes, colons)
 		// Try parsing as date
 		const d = new Date(val);
@@ -83,8 +83,8 @@
 		}
 
 		// Fallback for non-standard dates (e.g. DD-MM-YYYY) that JS Date rejects
-		const tokens = [...val.matchAll(/\d+/g)].map(m => m[0]);
-		if (tokens.length >= 3 && tokens.some(t => t.length === 4)) {
+		const tokens = [...val.matchAll(/\d+/g)].map((m) => m[0]);
+		if (tokens.length >= 3 && tokens.some((t) => t.length === 4)) {
 			return 'date';
 		}
 
@@ -92,7 +92,7 @@
 		if (/^\s*\d{1,2}:\d{2}(:\d{2})?\s*$/.test(val)) {
 			return 'time';
 		}
-		
+
 		return 'text';
 	}
 
@@ -105,23 +105,33 @@
 
 	// Date format utilities
 	function parseDateTokens(str: string, mmddFormat: 'mm-dd' | 'dd-mm') {
-		const tokens = [...str.matchAll(/\d+/g)].map(m => ({ val: m[0], index: m.index, length: m[0].length }));
-		const mapping: Record<string, {val: string, index: number, length: number}> = {};
-		
+		const tokens = [...str.matchAll(/\d+/g)].map((m) => ({
+			val: m[0],
+			index: m.index,
+			length: m[0].length
+		}));
+		const mapping: Record<string, { val: string; index: number; length: number }> = {};
+
 		const isTimeOnly = /^\s*\d{1,2}:\d{2}(:\d{2})?\s*$/.test(str);
 		if (isTimeOnly) {
-			if (tokens.length > 0) { mapping['Hour'] = tokens[0]; }
-			if (tokens.length > 1) { mapping['Minute'] = tokens[1]; }
-			if (tokens.length > 2) { mapping['Second'] = tokens[2]; }
+			if (tokens.length > 0) {
+				mapping['Hour'] = tokens[0];
+			}
+			if (tokens.length > 1) {
+				mapping['Minute'] = tokens[1];
+			}
+			if (tokens.length > 2) {
+				mapping['Second'] = tokens[2];
+			}
 			return mapping;
 		}
 
-		const yearIdx = tokens.findIndex(t => t.length === 4);
+		const yearIdx = tokens.findIndex((t) => t.length === 4);
 		if (yearIdx !== -1) {
 			mapping['Year'] = tokens[yearIdx];
 			tokens.splice(yearIdx, 1);
 		}
-		
+
 		if (tokens.length >= 2) {
 			if (mmddFormat === 'dd-mm') {
 				mapping['Day'] = tokens[0];
@@ -135,43 +145,80 @@
 			mapping['Month'] = tokens[0];
 			tokens.splice(0, 1);
 		}
-		
-		if (tokens.length > 0) { mapping['Hour'] = tokens[0]; }
-		if (tokens.length > 1) { mapping['Minute'] = tokens[1]; }
-		if (tokens.length > 2) { mapping['Second'] = tokens[2]; }
-		
+
+		if (tokens.length > 0) {
+			mapping['Hour'] = tokens[0];
+		}
+		if (tokens.length > 1) {
+			mapping['Minute'] = tokens[1];
+		}
+		if (tokens.length > 2) {
+			mapping['Second'] = tokens[2];
+		}
+
 		return mapping;
 	}
 
 	function parseToTimestamp(str: string, mmddFormat: 'mm-dd' | 'dd-mm'): number {
 		const mapping = parseDateTokens(str, mmddFormat);
 		const now = new Date();
-		let y = now.getFullYear(), m = 0, d = 1, h = 0, min = 0, s = 0;
-		if (mapping['Year']) { y = parseInt(mapping['Year'].val, 10);} 
-		if (mapping['Month']) { m = parseInt(mapping['Month'].val, 10) - 1;} 
-		if (mapping['Day']) { d = parseInt(mapping['Day'].val, 10);} 
-		if (mapping['Hour']) { h = parseInt(mapping['Hour'].val, 10);} 
-		if (mapping['Minute']) { min = parseInt(mapping['Minute'].val, 10);} 
-		if (mapping['Second']) { s = parseInt(mapping['Second'].val, 10);} 
+		let y = now.getFullYear(),
+			m = 0,
+			d = 1,
+			h = 0,
+			min = 0,
+			s = 0;
+		if (mapping['Year']) {
+			y = parseInt(mapping['Year'].val, 10);
+		}
+		if (mapping['Month']) {
+			m = parseInt(mapping['Month'].val, 10) - 1;
+		}
+		if (mapping['Day']) {
+			d = parseInt(mapping['Day'].val, 10);
+		}
+		if (mapping['Hour']) {
+			h = parseInt(mapping['Hour'].val, 10);
+		}
+		if (mapping['Minute']) {
+			min = parseInt(mapping['Minute'].val, 10);
+		}
+		if (mapping['Second']) {
+			s = parseInt(mapping['Second'].val, 10);
+		}
 		return new Date(y, m, d, h, min, s).getTime();
 	}
 
-	function formatTimestamp(ts: number, baseStr: string, mapping: Record<string, {val: string, index: number, length: number}>) {
+	function formatTimestamp(
+		ts: number,
+		baseStr: string,
+		mapping: Record<string, { val: string; index: number; length: number }>
+	) {
 		const d = new Date(ts);
 		let resultStr = baseStr;
-		const parts = Object.entries(mapping).map(([k, v]) => ({ block: k, ...v })).sort((a, b) => b.index - a.index);
-		
+		const parts = Object.entries(mapping)
+			.map(([k, v]) => ({ block: k, ...v }))
+			.sort((a, b) => b.index - a.index);
+
 		for (const p of parts) {
 			let num = 0;
-			if (p.block === 'Year') { num = d.getFullYear();}
-			else if (p.block === 'Month') { num = d.getMonth() + 1;}
-			else if (p.block === 'Day') { num = d.getDate();}
-			else if (p.block === 'Hour') { num = d.getHours();}
-			else if (p.block === 'Minute') { num = d.getMinutes();}
-			else if (p.block === 'Second') { num = d.getSeconds();}
-			
+			if (p.block === 'Year') {
+				num = d.getFullYear();
+			} else if (p.block === 'Month') {
+				num = d.getMonth() + 1;
+			} else if (p.block === 'Day') {
+				num = d.getDate();
+			} else if (p.block === 'Hour') {
+				num = d.getHours();
+			} else if (p.block === 'Minute') {
+				num = d.getMinutes();
+			} else if (p.block === 'Second') {
+				num = d.getSeconds();
+			}
+
 			let padStr = String(num).padStart(p.length, '0');
-			resultStr = resultStr.substring(0, p.index) + padStr + resultStr.substring(p.index + p.length);
+			resultStr =
+				resultStr.substring(0, p.index) + padStr + resultStr.substring(p.index + p.length);
 		}
 		return resultStr;
 	}
@@ -247,14 +294,18 @@
 		useCustomDateRange = true;
 		active = true;
 		startTime = performance.now();
-		
+
 		const baseVal = getCurrentVal();
 		let baseStr = typeof baseVal === 'string' ? baseVal : String(baseVal);
 		let decimalsMatch = baseStr.match(/\.(\d+)/);
 		let baseDecimals = decimalsMatch ? decimalsMatch[1].length : 0;
 
-		let baseDateMapping = (effectiveTextMode === 'date' || effectiveTextMode === 'time') ? parseDateTokens(baseStr, effectiveDateFormat) : null;
-		let minDateTs = 0, maxDateTs = 0;
+		let baseDateMapping =
+			effectiveTextMode === 'date' || effectiveTextMode === 'time'
+				? parseDateTokens(baseStr, effectiveDateFormat)
+				: null;
+		let minDateTs = 0,
+			maxDateTs = 0;
 		if ((effectiveTextMode === 'date' || effectiveTextMode === 'time') && baseDateMapping) {
 			minDateTs = parseToTimestamp(interpMinDate, effectiveDateFormat);
 			maxDateTs = parseToTimestamp(interpMaxDate, effectiveDateFormat);
@@ -278,10 +329,13 @@
 				const eMin = getEffectiveMin();
 				const eMax = getEffectiveMax();
 				const value = eMin + (eMax - eMin) * sine01;
-				
+
 				setProp(value.toFixed(baseDecimals), propName, props, undefined, true);
 				props = props;
-			} else if ((effectiveTextMode === 'date' || effectiveTextMode === 'time') && baseDateMapping) {
+			} else if (
+				(effectiveTextMode === 'date' || effectiveTextMode === 'time') &&
+				baseDateMapping
+			) {
 				const currentTs = minDateTs + (maxDateTs - minDateTs) * sine01;
 				const resultStr = formatTimestamp(currentTs, baseStr, baseDateMapping);
 				setProp(resultStr, propName, props, undefined, true);
@@ -362,8 +416,12 @@
 					interpMax = config.max;
 					useCustomRange = true;
 				}
-				if (config.textModeOverride)  {textModeOverride = config.textModeOverride;}
-				if (config.dateFormatOverride) {dateFormatOverride = config.dateFormatOverride;}
+				if (config.textModeOverride) {
+					textModeOverride = config.textModeOverride;
+				}
+				if (config.dateFormatOverride) {
+					dateFormatOverride = config.dateFormatOverride;
+				}
 				if (config.interpMinDate) {
 					interpMinDate = config.interpMinDate;
 					useCustomDateRange = true;
@@ -372,7 +430,7 @@
 					interpMaxDate = config.interpMaxDate;
 					useCustomDateRange = true;
 				}
-				
+
 				startInterpolation();
 			} catch {
 				// ignore bad config
@@ -441,7 +499,7 @@
 			{#if mode === 'text'}
 				<div class="field-col">
 					<span>Mode</span>
-					<GymOverrideButtons 
+					<GymOverrideButtons
 						options={[
 							{ label: 'Text', value: 'text' },
 							{ label: 'Num', value: 'number' },
@@ -450,8 +508,12 @@
 						]}
 						activeValue={effectiveTextMode}
 						optDefault=""
-						onselect={(v) => { textModeOverride = v; }}
-						onclear={() => { textModeOverride = null; }}
+						onselect={(v) => {
+							textModeOverride = v;
+						}}
+						onclear={() => {
+							textModeOverride = null;
+						}}
 					/>
 				</div>
 			{/if}
@@ -498,7 +560,7 @@
 						}}
 					/>
 				</label>
-				
+
 				<label class="field date-field">
 					<span>Max</span>
 					<input
@@ -513,26 +575,25 @@
 				{#if effectiveTextMode === 'date'}
 					<div class="field-col">
 						<span>Format Rule</span>
-						<GymOverrideButtons 
+						<GymOverrideButtons
 							options={[
 								{ label: 'MM-DD', value: 'mm-dd' },
 								{ label: 'DD-MM', value: 'dd-mm' }
 							]}
 							activeValue={effectiveDateFormat}
 							optDefault=""
-							onselect={(v) => { 
-								dateFormatOverride = v; 
+							onselect={(v) => {
+								dateFormatOverride = v;
 								useCustomDateRange = false;
 							}}
-							onclear={() => { 
-								dateFormatOverride = null; 
+							onclear={() => {
+								dateFormatOverride = null;
 								useCustomDateRange = false;
 							}}
 						/>
 					</div>
 				{/if}
 			{/if}
-
 		</div>
 	{/if}
 </span>
@@ -657,18 +718,18 @@
 		font-family: monospace;
 		background: #fafafa;
 	}
-	
+
 	.date-field input {
 		width: 100px;
 	}
-	
+
 	.field-col {
 		display: flex;
 		flex-direction: column;
 		gap: 4px;
 		margin-bottom: 8px;
 	}
-	
+
 	.field-col span {
 		font-weight: 600;
 		color: #666;

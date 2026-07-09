@@ -8,26 +8,33 @@
 		name: string;
 		label?: string;
 		hideExtra?: boolean;
+		subLabel?: string;
+		fallback?: string;
 	}
 
 	let {
 		props = $bindable(),
 		name,
 		label = name,
-		hideExtra = false
+		hideExtra = false,
+		subLabel = undefined,
+		fallback = undefined
 	}: GymColorPickerProps = $props();
 
 	const optDefault = 'NONE';
 
-	const extraOpts = [
-		{ label: 'null', value: null },
-		{ label: 'undefined', value: 'undefined' }
-	];
+	const extraOpts = [{ label: 'null', value: null }];
 
 	let _initialVal = $state('#000000');
 
 	$effect(() => {
-		let v = getProp(name, props) ?? '#000000';
+		let v = getProp(name, props);
+		if (v === undefined && fallback !== undefined) {
+			v = fallback;
+		}
+		if (v === undefined) {
+			v = '#000000';
+		}
 
 		let res = extraOpts.filter((e) => {
 			return e.value === v || '' + e.value === String(v);
@@ -36,7 +43,11 @@
 		if (res.length > 0) {
 			_initialVal = '#000000';
 		} else {
-			_initialVal = v as string;
+			let c = (v as string).trim();
+			if (c.length === 4 && c.startsWith('#')) {
+				c = '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3];
+			}
+			_initialVal = c;
 		}
 	});
 
@@ -54,14 +65,17 @@
 
 <div class="gym-control">
 	<span class="gym-label">{label ?? name}</span>
+	{#if subLabel}
+		<div class="gym-sublabel" title={subLabel}>{subLabel}</div>
+	{/if}
 	<div class="gym-value-row">
 		<span class="color-row">
 			<input
 				type="color"
 				bind:value={_initialVal}
-				oninput={(e) => {
-					setProp((e.target as HTMLInputElement).value, name, props);
-				}}
+				oninput={(e) => setProp((e.target as HTMLInputElement).value, name, props, undefined, true)}
+				onchange={(e) =>
+					setProp((e.target as HTMLInputElement).value, name, props, undefined, false)}
 			/>
 			<span class="hex-value">{_initialVal}</span>
 		</span>
@@ -92,6 +106,17 @@
 		font-weight: 600;
 		color: #000;
 		text-align: left;
+	}
+
+	.gym-sublabel {
+		font-size: 0.65rem;
+		color: #888;
+		margin-top: -0.25em;
+		margin-bottom: 0.4em;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-family: monospace;
 	}
 
 	.gym-value-row {

@@ -121,11 +121,17 @@
 
 <style>
 	.demo-component {
-		padding: 2rem;
-		border: 2px solid #ccc;
-		border-radius: 8px;
-		background: white;
-		color: black;
+		/* CSS variable scenarios for testing extractor */
+		--unused-variable: 42px;
+		--another-unused: oklch(0.5 0.2 200);
+
+		padding: var(--demo-padding, 2rem);
+		border: 2px solid var(--demo-border-color, #ccc);
+		border-radius: var(--demo-radius, 8px);
+		background: var(--demo-bg, white);
+		color: var(--demo-color, black);
+		transform: scale(var(--demo-scale, 1));
+		box-shadow: 0 4px 6px var(--demo-shadow, rgba(0, 0, 0, 0.1));
 		transition: all 0.3s ease;
 	}
 

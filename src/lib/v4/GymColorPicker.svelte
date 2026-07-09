@@ -6,6 +6,8 @@
 	export let name: string;
 	export let label: string | undefined = undefined;
 	export let hideExtra: boolean = false;
+	export let subLabel: string | undefined = undefined;
+	export let fallback: string | undefined = undefined;
 
 	$: _label = label ?? name;
 
@@ -15,12 +17,23 @@
 		_override: optDefault
 	};
 
-	let _initialVal = getProp(name, props) ?? '#000000';
+	let _initialVal = '#000000';
+	$: {
+		let v = getProp(name, props);
+		if (v === undefined && fallback !== undefined) {
+			v = fallback;
+		}
+		if (v === undefined) {
+			v = '#000000';
+		}
+		let c = (v as string).trim();
+		if (c.length === 4 && c.startsWith('#')) {
+			c = '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3];
+		}
+		_initialVal = c;
+	}
 
-	const extraOpts = [
-		{ label: 'null', value: null },
-		{ label: 'undefined', value: 'undefined' }
-	];
+	const extraOpts = [{ label: 'null', value: null }];
 
 	$: res = extraOpts.filter((e) => {
 		if (e.value === _initialVal || '' + e.value === _initialVal) {
@@ -53,16 +66,25 @@
 		const target = e.target as HTMLInputElement;
 		_initialVal = target.value;
 		_props._override = optDefault;
-		setProp(target.value, name, props);
+		setProp(target.value, name, props, undefined, true);
+		props = props;
+	}
+
+	function handleChange(e: Event) {
+		const target = e.target as HTMLInputElement;
+		setProp(target.value, name, props, undefined, false);
 		props = props;
 	}
 </script>
 
 <div class="gym-control">
 	<span class="gym-label">{_label}</span>
+	{#if subLabel}
+		<div class="gym-sublabel" title={subLabel}>{subLabel}</div>
+	{/if}
 	<div class="gym-value-row">
 		<span class="color-row">
-			<input type="color" value={_initialVal} on:input={handleInput} />
+			<input type="color" value={_initialVal} on:input={handleInput} on:change={handleChange} />
 			<span class="hex-value">{_initialVal}</span>
 		</span>
 		{#if !hideExtra}
@@ -88,6 +110,17 @@
 		font-weight: 600;
 		color: #000;
 		text-align: left;
+	}
+
+	.gym-sublabel {
+		font-size: 0.65rem;
+		color: #888;
+		margin-top: -0.25em;
+		margin-bottom: 0.4em;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-family: monospace;
 	}
 
 	.gym-value-row {

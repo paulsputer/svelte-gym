@@ -16,6 +16,9 @@
 		label?: string;
 		hideExtra?: boolean;
 		interpMenu?: GymInterpolateMenu;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		fallback?: any;
+		subLabel?: string;
 	}
 
 	let {
@@ -28,7 +31,9 @@
 		fn = null,
 		label = name,
 		hideExtra = false,
-		interpMenu = $bindable()
+		interpMenu = $bindable(),
+		fallback = undefined,
+		subLabel = undefined
 	}: GymSliderProps = $props();
 
 	const optDefault = 'NONE';
@@ -43,8 +48,7 @@
 		// and radio buttons will not activate accordingly
 		{ label: 'NaN', value: 'NaN' },
 		{ label: 'Inf', value: Infinity },
-		{ label: 'null', value: null },
-		{ label: 'undefined', value: 'undefined' }
+		{ label: 'null', value: null }
 	];
 
 	const unitOpts = [
@@ -60,7 +64,13 @@
 		'dvh',
 		'svw',
 		'lvw',
-		'dvw'
+		'dvw',
+		'ms',
+		's',
+		'deg',
+		'rad',
+		'turn',
+		'fr'
 	];
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -75,6 +85,9 @@
 	// Synchronous initial setup for SSR and immediate hydration
 	(() => {
 		let rawPropVal = applyFunctor(getProp(name, props));
+		if (rawPropVal === undefined && fallback !== undefined) {
+			rawPropVal = fallback;
+		}
 
 		if (units === null && typeof rawPropVal === 'string') {
 			const possibleUnits = unitOpts.filter((e) => {
@@ -126,9 +139,27 @@
 				case '%':
 					max = 100;
 					break;
+				case 'ms':
+					max = 1000;
+					break;
+				case 's':
+					max = 10;
+					break;
+				case 'deg':
+					max = 360;
+					break;
 				default:
 					max = 100;
 					break;
+			}
+		}
+
+		if (typeof rawPropVal === 'number') {
+			if (max !== null && rawPropVal > max) {
+				max = Math.ceil(rawPropVal * 1.5);
+			}
+			if (min !== null && rawPropVal < min) {
+				min = Math.floor(rawPropVal * 1.5);
 			}
 		}
 
@@ -171,6 +202,9 @@
 	$effect(() => {
 		// 1. Sync from props to local state
 		let rawPropVal = applyFunctor(getProp(name, props));
+		if (rawPropVal === undefined && fallback !== undefined) {
+			rawPropVal = fallback;
+		}
 
 		if (units === null && typeof rawPropVal === 'string') {
 			const possibleUnits = unitOpts.filter((e) => rawPropVal.endsWith(e));
@@ -199,36 +233,13 @@
 
 		untrack(() => {
 			if (!res && currentVal != _initialVal) {
-				console.log(`[GymSlider ${name}] Syncing props -> local:`, currentVal);
 				_initialVal = currentVal;
 			}
 		});
 	});
 
-	// Sync local state (_initialVal) to props
-	$effect(() => {
-		const numVal = Number(_initialVal);
-		console.log(
-			`[GymSlider ${name}] Syncing local -> props. _initialVal =`,
-			_initialVal,
-			'numVal =',
-			numVal
-		);
-		untrack(() => {
-			let currentPropVal = applyFunctor(getProp(name, props));
-			if (units && typeof currentPropVal === 'string' && currentPropVal.endsWith(units)) {
-				const num = parseFloat(currentPropVal.slice(0, -units.length));
-				if (!isNaN(num)) {
-					currentPropVal = num;
-				}
-			}
-
-			if (!isNaN(numVal) && currentPropVal !== numVal) {
-				console.log(`[GymSlider ${name}] Calling setProp for numVal =`, numVal);
-				setProp(applyFunctor(numVal), name, props, units ?? undefined);
-			}
-		});
-	});
+	// Removed buggy local->props sync effect that was forcefully zeroing out undefined props.
+	// We now sync directly from the input's oninput event.
 
 	let _override = $derived.by(() => {
 		let v = getProp(name, props);
@@ -278,6 +289,9 @@
 			bind:props
 		/>{label ?? name}</span
 	>
+	{#if subLabel}
+		<div class="gym-sublabel" title={subLabel}>{subLabel}</div>
+	{/if}
 	<div class="gym-value">
 		<span class="value-indicator"
 			>{#if _override !== optDefault}{extraOpts.find((e) => e.value === _override)?.label ??
@@ -286,7 +300,26 @@
 					? (units ?? '')
 					: ''}{/if}</span
 		>
-		<input type="range" class:highlight-active={isMenuOpen} min={min ?? 0} max={max ?? 100} step={_step} bind:value={_initialVal} />
+		<input
+			type="range"
+			class:highlight-active={isMenuOpen}
+			min={min ?? 0}
+			max={max ?? 100}
+			step={_step}
+			bind:value={_initialVal}
+			oninput={(e) => {
+				const val = Number((e.target as HTMLInputElement).value);
+				if (!isNaN(val)) {
+					setProp(applyFunctor(val), name, props, units ?? undefined, true);
+				}
+			}}
+			onchange={(e) => {
+				const val = Number((e.target as HTMLInputElement).value);
+				if (!isNaN(val)) {
+					setProp(applyFunctor(val), name, props, units ?? undefined, false);
+				}
+			}}
+		/>
 	</div>
 	{#if !hideExtra}
 		<div class="gym-overrides">
@@ -342,7 +375,17 @@
 		font-size: 0.75em;
 		line-height: 1;
 		margin: 0;
-		padding: 0;
+	}
+
+	.gym-sublabel {
+		font-size: 0.65rem;
+		color: #888;
+		margin-top: -0.25em;
+		margin-bottom: 0.4em;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-family: monospace;
 	}
 
 	.highlight-active {

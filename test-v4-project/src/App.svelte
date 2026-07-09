@@ -77,7 +77,7 @@
 			class:dark={kitchenSinkProps.settings.theme === 'dark'}
 		>
 			<h1>{kitchenSinkProps.label}</h1>
-			<p style="white-space: pre-wrap;">{kitchenSinkProps.description}</p>
+			<p style="white-space: pre-wrap; --test-var: 42">{kitchenSinkProps.description}</p>
 			<p>Status: {kitchenSinkProps.isActive ? 'Active' : 'Inactive'}</p>
 			<p>Count: {kitchenSinkProps.count}</p>
 			<p>Offset: {kitchenSinkProps.offset}</p>
@@ -105,13 +105,32 @@
 			<h3>Basic Types</h3>
 			<ul>
 				<li><GymTextbox bind:props={kitchenSinkProps} name="label" label="Label Text" /></li>
-				<li><GymTextbox bind:props={kitchenSinkProps} name="description" label="Description" multiline={true}/></li>
-				<li><GymTextbox bind:props={kitchenSinkProps} name="numericString" label="Numeric String" /></li>
+				<li>
+					<GymTextbox
+						bind:props={kitchenSinkProps}
+						name="description"
+						label="Description"
+						multiline={true}
+					/>
+				</li>
+				<li>
+					<GymTextbox bind:props={kitchenSinkProps} name="numericString" label="Numeric String" />
+				</li>
 				<li><GymTextbox bind:props={kitchenSinkProps} name="isoDate" label="ISO Date" /></li>
 				<li><GymTextbox bind:props={kitchenSinkProps} name="usDate" label="US Date" /></li>
 				<li><GymCheckbox bind:props={kitchenSinkProps} name="isActive" label="Is Active?" /></li>
-				<li><GymSlider bind:props={kitchenSinkProps} name="count" min={0} max={10} label="Count" /></li>
-				<li><GymSlider bind:props={kitchenSinkProps} name="offset" min={-20} max={20} label="Offset" /></li>
+				<li>
+					<GymSlider bind:props={kitchenSinkProps} name="count" min={0} max={10} label="Count" />
+				</li>
+				<li>
+					<GymSlider
+						bind:props={kitchenSinkProps}
+						name="offset"
+						min={-20}
+						max={20}
+						label="Offset"
+					/>
+				</li>
 			</ul>
 
 			<h3>Nested Properties (JSON Path)</h3>

@@ -28,7 +28,7 @@
 			<li><GymCheckbox bind:props name="active" /></li>
 			<li><GymCheckbox bind:props name="spinner" /></li>
 		</ul>
-		<div>
+		<div data-testid="test-label">
 			<GymTextbox bind:props name="label" />
 		</div>
 	{/snippet}

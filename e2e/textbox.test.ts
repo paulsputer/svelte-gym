@@ -7,9 +7,9 @@ test.describe('GymTextbox', () => {
 		await page.goto('/?label=default+text');
 
 		// Wait for the page to be ready
-		await page.waitForSelector('.gym-control input[type="text"]');
+		await page.waitForSelector('[data-testid="test-label"] input[type="text"]');
 
-		const input = page.locator('.gym-control input[type="text"]').first();
+		const input = page.locator('[data-testid="test-label"] input[type="text"]');
 
 		// Verify initial state
 		await expect(input).toHaveValue('default text');

@@ -13,8 +13,11 @@
 	export let label: string | undefined = undefined;
 	export let hideExtra: boolean = false;
 	export let interpMenu: GymInterpolateMenu | undefined = undefined;
+	export let fallback: any = undefined;
+	export let subLabel: string | undefined = undefined;
 
 	let isMenuOpen = false;
+	let inputRef: HTMLInputElement;
 
 	$: _label = label ?? name;
 
@@ -61,6 +64,15 @@
 				case '%':
 					max = 100;
 					break;
+				case 'ms':
+					max = 1000;
+					break;
+				case 's':
+					max = 10;
+					break;
+				case 'deg':
+					max = 360;
+					break;
 				default:
 					max = 100;
 					break;
@@ -87,6 +99,9 @@
 
 		// React to external prop changes (e.g. via bind:scrollTop)
 		let rawVal = getProp(name, props);
+		if (rawVal === undefined && fallback !== undefined) {
+			rawVal = fallback;
+		}
 
 		// Strip units if it matches our current units or generally parse it
 		if (typeof rawVal === 'string') {
@@ -98,17 +113,29 @@
 			}
 		}
 
+		if (typeof rawVal === 'number') {
+			if (max !== null && rawVal > max) {
+				max = Math.ceil(rawVal * 1.5);
+			}
+			if (min !== null && rawVal < min) {
+				min = Math.floor(rawVal * 1.5);
+			}
+		}
+
 		const currentVal = rawVal;
 		if (currentVal != _initialVal) {
-			_initialVal = currentVal;
+			if (typeof document !== 'undefined' && document.activeElement === inputRef) {
+				// User is actively dragging this slider, do not forcefully overwrite value
+			} else {
+				_initialVal = currentVal;
+			}
 		}
 	}
 
 	const extraOpts = [
 		{ label: 'NaN', value: 'NaN' },
 		{ label: 'Inf', value: Infinity },
-		{ label: 'null', value: null },
-		{ label: 'undefined', value: 'undefined' }
+		{ label: 'null', value: null }
 	];
 
 	const unitOpts = [
@@ -124,7 +151,13 @@
 		'dvh',
 		'svw',
 		'lvw',
-		'dvw'
+		'dvw',
+		'ms',
+		's',
+		'deg',
+		'rad',
+		'turn',
+		'fr'
 	];
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -136,7 +169,11 @@
 		return v;
 	}
 
-	let _initialVal = applyFunctor(getProp(name, props));
+	let _initialVal = (() => {
+		let v = getProp(name, props);
+		if (v === undefined && fallback !== undefined) return applyFunctor(fallback);
+		return applyFunctor(v);
+	})();
 
 	$: _decimals = (() => {
 		const s = String(_step);
@@ -204,14 +241,6 @@
 		setProp(applyFunctor(_initialVal), name, props, units ?? undefined);
 		props = props;
 	}
-
-	function handleInput(e: Event) {
-		const target = e.target as HTMLInputElement;
-		_props._override = optDefault;
-		_initialVal = +target.value;
-		setProp(applyFunctor(+target.value), name, props, units ?? undefined);
-		props = props;
-	}
 </script>
 
 <div class="gym-control">
@@ -227,6 +256,9 @@
 			bind:props
 		/>{_label}</span
 	>
+	{#if subLabel}
+		<div class="gym-sublabel" title={subLabel}>{subLabel}</div>
+	{/if}
 	<div class="gym-value">
 		<span class="value-indicator"
 			>{#if _props._override !== optDefault}{extraOpts.find((e) => e.value === _props._override)
@@ -236,13 +268,27 @@
 					: ''}{/if}</span
 		>
 		<input
+			bind:this={inputRef}
 			class:highlight-active={isMenuOpen}
 			type="range"
 			min={min ?? 0}
 			max={max ?? 100}
 			step={_step}
-			on:input={handleInput}
 			bind:value={_initialVal}
+			on:input={(e) => {
+				const val = Number(e.target.value);
+				if (!isNaN(val)) {
+					setProp(applyFunctor(val), name, props, units ?? undefined, true);
+					props = props;
+				}
+			}}
+			on:change={(e) => {
+				const val = Number(e.target.value);
+				if (!isNaN(val)) {
+					setProp(applyFunctor(val), name, props, units ?? undefined, false);
+					props = props;
+				}
+			}}
 		/>
 	</div>
 	{#if !hideExtra}
@@ -283,6 +329,17 @@
 	input[type='range'] {
 		width: 100%;
 		box-sizing: border-box;
+	}
+
+	.gym-sublabel {
+		font-size: 0.65rem;
+		color: #888;
+		margin-top: -0.25em;
+		margin-bottom: 0.4em;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-family: monospace;
 	}
 
 	.value-indicator {

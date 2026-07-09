@@ -45,15 +45,9 @@ export function setProp(v, name, props, postfix, excludePermaLink) {
 		finalVal += postfix;
 	}
 
-	console.log(
-		`[setProp debug] name=${name} setting value on base:`,
-		base ? JSON.stringify(base) : 'null',
-		`to finalVal=${finalVal}`
-	);
 	if (base) {
 		/** @type {any} */ (base)[parts.slice(-1)[0]] = finalVal;
 	}
-	console.log(`[setProp debug] base after set:`, base ? JSON.stringify(base) : 'null');
 
 	if (!(excludePermaLink ?? false) && typeof window !== 'undefined') {
 		const url = new URL(window.location.href);

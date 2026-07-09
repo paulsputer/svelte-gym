@@ -24,7 +24,14 @@
 </div>
 
 <style>
+	:root {
+		--primary-inactive: green;
+	}
 	.button {
+		/* CSS variable scenarios for testing extractor */
+		--unused-variable: 42px;
+		--another-unused: oklch(0.5 0.2 200);
+
 		--background-color: var(--primary-inactive);
 		--foreground-color: var(--primary);
 		--fade-time: 500ms;
@@ -32,12 +39,15 @@
 		font-family: sans-serif;
 		position: relative;
 		min-width: 10em;
-		border-radius: 0.5em;
+		border-radius: var(--custom-radius, 0.5em);
+		box-shadow: var(--shadow-offset-x, 2px) var(--shadow-offset-y, 2px) var(--shadow-blur, 10px)
+			var(--shadow-color, rgba(0, 0, 0, 0.2));
+		transform: scale(var(--scale-factor, 1));
 		line-height: 3em;
 		text-align: center;
 		text-transform: uppercase;
 		color: var(--foreground-color);
-		border: 1px solid var(--primary);
+		border: 1px solid var(--border-color, var(--primary));
 		background-color: var(--background-color);
 		/* Prevent the button from popping out of it's parent horizontally */
 		min-width: 0;
@@ -62,6 +72,7 @@
 		align-items: center;
 		opacity: 0;
 		transition: opacity var(--fade-time) ease-in-out;
+		--test: 42;
 	}
 
 	.button .label-holder {

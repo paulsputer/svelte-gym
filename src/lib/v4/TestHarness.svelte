@@ -1,5 +1,16 @@
 <script lang="ts">
 	import { restoreProps, setProp } from './helpers.js';
+	import {
+		gridOptions,
+		getGridClassFromValue,
+		getAnchorStyles,
+		resetAnimations,
+		getPermalinkUrl,
+		getResetUrl,
+		parseCssVars,
+		filterCssVarsByTab,
+		type CssVarData
+	} from '../harnessHelpers.js';
 	import { onMount } from 'svelte';
 
 	import GymCheckbox from './GymCheckbox.svelte';
@@ -7,6 +18,8 @@
 	import GymButton from './GymButton.svelte';
 	import GymDropdown from './GymDropdown.svelte';
 	import GymLog from './GymLog.svelte';
+	import GymColorPicker from './GymColorPicker.svelte';
+	import GymTextbox from './GymTextbox.svelte';
 
 	export let maxWidth: number | null = null;
 	export let maxHeight: number | null = null;
@@ -14,15 +27,32 @@
 	export let log: string[] | undefined = undefined;
 
 	let activeTab = $$slots.controls ? 'specific' : 'basic';
+	let initialTab = activeTab;
 	if (typeof window !== 'undefined') {
-		const tab = new URL(window.location.href).searchParams.get('__tab');
-		if (tab === 'basic' || tab === 'specific' || tab === 'logs') {
-			activeTab = tab;
+		const urlTab = new URL(window.location.href).searchParams.get('__tab');
+		if (urlTab === 'basic' || urlTab === 'specific' || urlTab === 'logs') {
+			initialTab = urlTab;
 		}
 	}
+	let tab = initialTab;
+	let cssVarTab = 'All';
 	let logsFullscreen = false;
 
-	$: if (activeTab !== 'logs') {
+	let cssVars: CssVarData[] = [];
+	let componentContainer: HTMLElement | undefined = undefined;
+	let cssVarObserver: MutationObserver | undefined = undefined;
+	let cssVarTimeout: number | undefined = undefined;
+
+	$: cssVarStyles = cssVars
+		.map((v) =>
+			props[`__var_${v.name}`] !== undefined && props[`__var_${v.name}`] !== ''
+				? `${v.name}: ${props[`__var_${v.name}`]};`
+				: ''
+		)
+		.filter(Boolean)
+		.join(' ');
+
+	$: if (tab !== 'logs') {
 		logsFullscreen = false;
 	}
 
@@ -54,108 +84,6 @@
 		}
 	}
 
-	const gridOptions = [
-		{ value: '0-grid-light-mode', class: 'grid bg-0 light-mode' },
-		{ value: '10-grid-light-mode', class: 'grid bg-10 light-mode' },
-		{ value: '20-grid-light-mode', class: 'grid bg-20 light-mode' },
-		{ value: '50-grid-light-mode', class: 'grid bg-50 light-mode' },
-		{ value: '100-grid-light-mode', class: 'grid bg-100 light-mode' },
-
-		{ value: '0-grid-dark-mode', class: 'grid bg-0 dark-mode' },
-		{ value: '10-grid-dark-mode', class: 'grid bg-10 dark-mode' },
-		{ value: '20-grid-dark-mode', class: 'grid bg-20 dark-mode' },
-		{ value: '50-grid-dark-mode', class: 'grid bg-50 dark-mode' },
-		{ value: '100-grid-dark-mode', class: 'grid bg-100 dark-mode' },
-
-		{ value: '10-text-light-mode', class: 'text bg-10 light-mode' },
-		{ value: '20-text-light-mode', class: 'text bg-20 light-mode' },
-		{ value: '50-text-light-mode', class: 'text bg-50 light-mode' },
-		{ value: '100-text-light-mode', class: 'text bg-100 light-mode' },
-
-		{ value: '10-text-dark-mode', class: 'text bg-10 dark-mode' },
-		{ value: '20-text-dark-mode', class: 'text bg-20 dark-mode' },
-		{ value: '50-text-dark-mode', class: 'text bg-50 dark-mode' },
-		{ value: '100-text-dark-mode', class: 'text bg-100 dark-mode' }
-	];
-
-	function getGridClassFromValue(v: string | boolean) {
-		const ov = v;
-
-		if (v === true || v === 'true') {
-			v = '20-grid-light-mode';
-		} else if (v === false || v === 'false') {
-			v = '';
-		}
-
-		switch (v) {
-			case 'none': {
-				v = '';
-				break;
-			}
-			case 'light': {
-				v = '20-grid-light-mode';
-				break;
-			}
-			case 'dark':
-				v = '50-grid-light-mode';
-				break;
-			case 'black':
-				v = '100-grid-light-mode';
-				break;
-			case 'white':
-				v = '100-grid-dark-mode';
-				break;
-			case 'textBlack':
-				v = '100-text-light-mode';
-				break;
-			case 'textWhite':
-				v = '100-text-dark-mode';
-				break;
-		}
-
-		if (ov != v) {
-			console.warn(`depreciated option ${ov} use ${v} instead`);
-		}
-		const g = gridOptions.filter((e) => e.value === v);
-
-		if (g.length > 0) {
-			return g[0].class;
-		}
-
-		return '';
-	}
-
-	/**
-	 * Translates anchor settings to CSS alignment values.
-	 * Format: 'vertical-horizontal' (e.g., 'top-left', 'center-right').
-	 * Default: 'center-center'
-	 */
-	function getAnchorStyles(anchor: string | undefined) {
-		const a = anchor || 'center-center';
-		switch (a) {
-			case 'top-left':
-				return { justify: 'flex-start', align: 'flex-start', margin: '0' };
-			case 'top-center':
-				return { justify: 'center', align: 'flex-start', margin: '0' };
-			case 'top-right':
-				return { justify: 'flex-end', align: 'flex-start', margin: '0' };
-			case 'center-left':
-				return { justify: 'flex-start', align: 'center', margin: '0' };
-			case 'center-center':
-				return { justify: 'center', align: 'center', margin: 'auto' };
-			case 'center-right':
-				return { justify: 'flex-end', align: 'center', margin: '0' };
-			case 'bottom-left':
-				return { justify: 'flex-start', align: 'flex-end', margin: '0' };
-			case 'bottom-center':
-				return { justify: 'center', align: 'flex-end', margin: '0' };
-			case 'bottom-right':
-				return { justify: 'flex-end', align: 'flex-end', margin: '0' };
-			default:
-				return { justify: 'center', align: 'center', margin: 'auto' };
-		}
-	}
-
 	let maxScroll = 0;
 
 	function updateMaxScroll() {
@@ -182,6 +110,16 @@
 			initialRestoration = false;
 		}
 
+		setTimeout(extractCssVars, 100);
+
+		cssVarObserver = new MutationObserver(() => {
+			if (cssVarTimeout) clearTimeout(cssVarTimeout);
+			cssVarTimeout = window.setTimeout(extractCssVars, 250);
+		});
+		if (componentContainer) {
+			cssVarObserver.observe(componentContainer, { childList: true, subtree: true });
+		}
+
 		const resizeObserver = new ResizeObserver(() => {
 			updateMaxScroll();
 		});
@@ -199,54 +137,38 @@
 			resizeObserver.disconnect();
 			window.removeEventListener('resize', updateMaxScroll);
 			window.removeEventListener('popstate', onPopState);
+			if (cssVarObserver) cssVarObserver.disconnect();
+			if (cssVarTimeout) clearTimeout(cssVarTimeout);
 		};
 	});
 
-	function resetAnimations() {
-		console.info('Svelte-Gym: Animations Reset');
-		document.getAnimations().forEach((a) => {
-			a.cancel();
-			a.play();
-		});
-		window.dispatchEvent(new CustomEvent('gymResetInterpolations'));
+	function extractCssVars() {
+		if (!componentContainer) return;
+		cssVars = parseCssVars(componentContainer);
+
+		let propsChanged = false;
+		for (const v of cssVars) {
+			const propName = `__var_${v.name}`;
+			if (!(propName in props)) {
+				props[propName] = undefined;
+				propsChanged = true;
+			}
+		}
+		if (propsChanged) props = props;
 	}
 
 	let permalinkLabel = 'Copy Permalink';
 
 	async function copyPermalink(e: Event) {
 		e.preventDefault();
-		const url = new URL(window.location.href);
-		if (props.__scrollY != null) {
-			url.searchParams.set('__scrollY', '' + props.__scrollY);
-		} else {
-			url.searchParams.delete('__scrollY');
-		}
-		await navigator.clipboard.writeText(url.toString());
+		const url = getPermalinkUrl(window.location.href, props.__scrollY);
+		await navigator.clipboard.writeText(url);
 		permalinkLabel = 'Copied!';
 		setTimeout(() => (permalinkLabel = 'Copy Permalink'), 1500);
 	}
 
 	function resetProps() {
-		const url = new URL(window.location.href);
-		const keys = Array.from(url.searchParams.keys());
-		
-		for (const key of keys) {
-			let isBasic = false;
-			if (key.startsWith('__interp_')) {
-				isBasic = key.startsWith('__interp___');
-			} else {
-				isBasic = key.startsWith('__');
-			}
-
-			if (activeTab === 'basic' && isBasic) {
-				url.searchParams.delete(key);
-			} else if (activeTab === 'specific' && !isBasic) {
-				url.searchParams.delete(key);
-			}
-		}
-
-		url.searchParams.set('__tab', activeTab);
-		window.location.href = url.toString();
+		window.location.href = getResetUrl(window.location.href, tab);
 	}
 
 	function updateScroll() {
@@ -287,6 +209,7 @@
 			<div
 				class="test-component"
 				class:highlight={props.__highlight}
+				bind:this={componentContainer}
 				style="
 					--w: {props.__width};
 					--h: {props.__height};
@@ -294,6 +217,7 @@
 					--component-justify: {anchorStyles.justify};
 					--component-align: {anchorStyles.align};
 					--component-margin: {anchorStyles.margin};
+					{cssVarStyles}
 				"
 			>
 				{#if $$slots.componentToTest}
@@ -305,16 +229,14 @@
 		</div>
 		<div class="test-controls" class:logs-fullscreen={logsFullscreen}>
 			<div class="tabs">
-				<button class:active={activeTab === 'basic'} on:click={() => (activeTab = 'basic')}
-					>Basic</button
-				>
+				<button class:active={tab === 'basic'} on:click={() => (tab = 'basic')}>Basic</button>
 				{#if $$slots.controls}
-					<button class:active={activeTab === 'specific'} on:click={() => (activeTab = 'specific')}
+					<button class:active={tab === 'specific'} on:click={() => (tab = 'specific')}
 						>Specific</button
 					>
 				{/if}
 				{#if $$slots.logs || log}
-					<button class:active={activeTab === 'logs'} on:click={() => (activeTab = 'logs')}>
+					<button class:active={tab === 'logs'} on:click={() => (tab = 'logs')}>
 						Logs
 						{#if log && log.length > 0}
 							<span class="log-count">{log.length}</span>
@@ -323,9 +245,11 @@
 				{/if}
 			</div>
 
-			<div style:display={activeTab === 'basic' ? 'block' : 'none'}>
+			<div style:display={tab === 'basic' ? 'block' : 'none'}>
 				<span style="display: flex; justify-content: space-between; align-items: center;">
-					<button type="button" class="link-button" on:click={copyPermalink}>{permalinkLabel}</button>
+					<button type="button" class="link-button" on:click={copyPermalink}
+						>{permalinkLabel}</button
+					>
 					<button type="button" class="link-button" on:click={resetProps}>Reset</button>
 				</span>
 				<hr />
@@ -402,11 +326,85 @@
 					name="__scrollY"
 					label="scrollY"
 				/>
+				{#if cssVars.length > 0}
+					<div class="harness-section props-section props-css-vars">
+						<div class="gym-section-header">
+							<span class="gym-label" style="margin-bottom: 0;">CSS Variables</span>
+							<span class="gym-badge">{cssVars.length}</span>
+						</div>
+
+						<div class="gym-sub-tabs">
+							{#each ['All', 'Defined', 'Inherited', 'Unset', 'Unused'] as tabName}
+								<button
+									class="gym-sub-tab"
+									class:active={cssVarTab === tabName}
+									on:click={() => (cssVarTab = tabName)}>{tabName}</button
+								>
+							{/each}
+						</div>
+
+						{#each filterCssVarsByTab(cssVars, cssVarTab) as v}
+							<div class="gym-css-var-row {v.isDefined ? '' : 'undefined-prop'}">
+								<div class="gym-css-var-badges">
+									{#if !v.isDefined}
+										<span class="gym-badge gym-badge-unset">unset</span>
+									{:else if v.definedBy === 'Inherited'}
+										<span class="gym-badge gym-badge-defined" title={v.definedBy}
+											>{v.definedBy}</span
+										>
+									{/if}
+									{#if !v.isUsed}
+										<span class="gym-badge gym-badge-unused">unused</span>
+									{/if}
+								</div>
+								{#if v.type === 'color'}
+									<GymColorPicker
+										bind:props
+										name="__var_{v.name}"
+										label={v.label}
+										hideExtra={true}
+										fallback={v.fallback}
+										subLabel={v.isDefined && v.definedBy && v.definedBy !== 'Inherited'
+											? `defined in: ${v.definedBy}`
+											: undefined}
+									/>
+								{:else if v.type === 'number'}
+									<GymSlider
+										bind:props
+										name="__var_{v.name}"
+										label={v.label}
+										hideExtra={true}
+										units={v.unit || undefined}
+										fallback={v.fallback
+											? Number(v.fallback.replace(/[a-zA-Z%]+$/, ''))
+											: undefined}
+										subLabel={v.isDefined && v.definedBy && v.definedBy !== 'Inherited'
+											? `defined in: ${v.definedBy}`
+											: undefined}
+									/>
+								{:else}
+									<GymTextbox
+										bind:props
+										name="__var_{v.name}"
+										label={v.label}
+										hideExtra={true}
+										fallback={v.fallback}
+										subLabel={v.isDefined && v.definedBy && v.definedBy !== 'Inherited'
+											? `defined in: ${v.definedBy}`
+											: undefined}
+									/>
+								{/if}
+							</div>
+						{/each}
+					</div>
+				{/if}
 			</div>
 
-			<div style:display={activeTab === 'specific' ? 'block' : 'none'}>
+			<div style:display={tab === 'specific' ? 'block' : 'none'}>
 				<span style="display: flex; justify-content: space-between; align-items: center;">
-					<button type="button" class="link-button" on:click={copyPermalink}>{permalinkLabel}</button>
+					<button type="button" class="link-button" on:click={copyPermalink}
+						>{permalinkLabel}</button
+					>
 					<button type="button" class="link-button" on:click={resetProps}>Reset</button>
 				</span>
 				<hr />
@@ -416,10 +414,27 @@
 				</span>
 			</div>
 
-			<div style:display={activeTab === 'logs' ? 'flex' : 'none'} class="logs-tab">
-				<span class="logs-header" style="display: flex; justify-content: space-between; align-items: center;">
-					<button type="button" class="link-button" on:click={() => logsFullscreen = !logsFullscreen}>{logsFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</button>
-					<button type="button" class="link-button" on:click={() => { if (log) { log.length = 0; log = log; } }}>Reset</button>
+			<div style:display={tab === 'logs' ? 'flex' : 'none'} class="logs-tab">
+				<span
+					class="logs-header"
+					style="display: flex; justify-content: space-between; align-items: center;"
+				>
+					<button
+						type="button"
+						class="link-button"
+						on:click={() => (logsFullscreen = !logsFullscreen)}
+						>{logsFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</button
+					>
+					<button
+						type="button"
+						class="link-button"
+						on:click={() => {
+							if (log) {
+								log.length = 0;
+								log = log;
+							}
+						}}>Reset</button
+					>
 				</span>
 				<hr />
 				{#if $$slots.logs}
@@ -436,6 +451,12 @@
 	:root {
 		--control-area-width: 320px;
 		--bg-color: #fff;
+		--gym-primary: #000;
+		--gym-bg: #fff;
+		--gym-bg-hover: rgba(0, 0, 0, 0.05);
+		--gym-border: rgba(0, 0, 0, 0.1);
+		--gym-text-muted: #555;
+		--gym-text: #000;
 	}
 
 	section hr {
@@ -732,6 +753,91 @@
 		background: #333;
 		border-color: #3e3e3e;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+	}
+
+	.gym-css-var-row {
+		position: relative;
+		margin-bottom: 0.5em;
+	}
+
+	.gym-css-var-badges {
+		display: flex;
+		gap: 4px;
+		position: absolute;
+		top: 6px;
+		right: 12px;
+		z-index: 2;
+	}
+
+	.gym-badge {
+		font-size: 0.65rem;
+		padding: 2px 4px;
+		border-radius: 3px;
+		font-family: monospace;
+		text-transform: uppercase;
+		font-weight: bold;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 100px;
+		border: 1px solid rgba(0, 0, 0, 0.18);
+		background: rgba(255, 255, 255, 0.45);
+		color: #999;
+	}
+
+	.gym-badge-unset {
+		color: #c62828;
+		background: rgba(255, 205, 210, 0.5);
+		border-color: #ef9a9a;
+	}
+
+	.gym-badge-unused {
+		color: #f57f17;
+		background: rgba(255, 249, 196, 0.5);
+		border-color: #fff59d;
+	}
+
+	.gym-section-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		background: rgba(0, 0, 0, 0.05);
+		padding: 0.5em 0.75em;
+		border-top: 1px solid var(--gym-border);
+		border-bottom: 1px solid var(--gym-border);
+		margin-top: 1em;
+		margin-bottom: 0.75em;
+	}
+
+	.gym-badge-defined {
+		background: #e0f2fe;
+		color: #0284c7;
+		border-color: #7dd3fc;
+	}
+
+	.gym-sub-tabs {
+		display: flex;
+		gap: 0.25rem;
+		margin-bottom: 1rem;
+		padding: 0 0.5rem;
+	}
+	.gym-sub-tab {
+		background: var(--gym-bg-hover);
+		border: 1px solid var(--gym-border);
+		color: var(--gym-text-muted);
+		cursor: pointer;
+		padding: 0.15rem 0.25rem;
+		border-radius: 4px;
+		font-family: inherit;
+		font-size: 0.75rem;
+	}
+	.gym-sub-tab:hover {
+		color: var(--gym-text);
+	}
+	.gym-sub-tab.active {
+		background: var(--gym-primary);
+		color: var(--gym-bg);
+		border-color: var(--gym-primary);
 	}
 
 	/* ================================================================

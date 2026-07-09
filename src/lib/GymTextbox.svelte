@@ -11,6 +11,9 @@
 		hideExtra?: boolean;
 		multiline?: boolean;
 		interpMenu?: GymInterpolateMenu;
+		subLabel?: string;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		fallback?: any;
 	}
 
 	let {
@@ -19,15 +22,14 @@
 		label = name,
 		hideExtra = false,
 		multiline = false,
-		interpMenu = $bindable()
+		interpMenu = $bindable(),
+		subLabel = undefined,
+		fallback = undefined
 	}: GymTextboxProps = $props();
 
 	const optDefault = 'NONE';
 
-	const extraOpts = [
-		{ label: 'null', value: null },
-		{ label: 'undefined', value: 'undefined' }
-	];
+	const extraOpts = [{ label: 'null', value: null }];
 
 	let _initialVal = $state('');
 	let inputRef: HTMLInputElement | HTMLTextAreaElement | undefined = $state();
@@ -74,12 +76,16 @@
 			bind:props
 		/>{label ?? name}</span
 	>
+	{#if subLabel}
+		<div class="gym-sublabel" title={subLabel}>{subLabel}</div>
+	{/if}
 	<div class="gym-value">
 		{#if multiline}
 			<textarea
 				class:highlight-active={isMenuOpen}
 				bind:this={inputRef}
 				bind:value={_initialVal}
+				placeholder={fallback ?? ''}
 				oninput={(e) => {
 					setProp((e.target as HTMLTextAreaElement).value, name, props);
 				}}
@@ -90,6 +96,7 @@
 				bind:this={inputRef}
 				type="text"
 				bind:value={_initialVal}
+				placeholder={fallback ?? ''}
 				oninput={(e) => {
 					setProp((e.target as HTMLInputElement).value, name, props);
 				}}
@@ -140,6 +147,26 @@
 		background-color: #fff;
 		width: 100%;
 		box-sizing: border-box;
+	}
+
+	.gym-sublabel {
+		font-size: 0.65rem;
+		color: #888;
+		margin-top: -0.25em;
+		margin-bottom: 0.4em;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-family: monospace;
+	}
+
+	.gym-value input {
+		width: 100%;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		background: #fff;
+		padding: 4px;
+		font-family: monospace;
 	}
 
 	textarea {
